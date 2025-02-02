@@ -1,0 +1,28 @@
+{
+  "name": "ast-v8-to-istanbul",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --experimental-strip-types test/example.test.ts",
+    "watch": "node --watch --experimental-strip-types test/example.test.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@jridgewell/trace-mapping": "^0.3.25",
+    "estree-walker": "^3.0.3",
+    "istanbul-lib-coverage": "^3.2.2",
+    "vite": "^6.0.7"
+  },
+  "devDependencies": {
+    "@types/estree": "^1.0.6",
+    "@types/istanbul-lib-coverage": "^2.0.6",
+    "@types/node": "^22.10.9",
+    "istanbul-lib-report": "^3.0.1",
+    "istanbul-reports": "^3.1.7",
+    "rollup": "^4.32.1"
+  }
+}
