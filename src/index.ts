@@ -48,8 +48,8 @@ export default async function convert(options: {
       addFunction({
         coverageMap,
         covered,
-        loc: { start: loc.start, end: loc.end },
-        decl: { start: loc.start, end: loc.end },
+        loc,
+        decl: loc,
         filename: options.coverage.url,
         name: getFunctionName(node),
       });

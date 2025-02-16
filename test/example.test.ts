@@ -5,7 +5,7 @@ import { test } from "vitest";
 
 import convert from "../src/index.ts";
 import { functions } from "./fixtures/functions.ts";
-import { sources } from "./fixtures/sources.ts";
+import { sources } from "./fixtures/functions/sources.ts";
 
 const WRAPPER_LENGHT = 185;
 
