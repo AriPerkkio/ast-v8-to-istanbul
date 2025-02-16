@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node --experimental-strip-types test/example.test.ts",
-    "watch": "node --watch --experimental-strip-types test/example.test.ts"
+    "watch": "node --watch --experimental-strip-types test/example.test.ts",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "@types/node": "^22.10.9",
     "istanbul-lib-report": "^3.0.1",
     "istanbul-reports": "^3.1.7",
-    "rollup": "^4.32.1"
+    "rollup": "^4.32.1",
+    "vitest": "^3.0.5"
   }
 }

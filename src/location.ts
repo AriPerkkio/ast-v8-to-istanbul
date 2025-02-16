@@ -15,22 +15,21 @@ export function offsetToNeedle(offset: number, code: string): Needle {
     line = index + 1;
 
     if (current >= offset - 1) {
-      globalThis.debug && console.log("Found", { offset, current, line });
-      return { column: Math.max(0, offset - current), line };
-    }
-
-    if (content.length >= offset - current) {
       return { column: Math.max(0, offset - current), line };
     }
 
     current += content.length;
+
+    if (content.length >= offset) {
+      return { column: Math.max(0, offset - current), line };
+    }
   }
 
   return { line, column: offset - current };
 }
 
 export function needleToOffset(
-  needle: ReturnType<typeof originalPositionFor>,
+  needle: { column: number; line: number } | { column: null; line: null },
   code: string,
   bias = 0
 ): number {

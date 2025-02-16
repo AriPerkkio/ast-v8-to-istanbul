@@ -4,7 +4,6 @@ import {
   type Needle,
   type SourceMapInput,
 } from "@jridgewell/trace-mapping";
-import type { Program } from "estree";
 import type { Profiler } from "node:inspector";
 
 import { offsetToNeedle } from "./location.ts";
@@ -24,8 +23,9 @@ export default async function convert(options: {
 
   const map = new TraceMap(options.sourceMap);
   const coverageMap = createCoverageMap(options.coverage.url);
+  const ast = await options.getAst(options.code);
 
-  await walk(await options.getAst(options.code), {
+  await walk(ast, {
     onFunctionDeclaration(node) {
       const loc = {
         start: getPosition(offsetToNeedle(node.start, options.code)),
@@ -36,12 +36,6 @@ export default async function convert(options: {
         start: getPosition(offsetToNeedle(node.id.start, options.code)),
         end: getPosition(offsetToNeedle(node.id.end, options.code)),
       };
-
-      console.log({
-        node,
-        start: offsetToNeedle(node.id.start, options.code),
-        end: offsetToNeedle(node.id.end, options.code),
-      });
 
       let covered = 0;
       const start = node.start + wrapperLength;
