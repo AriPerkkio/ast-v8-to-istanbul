@@ -5,8 +5,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --experimental-strip-types test/example.test.ts",
-    "watch": "node --watch --experimental-strip-types test/example.test.ts",
     "test": "vitest"
   },
   "keywords": [],

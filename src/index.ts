@@ -32,11 +32,6 @@ export default async function convert(options: {
         end: getPosition(offsetToNeedle(node.end, options.code)),
       };
 
-      const decl = {
-        start: getPosition(offsetToNeedle(node.id.start, options.code)),
-        end: getPosition(offsetToNeedle(node.id.end, options.code)),
-      };
-
       let covered = 0;
       const start = node.start + wrapperLength;
       const end = node.end + wrapperLength;
@@ -54,7 +49,7 @@ export default async function convert(options: {
         coverageMap,
         covered,
         loc: { start: loc.start, end: loc.end },
-        decl: { start: decl.start, end: decl.end },
+        decl: { start: loc.start, end: loc.end },
         filename: options.coverage.url,
         name: getFunctionName(node),
       });
