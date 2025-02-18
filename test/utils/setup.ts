@@ -13,7 +13,7 @@ expect.addSnapshotSerializer({
       config,
       indentation,
       depth,
-      refs
+      refs,
     );
   },
 });
@@ -26,7 +26,7 @@ expect.addSnapshotSerializer({
       config,
       indentation,
       depth,
-      refs
+      refs,
     );
   },
 });
@@ -41,14 +41,14 @@ expect.addSnapshotSerializer({
     indentation,
     depth,
     refs,
-    printer
+    printer,
   ) => {
     const summary = val.reduce(
       (all, current) => ({
         ...all,
         [current.path]: formatSummary(current.toSummary()),
       }),
-      {}
+      {},
     );
 
     return printer(summary, config, indentation, depth, refs);
@@ -61,6 +61,6 @@ function formatSummary(summary: CoverageSummary) {
       ...all,
       [current]: `${summary[current].covered}/${summary[current].total} (${summary[current].pct}%)`,
     }),
-    {}
+    {},
   );
 }

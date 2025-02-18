@@ -1,7 +1,7 @@
-import esbuild from "esbuild";
 import { readdir, rm, writeFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
 import inspector, { Profiler } from "node:inspector";
+import { fileURLToPath } from "node:url";
+import esbuild from "esbuild";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 
@@ -24,13 +24,13 @@ export async function setup() {
     });
 
     const coverage = await collectCoverage(
-      () => import(`${root}/fixtures/${directory}/execute.ts`)
+      () => import(`${root}/fixtures/${directory}/execute.ts`),
     );
 
     await writeFile(
       `${root}/fixtures/${directory}/dist/coverage.json`,
       JSON.stringify(coverage, null, 2),
-      "utf8"
+      "utf8",
     );
   }
 }
@@ -54,7 +54,7 @@ async function collectCoverage(method: () => void | Promise<void>) {
 
       const filtered = data.result.filter(
         (entry) =>
-          entry.url.includes("test/fixtures") && entry.url.includes("/dist/")
+          entry.url.includes("test/fixtures") && entry.url.includes("/dist/"),
       );
 
       resolve(filtered);

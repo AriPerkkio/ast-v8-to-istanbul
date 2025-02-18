@@ -1,7 +1,7 @@
+import { fileURLToPath } from "node:url";
 import type { Needle } from "@jridgewell/trace-mapping";
 import { TraceMap } from "@jridgewell/trace-mapping";
 import libCoverage, { type CoverageMap } from "istanbul-lib-coverage";
-import { fileURLToPath } from "node:url";
 
 export function createCoverageMap(filename: string, sourceMap: TraceMap) {
   const coverageMap: CoverageMap = libCoverage.createCoverageMap();
@@ -32,7 +32,7 @@ export function addFunction(options: {
   loc: { start: Needle; end: Needle };
 }) {
   const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
-  let index =
+  const index =
     1 +
     (Object.keys(fileCoverage.f)
       .map((key) => parseInt(key))

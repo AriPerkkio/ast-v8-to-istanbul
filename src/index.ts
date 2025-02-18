@@ -1,15 +1,15 @@
+import type { Profiler } from "node:inspector";
+import { fileURLToPath } from "node:url";
 import {
   originalPositionFor,
   TraceMap,
   type Needle,
   type SourceMapInput,
 } from "@jridgewell/trace-mapping";
-import type { Profiler } from "node:inspector";
-import { fileURLToPath } from "node:url";
 
-import { offsetToNeedle } from "./location.ts";
-import { getFunctionName, walk } from "./ast.ts";
-import { addFunction, createCoverageMap } from "./coverage-map.ts";
+import { getFunctionName, walk } from "./ast";
+import { addFunction, createCoverageMap } from "./coverage-map";
+import { offsetToNeedle } from "./location";
 
 export default async function convert(options: {
   code: string;
@@ -17,7 +17,7 @@ export default async function convert(options: {
   sourceMap: SourceMapInput;
   coverage: Profiler.ScriptCoverage;
   getAst: (
-    code: string
+    code: string,
   ) => Parameters<typeof walk>[0] | Promise<Parameters<typeof walk>[0]>;
   debug?: boolean;
 }) {
@@ -55,7 +55,9 @@ export default async function convert(options: {
       const originalFilename = loc.start.filename || loc.end.filename;
 
       if (!originalFilename) {
-        throw new Error(`Missing original fiulename for ${loc}`);
+        throw new Error(
+          `Missing original filename for ${JSON.stringify(loc, null, 2)}`,
+        );
       }
 
       addFunction({
@@ -64,7 +66,7 @@ export default async function convert(options: {
         loc,
         decl: loc,
         filename: fileURLToPath(
-          new URL(originalFilename, options.coverage.url)
+          new URL(originalFilename, options.coverage.url),
         ),
         name: getFunctionName(node),
       });
@@ -81,8 +83,8 @@ export default async function convert(options: {
         `Position is InvalidOriginalMapping ${JSON.stringify(
           { position: { line, column }, needle },
           null,
-          2
-        )}`
+          2,
+        )}`,
       );
     }
 

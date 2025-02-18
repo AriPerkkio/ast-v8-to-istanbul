@@ -1,4 +1,4 @@
-import { type Needle, originalPositionFor } from "@jridgewell/trace-mapping";
+import { type Needle } from "@jridgewell/trace-mapping";
 
 const EOF_PATTERN = /(?<=\r?\n)/u;
 
@@ -31,7 +31,7 @@ export function offsetToNeedle(offset: number, code: string): Needle {
 export function needleToOffset(
   needle: { column: number; line: number } | { column: null; line: null },
   code: string,
-  bias = 0
+  bias = 0,
 ): number {
   let offset = 0;
 
@@ -48,6 +48,6 @@ export function needleToOffset(
   }
 
   throw new Error(
-    `Unable to find offset for ${JSON.stringify(needle, null, 2)}`
+    `Unable to find offset for ${JSON.stringify(needle, null, 2)}`,
   );
 }

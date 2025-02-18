@@ -1,19 +1,19 @@
+import { readFile } from "node:fs/promises";
+import { Profiler } from "node:inspector";
+import { normalize, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { SourceMapInput } from "@jridgewell/trace-mapping";
 import {
   CoverageMap,
   createCoverageMap,
   FileCoverageData,
 } from "istanbul-lib-coverage";
-import reports from "istanbul-reports";
 import libReport from "istanbul-lib-report";
-import { readFile } from "node:fs/promises";
-import { Profiler } from "node:inspector";
-import { normalize, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import reports from "istanbul-reports";
 
 export async function readFixture(filename: string) {
   const root = fileURLToPath(
-    new URL(`../fixtures/${filename}`, import.meta.url)
+    new URL(`../fixtures/${filename}`, import.meta.url),
   );
 
   const [transpiled, sourceMap, coverage] = await Promise.all([

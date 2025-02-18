@@ -1,5 +1,5 @@
-import { asyncWalk } from "estree-walker";
 import type { FunctionDeclaration, Identifier, Program, Node } from "estree";
+import { asyncWalk } from "estree-walker";
 
 import type { Positioned } from "./location";
 
@@ -7,9 +7,9 @@ export async function walk(
   ast: Program,
   visitors: {
     onFunctionDeclaration: (
-      node: Positioned<FunctionDeclaration> & { id: Positioned<Identifier> }
+      node: Positioned<FunctionDeclaration> & { id: Positioned<Identifier> },
     ) => void;
-  }
+  },
 ) {
   return await asyncWalk(ast, {
     async leave(node) {

@@ -1,12 +1,12 @@
-import { expect, test } from "vitest";
 import { parseAstAsync } from "vite";
+import { expect, test } from "vitest";
 
-import convert from "../src/index.ts";
+import convert from "../src/index";
 import { readFixture, normalizeMap } from "./utils";
 
 test("function coverage", async () => {
   const { transpiled, sourceMap, coverage } = await readFixture(
-    "function-declaration"
+    "function-declaration",
   );
 
   const coverageMap = await convert({
