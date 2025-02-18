@@ -35,8 +35,13 @@ export default async function convert(options: {
   await walk(ast, {
     onFunctionDeclaration(node) {
       const loc = {
-        start: getPosition(offsetToNeedle(node.start, options.code)),
-        end: getPosition(offsetToNeedle(node.end, options.code)),
+        start: getPosition(offsetToNeedle(node.body.start, options.code)),
+        end: getPosition(offsetToNeedle(node.body.end, options.code)),
+      };
+
+      const decl = {
+        start: getPosition(offsetToNeedle(node.id.start, options.code)),
+        end: getPosition(offsetToNeedle(node.id.end + 1, options.code)),
       };
 
       let covered = 0;
@@ -64,7 +69,7 @@ export default async function convert(options: {
         coverageMap,
         covered,
         loc,
-        decl: loc,
+        decl,
         filename: fileURLToPath(
           new URL(originalFilename, options.coverage.url),
         ),

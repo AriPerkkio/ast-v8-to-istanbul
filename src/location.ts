@@ -9,23 +9,26 @@ export type Positioned<T> = T & {
 
 export function offsetToNeedle(offset: number, code: string): Needle {
   let current = 0;
-  let line = 0;
+  let line = 1;
+  let column = 0;
 
-  for (const [index, content] of code.split(EOF_PATTERN).entries()) {
-    line = index + 1;
-
-    if (current >= offset - 1) {
-      return { column: Math.max(0, offset - current), line };
+  for (const char of code) {
+    if (current === offset) {
+      return { line, column };
     }
 
-    current += content.length;
-
-    if (content.length > offset) {
-      return { column: Math.max(0, offset - current), line };
+    // TODO: Add tests for Windows \r\n eof
+    if (char === "\n") {
+      line++;
+      column = 0;
+    } else {
+      column++;
     }
+
+    current++;
   }
 
-  return { line, column: offset - current };
+  return { line, column };
 }
 
 export function needleToOffset(
