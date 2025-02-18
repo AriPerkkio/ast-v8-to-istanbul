@@ -1,18 +1,24 @@
 import type { Needle } from "@jridgewell/trace-mapping";
+import { TraceMap } from "@jridgewell/trace-mapping";
 import libCoverage, { type CoverageMap } from "istanbul-lib-coverage";
+import { fileURLToPath } from "node:url";
 
-export function createCoverageMap(filename: string) {
+export function createCoverageMap(filename: string, sourceMap: TraceMap) {
   const coverageMap: CoverageMap = libCoverage.createCoverageMap();
 
-  coverageMap.addFileCoverage({
-    path: filename,
-    branchMap: {},
-    b: {},
-    statementMap: {},
-    s: {},
-    fnMap: {},
-    f: {},
-  });
+  for (const source of sourceMap.sources) {
+    const path = source ? fileURLToPath(new URL(source, filename)) : filename;
+
+    coverageMap.addFileCoverage({
+      path,
+      branchMap: {},
+      b: {},
+      statementMap: {},
+      s: {},
+      fnMap: {},
+      f: {},
+    });
+  }
 
   return coverageMap;
 }

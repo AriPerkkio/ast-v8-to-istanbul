@@ -20,7 +20,7 @@ export function offsetToNeedle(offset: number, code: string): Needle {
 
     current += content.length;
 
-    if (content.length >= offset) {
+    if (content.length > offset) {
       return { column: Math.max(0, offset - current), line };
     }
   }

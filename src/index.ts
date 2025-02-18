@@ -5,6 +5,7 @@ import {
   type SourceMapInput,
 } from "@jridgewell/trace-mapping";
 import type { Profiler } from "node:inspector";
+import { fileURLToPath } from "node:url";
 
 import { offsetToNeedle } from "./location.ts";
 import { getFunctionName, walk } from "./ast.ts";
@@ -18,12 +19,18 @@ export default async function convert(options: {
   getAst: (
     code: string
   ) => Parameters<typeof walk>[0] | Promise<Parameters<typeof walk>[0]>;
+  debug?: boolean;
 }) {
   const wrapperLength = options.wrapperLength || 0;
 
   const map = new TraceMap(options.sourceMap);
-  const coverageMap = createCoverageMap(options.coverage.url);
+
+  const coverageMap = createCoverageMap(options.coverage.url, map);
   const ast = await options.getAst(options.code);
+
+  if (options.debug) {
+    await debugMappings(map);
+  }
 
   await walk(ast, {
     onFunctionDeclaration(node) {
@@ -45,12 +52,20 @@ export default async function convert(options: {
         }
       }
 
+      const originalFilename = loc.start.filename || loc.end.filename;
+
+      if (!originalFilename) {
+        throw new Error(`Missing original fiulename for ${loc}`);
+      }
+
       addFunction({
         coverageMap,
         covered,
-        loc: { start: loc.start, end: loc.end },
-        decl: { start: loc.start, end: loc.end },
-        filename: options.coverage.url,
+        loc,
+        decl: loc,
+        filename: fileURLToPath(
+          new URL(originalFilename, options.coverage.url)
+        ),
         name: getFunctionName(node),
       });
     },
@@ -59,7 +74,7 @@ export default async function convert(options: {
   return coverageMap;
 
   function getPosition(needle: Needle) {
-    const { line, column } = originalPositionFor(map, needle);
+    const { line, column, source } = originalPositionFor(map, needle);
 
     if (line == null || column == null) {
       throw new Error(
@@ -71,6 +86,18 @@ export default async function convert(options: {
       );
     }
 
-    return { line, column };
+    return { line, column, filename: source };
   }
+}
+
+async function debugMappings(map: TraceMap) {
+  const { eachMapping } = await import("@jridgewell/trace-mapping");
+
+  console.log("Mappings:");
+  eachMapping(map, (mapping) => {
+    console.log({
+      from: { line: mapping.originalLine, col: mapping.originalColumn },
+      to: { line: mapping.generatedLine, col: mapping.generatedColumn },
+    });
+  });
 }
