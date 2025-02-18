@@ -1,5 +1,3 @@
-import reports from "istanbul-reports";
-import libReport from "istanbul-lib-report";
 import { expect, test } from "vitest";
 import { parseAstAsync } from "vite";
 
@@ -7,7 +5,9 @@ import convert from "../src/index.ts";
 import { readFixture, normalizeMap } from "./utils";
 
 test("function coverage", async () => {
-  const { transpiled, sourceMap, coverage } = await readFixture("functions");
+  const { transpiled, sourceMap, coverage } = await readFixture(
+    "function-declaration"
+  );
 
   const coverageMap = await convert({
     getAst: parseAstAsync,
@@ -17,19 +17,11 @@ test("function coverage", async () => {
     sourceMap: sourceMap,
   });
 
-  const context = libReport.createContext({
-    dir: "./coverage",
-    coverageMap,
-  });
-
-  reports.create("html").execute(context);
-  reports.create("json").execute(context);
-
   const normalized = normalizeMap(coverageMap);
 
   expect(normalized.files()).toMatchInlineSnapshot(`
     [
-      "<process-cwd>/test/fixtures/functions/sources.ts",
+      "<process-cwd>/test/fixtures/function-declaration/sources.ts",
     ]
   `);
 

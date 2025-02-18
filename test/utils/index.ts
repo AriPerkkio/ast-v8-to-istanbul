@@ -4,6 +4,8 @@ import {
   createCoverageMap,
   FileCoverageData,
 } from "istanbul-lib-coverage";
+import reports from "istanbul-reports";
+import libReport from "istanbul-lib-report";
 import { readFile } from "node:fs/promises";
 import { Profiler } from "node:inspector";
 import { normalize, resolve } from "node:path";
@@ -47,4 +49,14 @@ function normalizeFilename(filename: string) {
   return normalize(filename)
     .replace(normalize(process.cwd()), "<process-cwd>")
     .replace(normalize(resolve(process.cwd(), "../../")), "<project-root>");
+}
+
+export function generateReports(coverageMap: CoverageMap) {
+  const context = libReport.createContext({
+    dir: "./coverage",
+    coverageMap,
+  });
+
+  reports.create("html").execute(context);
+  reports.create("json").execute(context);
 }
