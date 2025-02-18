@@ -1,13 +1,13 @@
 {
   "name": "ast-v8-to-istanbul",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "vitest"
   },
-  "keywords": [],
+  "files": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
