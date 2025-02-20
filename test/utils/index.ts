@@ -67,6 +67,7 @@ export async function getIstanbulInstrumented(
   code: string,
   filename: string,
   sourceMap: EncodedSourceMap,
+  report = false,
 ) {
   const instrumenter = createInstrumenter({
     produceSourceMap: true,
@@ -83,5 +84,8 @@ export async function getIstanbulInstrumented(
   const sourceMapStore = libSourceMaps.createSourceMapStore();
   const transformed = await sourceMapStore.transformCoverage(coverageMap);
 
+  if (report) {
+    generateReports(transformed, "./istanbul-coverage");
+  }
   return transformed.fileCoverageFor(transformed.files()[0]);
 }

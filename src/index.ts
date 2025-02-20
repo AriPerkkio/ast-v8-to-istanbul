@@ -7,9 +7,9 @@ import {
   type SourceMapInput,
 } from "@jridgewell/trace-mapping";
 
-import { getFunctionName, walk } from "./ast";
+import { FunctionNodes, getFunctionName, walk } from "./ast";
 import { addFunction, createCoverageMap } from "./coverage-map";
-import { offsetToNeedle } from "./location";
+import { offsetToNeedle, Positioned } from "./location";
 
 export default async function convert(options: {
   code: string;
@@ -34,51 +34,65 @@ export default async function convert(options: {
 
   await walk(ast, {
     onFunctionDeclaration(node) {
-      const loc = {
-        start: getPosition(offsetToNeedle(node.body.start, options.code)),
-        end: getPosition(offsetToNeedle(node.body.end, options.code)),
-      };
-
-      const decl = {
-        start: getPosition(offsetToNeedle(node.id.start, options.code)),
-        end: getPosition(offsetToNeedle(node.id.end + 1, options.code)),
-      };
-
-      let covered = 0;
-      const start = node.start + wrapperLength;
-      const end = node.end + wrapperLength;
-
-      for (const { ranges } of options.coverage.functions) {
-        for (const range of ranges) {
-          if (range.startOffset === start && range.endOffset === end) {
-            covered += range.count;
-            // TODO: Can we break the loop here?
-          }
-        }
-      }
-
-      const originalFilename = loc.start.filename || loc.end.filename;
-
-      if (!originalFilename) {
-        throw new Error(
-          `Missing original filename for ${JSON.stringify(loc, null, 2)}`,
-        );
-      }
-
-      addFunction({
-        coverageMap,
-        covered,
-        loc,
-        decl,
-        filename: fileURLToPath(
-          new URL(originalFilename, options.coverage.url),
-        ),
-        name: getFunctionName(node),
+      onFunction(node, {
+        loc: node.body,
+        decl: node.id,
+      });
+    },
+    onArrowFunctionExpression(node) {
+      onFunction(node, {
+        loc: node.body,
+        decl: node,
       });
     },
   });
 
   return coverageMap;
+
+  function onFunction(
+    node: FunctionNodes,
+    positions: { loc: Positioned; decl: Positioned },
+  ) {
+    const loc = {
+      start: getPosition(offsetToNeedle(positions.loc.start, options.code)),
+      end: getPosition(offsetToNeedle(positions.loc.end, options.code)),
+    };
+
+    const decl = {
+      start: getPosition(offsetToNeedle(positions.decl.start, options.code)),
+      end: getPosition(offsetToNeedle(positions.decl.end + 1, options.code)),
+    };
+
+    let covered = 0;
+    const start = node.start + wrapperLength;
+    const end = node.end + wrapperLength;
+
+    for (const { ranges } of options.coverage.functions) {
+      for (const range of ranges) {
+        if (range.startOffset === start && range.endOffset === end) {
+          covered += range.count;
+          // TODO: Can we break the loop here?
+        }
+      }
+    }
+
+    const originalFilename = loc.start.filename || loc.end.filename;
+
+    if (!originalFilename) {
+      throw new Error(
+        `Missing original filename for ${JSON.stringify(loc, null, 2)}`,
+      );
+    }
+
+    addFunction({
+      coverageMap,
+      covered,
+      loc,
+      decl,
+      filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
+      name: getFunctionName(node),
+    });
+  }
 
   function getPosition(needle: Needle) {
     const { line, column, source } = originalPositionFor(map, needle);

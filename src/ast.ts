@@ -4,27 +4,36 @@ import type {
   Program,
   Node,
   BlockStatement,
+  ArrowFunctionExpression,
 } from "estree";
 import { asyncWalk } from "estree-walker";
 
 import type { Positioned } from "./location";
 
-export async function walk(
-  ast: Program,
-  visitors: {
-    onFunctionDeclaration: (
-      node: Positioned<FunctionDeclaration> & {
-        id: Positioned<Identifier>;
-        body: Positioned<BlockStatement>;
-      },
-    ) => void;
-  },
-) {
+type WrapPosition<T> = Positioned<T> & {
+  id: Positioned<Identifier>;
+  body: Positioned<BlockStatement>;
+};
+
+interface Visitors {
+  onFunctionDeclaration: (node: WrapPosition<FunctionDeclaration>) => void;
+  onArrowFunctionExpression: (
+    node: WrapPosition<ArrowFunctionExpression>,
+  ) => void;
+}
+export type FunctionNodes = Parameters<
+  Visitors["onArrowFunctionExpression" | "onFunctionDeclaration"]
+>[0];
+
+export async function walk(ast: Program, visitors: Visitors) {
   return await asyncWalk(ast, {
     async leave(node) {
       switch (node.type) {
         case "FunctionDeclaration": {
-          visitors.onFunctionDeclaration(node as any);
+          return visitors.onFunctionDeclaration(node as any);
+        }
+        case "ArrowFunctionExpression": {
+          return visitors.onArrowFunctionExpression(node as any);
         }
       }
     },

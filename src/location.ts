@@ -2,7 +2,7 @@ import { type Needle } from "@jridgewell/trace-mapping";
 
 const EOF_PATTERN = /(?<=\r?\n)/u;
 
-export type Positioned<T> = T & {
+export type Positioned<T = unknown> = T & {
   start: number;
   end: number;
 };
