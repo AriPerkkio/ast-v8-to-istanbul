@@ -1,7 +1,10 @@
-import { readdir, rm, writeFile } from "node:fs/promises";
+import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import inspector, { Profiler } from "node:inspector";
 import { fileURLToPath } from "node:url";
 import esbuild from "esbuild";
+import c from "tinyrainbow";
+
+import { toVisualizer } from "./source-map-visualizer";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 
@@ -9,11 +12,13 @@ export async function setup() {
   const fixtures = await readdir(`${root}/fixtures`);
 
   for (const directory of fixtures) {
+    log("Cleaning", `fixtures/${directory}/dist`);
     await rm(`${root}/fixtures/${directory}/dist`, {
       recursive: true,
       force: true,
     });
 
+    log("Building", `fixtures/${directory}/sources.ts`);
     await esbuild.build({
       entryPoints: [`${root}/fixtures/${directory}/sources.ts`],
       sourcemap: "linked",
@@ -23,10 +28,25 @@ export async function setup() {
       outfile: `${root}/fixtures/${directory}/dist/index.js`,
     });
 
+    const [code, map] = await Promise.all([
+      readFile(`${root}/fixtures/${directory}/dist/index.js`, "utf8"),
+      readFile(`${root}/fixtures/${directory}/dist/index.js.map`, "utf8"),
+    ]);
+
+    log("Generating link", `fixtures/${directory}/dist/link.md`);
+    const link = toVisualizer({ code, map: JSON.parse(map) });
+    await writeFile(
+      `${root}/fixtures/${directory}/dist/link.md`,
+      `${link}\n`,
+      "utf8",
+    );
+
+    log("Collecting coverage with", `fixtures/${directory}/execute.ts`);
     const coverage = await collectCoverage(
       () => import(`${root}/fixtures/${directory}/execute.ts`),
     );
 
+    log("Writing coverage to", `fixtures/${directory}/coverage.json\n`);
     await writeFile(
       `${root}/fixtures/${directory}/dist/coverage.json`,
       JSON.stringify(coverage, null, 2),
@@ -60,4 +80,8 @@ async function collectCoverage(method: () => void | Promise<void>) {
       resolve(filtered);
     });
   });
+}
+
+function log(...messages: string[]) {
+  console.log(c.bgBlueBright(`[${c.white("setup")}]`), ...messages);
 }
