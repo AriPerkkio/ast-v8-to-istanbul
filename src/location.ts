@@ -2,11 +2,6 @@ import { type Needle } from "@jridgewell/trace-mapping";
 
 const EOF_PATTERN = /(?<=\r?\n)/u;
 
-export type Positioned<T = unknown> = T & {
-  start: number;
-  end: number;
-};
-
 export function offsetToNeedle(offset: number, code: string): Needle {
   let current = 0;
   let line = 1;

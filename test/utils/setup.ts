@@ -5,6 +5,8 @@ import {
 } from "istanbul-lib-coverage";
 import { expect } from "vitest";
 
+import "./expect-extend";
+
 expect.addSnapshotSerializer({
   test: (val) => val.constructor.name === "CoverageMap",
   serialize: (val: CoverageMap, config, indentation, depth, refs, printer) => {

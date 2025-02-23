@@ -24,6 +24,18 @@ export default defineConfig([
     },
   },
   {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+    },
+  },
+  {
     files: tsconfig.include,
     name: "recommended-imports",
     plugins: {
@@ -31,8 +43,17 @@ export default defineConfig([
       unicorn: eslintPluginUnicorn,
     },
     rules: {
-      "import/order": ["error", { alphabetize: { order: "asc" } }],
       "unicorn/prefer-node-protocol": "error",
+      "import/order": ["error", { alphabetize: { order: "asc" } }],
+      "import/no-duplicates": ["error", { "prefer-inline": true }],
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        {
+          prefer: "type-imports",
+          fixStyle: "inline-type-imports",
+          disallowTypeAnnotations: false,
+        },
+      ],
     },
   },
   {
@@ -43,6 +64,8 @@ export default defineConfig([
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
     },
   },
   {

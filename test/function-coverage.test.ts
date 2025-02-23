@@ -2,12 +2,9 @@ import { parseAstAsync } from "vite";
 import { expect, test } from "vitest";
 
 import convert from "../src/index";
-import {
-  readFixture,
-  normalizeMap,
-  getIstanbulInstrumented,
-  generateReports,
-} from "./utils";
+import { readFixture, normalizeMap, getIstanbulInstrumented } from "./utils";
+
+const wrapperLength = 185; // Tests are executed by Vitest in global setup
 
 test("function declaration", async () => {
   const { transpiled, sourceMap, coverage } = await readFixture(
@@ -17,7 +14,7 @@ test("function declaration", async () => {
   const coverageMap = await convert({
     getAst: parseAstAsync,
     code: transpiled,
-    wrapperLength: 0,
+    wrapperLength,
     coverage: coverage[0],
     sourceMap: sourceMap,
   });
@@ -30,9 +27,9 @@ test("function declaration", async () => {
   expect(fileCoverage).toMatchInlineSnapshot(`
     {
       "branches": "0/0 (100%)",
-      "functions": "0/4 (0%)",
-      "lines": "0/0 (100%)",
-      "statements": "0/0 (100%)",
+      "functions": "1/4 (25%)",
+      "lines": "1/4 (25%)",
+      "statements": "1/4 (25%)",
     }
   `);
 
@@ -42,22 +39,11 @@ test("function declaration", async () => {
     sourceMap,
   );
 
-  const fnMap = fileCoverage.fnMap;
-  const fnMapIstanbul = istanbul.fnMap;
+  expect(fileCoverage.fnMap).toMatchFunctions(istanbul.fnMap);
+  expect(Object.keys(fileCoverage.f)).toEqual(Object.keys(istanbul.f));
 
-  for (const key of ["0", "1", "2", "3"]) {
-    const actual = fnMap[key];
-    const expected = fnMapIstanbul[key];
-
-    // https://github.com/istanbuljs/istanbuljs/blob/istanbul-lib-source-maps-v5.0.6/packages/istanbul-lib-source-maps/lib/get-mapping.js#L70-L77
-    if (expected.loc.end.column === Infinity) {
-      expected.loc.end.column = 0;
-    }
-
-    expect.soft(actual.name).toBe(expected.name);
-    expect.soft(actual.decl).toEqual(expected.decl);
-    expect.soft(actual.loc).toEqual(expected.loc);
-  }
+  expect(fileCoverage.statementMap).toMatchStatements(istanbul.statementMap);
+  expect(Object.keys(fileCoverage.s)).toEqual(Object.keys(istanbul.s));
 });
 
 test("arrow function expression", async () => {
@@ -68,12 +54,11 @@ test("arrow function expression", async () => {
   const coverageMap = await convert({
     getAst: parseAstAsync,
     code: transpiled,
-    wrapperLength: 0,
+    wrapperLength,
     coverage: coverage[0],
     sourceMap: sourceMap,
   });
 
-  generateReports(coverageMap);
   const normalized = normalizeMap(coverageMap);
   const fileCoverage = normalized.fileCoverageFor(
     "<process-cwd>/test/fixtures/arrow-function-expression/sources.ts",
@@ -82,9 +67,9 @@ test("arrow function expression", async () => {
   expect(fileCoverage).toMatchInlineSnapshot(`
     {
       "branches": "0/0 (100%)",
-      "functions": "0/4 (0%)",
-      "lines": "0/0 (100%)",
-      "statements": "0/0 (100%)",
+      "functions": "1/4 (25%)",
+      "lines": "2/8 (25%)",
+      "statements": "2/8 (25%)",
     }
   `);
 
@@ -94,23 +79,12 @@ test("arrow function expression", async () => {
     sourceMap,
   );
 
-  const fnMap = fileCoverage.fnMap;
-  const fnMapIstanbul = istanbul.fnMap;
+  expect(fileCoverage.fnMap).toMatchFunctions(istanbul.fnMap, {
+    // TODO: Don't ignore
+    ignoreDeclEnd: true,
+  });
+  expect(Object.keys(fileCoverage.f)).toEqual(Object.keys(istanbul.f));
 
-  for (const key of ["0", "1", "2", "3"]) {
-    const actual = fnMap[key];
-    const expected = fnMapIstanbul[key];
-
-    // https://github.com/istanbuljs/istanbuljs/blob/istanbul-lib-source-maps-v5.0.6/packages/istanbul-lib-source-maps/lib/get-mapping.js#L70-L77
-    if (expected.loc.end.column === Infinity) {
-      expected.loc.end.column = 0;
-    }
-
-    expect.soft(actual.name).toBe(expected.name);
-    expect.soft(actual.loc).toEqual(expected.loc);
-    expect.soft(actual.decl.start).toEqual(expected.decl.start);
-
-    // TODO:
-    // expect.soft(actual.decl.end).toEqual(expected.decl.end);
-  }
+  expect(fileCoverage.statementMap).toMatchStatements(istanbul.statementMap);
+  expect(Object.keys(fileCoverage.s)).toEqual(Object.keys(istanbul.s));
 });

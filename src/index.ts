@@ -6,10 +6,11 @@ import {
   type Needle,
   type SourceMapInput,
 } from "@jridgewell/trace-mapping";
+import type { Node } from "estree";
 
-import { FunctionNodes, getFunctionName, walk } from "./ast";
-import { addFunction, createCoverageMap } from "./coverage-map";
-import { offsetToNeedle, Positioned } from "./location";
+import { type FunctionNodes, getFunctionName, walk } from "./ast";
+import { addFunction, addStatement, createCoverageMap } from "./coverage-map";
+import { offsetToNeedle } from "./location";
 
 export default async function convert(options: {
   code: string;
@@ -33,6 +34,7 @@ export default async function convert(options: {
   }
 
   await walk(ast, {
+    // Functions
     onFunctionDeclaration(node) {
       onFunction(node, {
         loc: node.body,
@@ -45,13 +47,34 @@ export default async function convert(options: {
         decl: node,
       });
     },
+
+    // Statements
+    onExpressionStatement: onStatement,
+    onBreakStatement: onStatement,
+    onContinueStatement: onStatement,
+    onDebuggerStatement: onStatement,
+    onReturnStatement: onStatement,
+    onThrowStatement: onStatement,
+    onTryStatement: onStatement,
+    onIfStatement: onStatement,
+    onForStatement: onStatement,
+    onForInStatement: onStatement,
+    onForOfStatement: onStatement,
+    onWhileStatement: onStatement,
+    onDoWhileStatement: onStatement,
+    onSwitchStatement: onStatement,
+    onWithStatement: onStatement,
+    onLabeledStatement: onStatement,
+    onVariableDeclarator(node) {
+      onStatement(node.init || node);
+    },
   });
 
   return coverageMap;
 
   function onFunction(
     node: FunctionNodes,
-    positions: { loc: Positioned; decl: Positioned },
+    positions: { loc: Node; decl: Node },
   ) {
     const loc = {
       start: getPosition(offsetToNeedle(positions.loc.start, options.code)),
@@ -69,7 +92,11 @@ export default async function convert(options: {
 
     for (const { ranges } of options.coverage.functions) {
       for (const range of ranges) {
-        if (range.startOffset === start && range.endOffset === end) {
+        if (
+          range.count &&
+          range.startOffset === start &&
+          range.endOffset === end
+        ) {
           covered += range.count;
           // TODO: Can we break the loop here?
         }
@@ -91,6 +118,52 @@ export default async function convert(options: {
       decl,
       filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
       name: getFunctionName(node),
+    });
+  }
+
+  function onStatement(node: Node) {
+    const loc = {
+      start: getPosition(offsetToNeedle(node.start, options.code)),
+      end: getPosition(offsetToNeedle(node.end, options.code)),
+    };
+
+    const originalFilename = loc.start.filename || loc.end.filename;
+
+    if (!originalFilename) {
+      throw new Error(
+        `Missing original filename for ${JSON.stringify(loc, null, 2)}`,
+      );
+    }
+
+    const start = node.start + wrapperLength;
+    const end = node.end + wrapperLength;
+
+    let closest: Profiler.CoverageRange = {
+      count: 0,
+      startOffset: -1,
+      endOffset: Infinity,
+    };
+
+    for (const { ranges } of options.coverage.functions) {
+      for (const range of ranges) {
+        if (
+          // Node is between the range
+          range.startOffset <= start &&
+          end <= range.endOffset &&
+          // Range is inside the previous one
+          range.startOffset > closest.startOffset &&
+          range.endOffset < closest.endOffset
+        ) {
+          closest = range;
+        }
+      }
+    }
+
+    addStatement({
+      coverageMap,
+      loc,
+      covered: closest.count,
+      filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
     });
   }
 
