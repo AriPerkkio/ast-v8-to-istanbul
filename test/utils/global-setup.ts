@@ -83,5 +83,5 @@ async function collectCoverage(method: () => void | Promise<void>) {
 }
 
 function log(...messages: string[]) {
-  console.log(c.bgBlueBright(`[${c.white("setup")}]`), ...messages);
+  console.log(c.bgBlueBright("[setup]"), ...messages);
 }

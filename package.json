@@ -2,6 +2,7 @@
   "name": "ast-v8-to-istanbul",
   "version": "0.0.1",
   "type": "module",
+  "packageManager": "pnpm@10.4.1",
   "description": "",
   "main": "index.js",
   "scripts": {
