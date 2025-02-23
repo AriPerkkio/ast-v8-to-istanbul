@@ -5,5 +5,10 @@ export default defineConfig({
     reporters: "verbose",
     setupFiles: ["./test/utils/setup.ts"],
     globalSetup: ["./test/utils/global-setup.ts"],
+
+    coverage: {
+      enabled: true,
+      include: ["src"],
+    },
   },
 });

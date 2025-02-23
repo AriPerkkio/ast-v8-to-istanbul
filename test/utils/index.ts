@@ -53,7 +53,10 @@ function normalizeFilename(filename: string) {
     .replace(normalize(resolve(process.cwd(), "../../")), "<project-root>");
 }
 
-export function generateReports(coverageMap: CoverageMap, dir = "./coverage") {
+export function generateReports(
+  coverageMap: CoverageMap,
+  dir = "./fixture-coverage",
+) {
   const context = libReport.createContext({
     dir,
     coverageMap,
