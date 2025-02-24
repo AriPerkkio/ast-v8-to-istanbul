@@ -24,7 +24,7 @@ import type {
 import { asyncWalk } from "estree-walker";
 
 declare module "estree" {
-  interface BaseNodeWithoutComments {
+  interface BaseNode {
     start: number;
     end: number;
   }
