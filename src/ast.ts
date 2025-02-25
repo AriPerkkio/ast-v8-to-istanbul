@@ -1,25 +1,27 @@
 import type {
-  FunctionDeclaration,
-  Program,
-  Node,
   ArrowFunctionExpression,
-  ReturnStatement,
-  ExpressionStatement,
   BreakStatement,
   ContinueStatement,
   DebuggerStatement,
-  ThrowStatement,
-  TryStatement,
-  IfStatement,
-  ForStatement,
+  DoWhileStatement,
+  ExpressionStatement,
   ForInStatement,
   ForOfStatement,
-  WhileStatement,
-  DoWhileStatement,
-  SwitchStatement,
-  WithStatement,
+  ForStatement,
+  FunctionDeclaration,
+  IfStatement,
   LabeledStatement,
+  MethodDefinition,
+  Node,
+  Property,
+  Program,
+  ReturnStatement,
+  SwitchStatement,
+  ThrowStatement,
+  TryStatement,
   VariableDeclarator,
+  WhileStatement,
+  WithStatement,
 } from "estree";
 import { asyncWalk } from "estree-walker";
 
@@ -34,6 +36,8 @@ interface Visitors {
   // Functions
   onFunctionDeclaration: (node: FunctionDeclaration) => void;
   onArrowFunctionExpression: (node: ArrowFunctionExpression) => void;
+  onMethodDefinition: (node: MethodDefinition) => void;
+  onProperty: (node: Property) => void;
 
   // Statements
   onExpressionStatement: (node: ExpressionStatement) => void;
@@ -55,7 +59,11 @@ interface Visitors {
   onVariableDeclarator: (node: VariableDeclarator) => void;
 }
 export type FunctionNodes = Parameters<
-  Visitors["onArrowFunctionExpression" | "onFunctionDeclaration"]
+  Visitors[
+    | "onArrowFunctionExpression"
+    | "onFunctionDeclaration"
+    | "onMethodDefinition"
+    | "onProperty"]
 >[0];
 
 export async function walk(ast: Program, visitors: Visitors) {
@@ -65,6 +73,12 @@ export async function walk(ast: Program, visitors: Visitors) {
         // Functions
         case "FunctionDeclaration": {
           return visitors.onFunctionDeclaration(node);
+        }
+        case "MethodDefinition": {
+          return visitors.onMethodDefinition(node);
+        }
+        case "Property": {
+          return visitors.onProperty(node);
         }
         case "ArrowFunctionExpression": {
           return visitors.onArrowFunctionExpression(node);
