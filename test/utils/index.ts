@@ -13,6 +13,8 @@ import {
 import libReport from "istanbul-lib-report";
 import reports from "istanbul-reports";
 
+export { test } from "./test";
+
 export async function readFixture(filename: string) {
   const root = fileURLToPath(
     new URL(`../fixtures/${filename}`, import.meta.url),
