@@ -34,6 +34,7 @@
     "eslint-plugin-import-x": "^4.6.1",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-unicorn": "^57.0.0",
+    "fflate": "^0.8.2",
     "istanbul-lib-instrument": "^6.0.3",
     "istanbul-lib-report": "^3.0.1",
     "istanbul-lib-source-maps": "^5.0.6",

@@ -5,6 +5,7 @@ import esbuild from "esbuild";
 import c from "tinyrainbow";
 
 import { toVisualizer } from "./source-map-visualizer";
+import { toAstExplorer } from "./ast-explorer";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 
@@ -33,11 +34,13 @@ export async function setup() {
       readFile(`${root}/fixtures/${directory}/dist/index.js.map`, "utf8"),
     ]);
 
-    log("Generating link", `fixtures/${directory}/dist/link.md`);
-    const link = toVisualizer({ code, map: JSON.parse(map) });
+    log("Generating links", `fixtures/${directory}/dist/links.md`);
+    const visualizer = toVisualizer({ code, map: JSON.parse(map) });
+    const astExplorer = toAstExplorer({ code });
+
     await writeFile(
-      `${root}/fixtures/${directory}/dist/link.md`,
-      `${link}\n`,
+      `${root}/fixtures/${directory}/dist/links.md`,
+      `- ${visualizer}\n\n- ${astExplorer}\n`,
       "utf8",
     );
 
