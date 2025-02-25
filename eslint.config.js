@@ -59,6 +59,7 @@ export default defineConfig([
   {
     name: "disables",
     rules: {
+      "no-empty-pattern": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",

@@ -31,11 +31,11 @@ function toMatchFunctions(
       mismatches.push(...locDiff);
     }
 
-    const dlocDiff = rangeDiff(fnActual.decl, fnExpected.decl);
+    const declDiff = rangeDiff(fnActual.decl, fnExpected.decl);
 
-    if (dlocDiff.length) {
-      mismatches.push(`dlocs ${key} did not match:`);
-      mismatches.push(...dlocDiff);
+    if (declDiff.length) {
+      mismatches.push(`decls ${key} did not match:`);
+      mismatches.push(...declDiff);
     }
   }
 
