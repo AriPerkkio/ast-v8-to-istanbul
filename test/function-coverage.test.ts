@@ -84,10 +84,7 @@ test("arrow function expression", async () => {
     sourceMap,
   );
 
-  expect(fileCoverage.fnMap).toMatchFunctions(istanbul.fnMap, {
-    // TODO: Don't ignore
-    ignoreDeclEnd: true,
-  });
+  expect(fileCoverage.fnMap).toMatchFunctions(istanbul.fnMap);
   expect(Object.keys(fileCoverage.f)).toEqual(Object.keys(istanbul.f));
 
   expect(fileCoverage.statementMap).toMatchStatements(istanbul.statementMap);

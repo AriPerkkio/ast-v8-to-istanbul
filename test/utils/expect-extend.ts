@@ -1,6 +1,5 @@
 import type { FileCoverage, Range } from "istanbul-lib-coverage";
 import { expect } from "vitest";
-import c from "tinyrainbow";
 
 expect.extend({ toMatchFunctions, toMatchStatements });
 
@@ -8,18 +7,9 @@ function toMatchFunctions(
   this: { isNot?: boolean },
   expected: FileCoverage["fnMap"],
   actual: FileCoverage["fnMap"],
-  options?: { ignoreDeclEnd?: boolean },
 ) {
   if (this.isNot) {
     throw new Error(".toMatchFunctions.not(...) is not implemented");
-  }
-
-  if (options?.ignoreDeclEnd) {
-    process.stdout.write(
-      c.yellow(
-        `     [toMatchFunctions]: Test case "${expect.getState().currentTestName}" is ignoring decl.end\n`,
-      ),
-    );
   }
 
   const mismatches: string[] = [];
@@ -37,27 +27,14 @@ function toMatchFunctions(
     const locDiff = rangeDiff(fnActual.loc, fnExpected.loc);
 
     if (locDiff.length) {
-      mismatches.push("locs did not match:");
+      mismatches.push(`locs ${key} did not match:`);
       mismatches.push(...locDiff);
     }
 
-    const dlocDiff = rangeDiff(
-      {
-        ...fnActual.decl,
-        end: options?.ignoreDeclEnd
-          ? { line: 0, column: 0 }
-          : fnActual.decl.end,
-      },
-      {
-        ...fnExpected.decl,
-        end: options?.ignoreDeclEnd
-          ? { line: 0, column: 0 }
-          : fnExpected.decl.end,
-      },
-    );
+    const dlocDiff = rangeDiff(fnActual.decl, fnExpected.decl);
 
     if (dlocDiff.length) {
-      mismatches.push("dlocs did not match:");
+      mismatches.push(`dlocs ${key} did not match:`);
       mismatches.push(...dlocDiff);
     }
   }

@@ -44,7 +44,12 @@ export default async function convert(options: {
     onArrowFunctionExpression(node) {
       onFunction(node, {
         loc: node.body,
-        decl: node,
+        decl: {
+          ...node,
+
+          // TODO: This matches Istanbul's output, but is it correct? Using 'node.end' seems more correct.
+          end: node.start + 1,
+        },
       });
     },
     onMethodDefinition(node) {
