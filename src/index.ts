@@ -47,6 +47,20 @@ export default async function convert(options: {
         decl: node,
       });
     },
+    onMethodDefinition(node) {
+      onFunction(node, {
+        loc: node.value.body,
+        decl: node.key,
+      });
+    },
+    onProperty(node) {
+      if (node.value.type === "FunctionExpression") {
+        onFunction(node, {
+          loc: node.value.body,
+          decl: node.key,
+        });
+      }
+    },
 
     // Statements
     onExpressionStatement: onStatement,
