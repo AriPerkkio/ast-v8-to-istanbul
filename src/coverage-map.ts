@@ -67,6 +67,33 @@ export function addStatement(options: {
   fileCoverage.s[index] = options.covered || 0;
 }
 
+export function addBranch(options: {
+  coverageMap: CoverageMap;
+  filename: string;
+  type: "if" | "switch" | "conditional" | "binary";
+  loc: { start: Needle; end: Needle };
+  locations: { start: Partial<Needle>; end: Partial<Needle> }[];
+  covered?: number[];
+}) {
+  const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
+  const index =
+    1 +
+    (Object.keys(fileCoverage.b)
+      .map((key) => parseInt(key))
+      .sort()
+      .pop() ?? -1);
+
+  fileCoverage.data.branchMap[index] = {
+    type: options.type,
+    // @ts-expect-error -- Istanbul cheats types for implicit else
+    locations: options.locations.map((loc) => pickLocation(loc)),
+    loc: pickLocation(options.loc),
+    line: options.loc.start.line,
+  };
+  fileCoverage.b[index] =
+    options.covered || Array(options.locations.length).fill(0);
+}
+
 function pickLocation<T extends { start: Needle; end: Needle }>(original: T) {
   return {
     start: { line: original.start.line, column: original.start.column },

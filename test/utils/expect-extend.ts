@@ -1,7 +1,7 @@
 import type { FileCoverage, Range } from "istanbul-lib-coverage";
 import { expect } from "vitest";
 
-expect.extend({ toMatchFunctions, toMatchStatements });
+expect.extend({ toMatchFunctions, toMatchStatements, toMatchBranches });
 
 function toMatchFunctions(
   this: { isNot?: boolean },
@@ -9,7 +9,10 @@ function toMatchFunctions(
   actual: FileCoverage["fnMap"],
 ) {
   if (this.isNot) {
-    throw new Error(".toMatchFunctions.not(...) is not implemented");
+    return {
+      pass: true, // true, as in isNot failed
+      message: () => ".not.toMatchFunctions(...) is not implemented",
+    };
   }
 
   const mismatches: string[] = [];
@@ -51,7 +54,10 @@ function toMatchStatements(
   actual: FileCoverage["statementMap"],
 ) {
   if (this.isNot) {
-    throw new Error(".toMatchStatements.not(...) is not implemented");
+    return {
+      pass: true, // true, as in isNot failed
+      message: () => ".not.toMatchStatements(...) is not implemented",
+    };
   }
 
   const mismatches: string[] = [];
@@ -74,6 +80,53 @@ function toMatchStatements(
   return {
     pass: mismatches.length === 0,
     message: () => ["Statement maps did not match:", ...mismatches].join("\n"),
+  };
+}
+
+function toMatchBranches(
+  this: { isNot?: boolean },
+  expected: FileCoverage["branchMap"],
+  actual: FileCoverage["branchMap"],
+) {
+  if (this.isNot) {
+    return {
+      pass: true, // true, as in isNot failed
+      message: () => ".not.toMatchBranches(...) is not implemented",
+    };
+  }
+
+  const mismatches: string[] = [];
+
+  for (const key in expected) {
+    const branchActual = actual[key];
+    const branchExpected = expected[key];
+
+    if (branchActual.type !== branchExpected.type) {
+      mismatches.push(
+        `Type did not match: ${branchActual.type} !== ${branchExpected.type}`,
+      );
+    }
+
+    const locDiff = rangeDiff(branchActual.loc, branchExpected.loc);
+
+    if (locDiff.length) {
+      mismatches.push(`locs ${key} did not match:`);
+      mismatches.push(...locDiff);
+    }
+
+    branchExpected.locations.forEach((loc, i) => {
+      const diff = rangeDiff(branchActual.locations[i], loc);
+
+      if (diff.length) {
+        mismatches.push(`Location ${i} did not match:`);
+        mismatches.push(...diff);
+      }
+    });
+  }
+
+  return {
+    pass: mismatches.length === 0,
+    message: () => ["Branch maps did not match:", ...mismatches].join("\n"),
   };
 }
 

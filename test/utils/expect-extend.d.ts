@@ -10,6 +10,9 @@ interface CoverageMatchers<R = unknown> {
 
   /** Compare `FileCoverage['statementMap']` */
   toMatchStatements: (actual: FileCoverage["statementMap"]) => R;
+
+  /** Compare `FileCoverage['branchMap']` */
+  toMatchBranches: (actual: FileCoverage["branchMap"]) => R;
 }
 
 declare module "vitest" {
