@@ -9,7 +9,12 @@ import {
 import type { Node } from "estree";
 
 import { type FunctionNodes, getFunctionName, walk } from "./ast";
-import { addFunction, addStatement, createCoverageMap } from "./coverage-map";
+import {
+  addBranch,
+  addFunction,
+  addStatement,
+  createCoverageMap,
+} from "./coverage-map";
 import { offsetToNeedle } from "./location";
 
 export default async function convert(options: {
@@ -75,7 +80,6 @@ export default async function convert(options: {
     onReturnStatement: onStatement,
     onThrowStatement: onStatement,
     onTryStatement: onStatement,
-    onIfStatement: onStatement,
     onForStatement: onStatement,
     onForInStatement: onStatement,
     onForOfStatement: onStatement,
@@ -87,6 +91,15 @@ export default async function convert(options: {
     onVariableDeclarator(node) {
       onStatement(node.init || node);
     },
+
+    // Branches
+    onIfStatement(node) {
+      onBranch(node, [node, node.alternate]);
+      onStatement(node);
+    },
+    onSwitchCase() {},
+    onConditionalExpression() {},
+    onLogicalExpression() {},
   });
 
   return coverageMap;
@@ -182,6 +195,92 @@ export default async function convert(options: {
       coverageMap,
       loc,
       covered: closest.count,
+      filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
+    });
+  }
+
+  function onBranch(node: Node, branches: (Node | null | undefined)[]) {
+    const loc = {
+      start: getPosition(offsetToNeedle(node.start, options.code)),
+      end: getPosition(offsetToNeedle(node.end, options.code)),
+    };
+
+    const locations = branches.map((location) => {
+      if (!location) {
+        return {
+          start: { line: undefined, column: undefined },
+          end: { line: undefined, coolumn: undefined },
+        };
+      }
+
+      return {
+        start: getPosition(offsetToNeedle(location.start, options.code)),
+        end: getPosition(offsetToNeedle(location.end, options.code)),
+      };
+    });
+
+    const originalFilename = loc.start.filename || loc.end.filename;
+
+    if (!originalFilename) {
+      throw new Error(
+        `Missing original filename for ${JSON.stringify(loc, null, 2)}`,
+      );
+    }
+
+    const start = node.start + wrapperLength;
+    const end = node.end + wrapperLength;
+    const offsets = branches.map((branch) =>
+      branch
+        ? {
+            start: branch?.start + wrapperLength,
+            end: branch?.end + wrapperLength,
+          }
+        : null,
+    );
+
+    const closest: Profiler.CoverageRange[] = locations.map(() => ({
+      startOffset: -1,
+      endOffset: Infinity,
+      count: 0,
+    }));
+
+    for (const { ranges } of options.coverage.functions) {
+      for (const range of ranges) {
+        // Node must be between the overall range
+        if (range.startOffset > start || end > range.endOffset) {
+          continue;
+        }
+
+        for (const [index, branch] of offsets.entries()) {
+          if (!branch) {
+            continue;
+          }
+
+          // Node must be between the branch
+          if (
+            range.startOffset > branch.start &&
+            branch.end > range.endOffset
+          ) {
+            continue;
+          }
+
+          // Range is inside the previous one
+          if (
+            range.startOffset > closest[index].startOffset &&
+            range.endOffset < closest[index].endOffset
+          ) {
+            closest[index] = range;
+          }
+        }
+      }
+    }
+
+    addBranch({
+      coverageMap,
+      loc,
+      locations,
+      type: "if",
+      covered: closest.map((range) => range.count),
       filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
     });
   }

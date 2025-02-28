@@ -22,6 +22,9 @@ import type {
   VariableDeclarator,
   WhileStatement,
   WithStatement,
+  SwitchCase,
+  ConditionalExpression,
+  LogicalExpression,
 } from "estree";
 import { asyncWalk } from "estree-walker";
 
@@ -47,7 +50,6 @@ interface Visitors {
   onReturnStatement: (node: ReturnStatement) => void;
   onThrowStatement: (node: ThrowStatement) => void;
   onTryStatement: (node: TryStatement) => void;
-  onIfStatement: (node: IfStatement) => void;
   onForStatement: (node: ForStatement) => void;
   onForInStatement: (node: ForInStatement) => void;
   onForOfStatement: (node: ForOfStatement) => void;
@@ -57,6 +59,12 @@ interface Visitors {
   onWithStatement: (node: WithStatement) => void;
   onLabeledStatement: (node: LabeledStatement) => void;
   onVariableDeclarator: (node: VariableDeclarator) => void;
+
+  // Branches
+  onIfStatement: (node: IfStatement) => void;
+  onSwitchCase: (node: SwitchCase) => void;
+  onConditionalExpression: (node: ConditionalExpression) => void;
+  onLogicalExpression: (node: LogicalExpression) => void;
 }
 export type FunctionNodes = Parameters<
   Visitors[
@@ -106,9 +114,6 @@ export async function walk(ast: Program, visitors: Visitors) {
         case "TryStatement": {
           return visitors.onTryStatement(node);
         }
-        case "IfStatement": {
-          return visitors.onIfStatement(node);
-        }
         case "ForStatement": {
           return visitors.onForStatement(node);
         }
@@ -135,6 +140,20 @@ export async function walk(ast: Program, visitors: Visitors) {
         }
         case "VariableDeclarator": {
           return visitors.onVariableDeclarator(node);
+        }
+
+        // Branches
+        case "IfStatement": {
+          return visitors.onIfStatement(node);
+        }
+        case "SwitchCase": {
+          return visitors.onSwitchCase(node);
+        }
+        case "ConditionalExpression": {
+          return visitors.onConditionalExpression(node);
+        }
+        case "LogicalExpression": {
+          return visitors.onLogicalExpression(node);
         }
       }
     },
