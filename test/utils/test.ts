@@ -1,14 +1,10 @@
 import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
+import libSourceMaps from "istanbul-lib-source-maps";
 import { parseAstAsync } from "vite";
 import { expect, test as base } from "vitest";
 
 import convert from "../../src/index";
-import {
-  readFixture,
-  normalizeMap,
-  getIstanbulInstrumented,
-  generateReports,
-} from "./index";
+import { readFixture, normalizeMap, generateReports } from "./index";
 
 export const test = base.extend<{
   actual: FileCoverage;
@@ -19,9 +15,8 @@ export const test = base.extend<{
   debug: { generateReports: false },
   fixture: async ({}, use) => {
     const name = expect.getState().currentTestName!.replace(/ /g, "-");
-    const { transpiled, sourceMap, coverage } = await readFixture(name);
 
-    return use({ name, transpiled, sourceMap, coverage });
+    return use({ name, ...(await readFixture(name)) });
   },
 
   actual: async ({ fixture, debug }, use) => {
@@ -40,6 +35,8 @@ export const test = base.extend<{
       `<process-cwd>/test/fixtures/${fixture.name}/sources.ts`,
     );
 
+    debug.generateReports = false;
+
     await use(actual);
 
     if (debug.generateReports) {
@@ -48,15 +45,13 @@ export const test = base.extend<{
   },
 
   expected: async ({ fixture, debug }, use) => {
-    const coverageMap = await getIstanbulInstrumented(
-      fixture.transpiled,
-      fixture.coverage[0].url,
-      fixture.sourceMap,
+    const sourceMapStore = libSourceMaps.createSourceMapStore();
+    const coverageMap = await sourceMapStore.transformCoverage(
+      fixture.istanbul,
     );
 
-    const expected = coverageMap.fileCoverageFor(coverageMap.files()[0]);
-
-    await use(expected);
+    debug.generateReports = false;
+    await use(coverageMap.fileCoverageFor(coverageMap.files()[0]));
 
     if (debug.generateReports) {
       generateReports(coverageMap, "./istanbul-coverage");

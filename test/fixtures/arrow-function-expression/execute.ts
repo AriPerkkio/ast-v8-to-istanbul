@@ -1,4 +1,8 @@
 // @ts-ignore -- generated on runtime
-import { subtract } from "./dist/index.js";
+import * as transpiled from "./dist/index.js";
 
-subtract(2, 3);
+// @ts-ignore -- generated on runtime
+import * as instrumented from "./dist/instrumented.js";
+
+transpiled.subtract(2, 3);
+instrumented.subtract(2, 3);

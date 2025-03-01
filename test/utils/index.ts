@@ -2,8 +2,6 @@ import { readFile } from "node:fs/promises";
 import { Profiler } from "node:inspector";
 import { normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createInstrumenter } from "istanbul-lib-instrument";
-import libSourceMaps from "istanbul-lib-source-maps";
 import { EncodedSourceMap } from "@jridgewell/trace-mapping";
 import {
   CoverageMap,
@@ -20,16 +18,18 @@ export async function readFixture(filename: string) {
     new URL(`../fixtures/${filename}`, import.meta.url),
   );
 
-  const [transpiled, sourceMap, coverage] = await Promise.all([
+  const [transpiled, sourceMap, v8, istanbul] = await Promise.all([
     readFile(`${root}/dist/index.js`, "utf8"),
     readFile(`${root}/dist/index.js.map`, "utf8"),
     readFile(`${root}/dist/coverage.json`, "utf8"),
+    readFile(`${root}/dist/coverage-istanbul.json`, "utf8"),
   ]);
 
   return {
     transpiled,
     sourceMap: JSON.parse(sourceMap) as EncodedSourceMap,
-    coverage: JSON.parse(coverage) as Profiler.ScriptCoverage[],
+    coverage: JSON.parse(v8) as Profiler.ScriptCoverage[],
+    istanbul: createCoverageMap(JSON.parse(istanbul)),
   };
 }
 
@@ -66,26 +66,4 @@ export function generateReports(
 
   reports.create("html").execute(context);
   reports.create("json").execute(context);
-}
-
-export async function getIstanbulInstrumented(
-  code: string,
-  filename: string,
-  sourceMap: EncodedSourceMap,
-) {
-  const instrumenter = createInstrumenter({
-    produceSourceMap: true,
-    autoWrap: false,
-    esModules: true,
-    compact: false,
-  });
-
-  instrumenter.instrumentSync(code, fileURLToPath(filename), sourceMap as any);
-
-  const coverageMap = createCoverageMap();
-  coverageMap.addFileCoverage(instrumenter.lastFileCoverage());
-
-  const sourceMapStore = libSourceMaps.createSourceMapStore();
-
-  return await sourceMapStore.transformCoverage(coverageMap);
 }

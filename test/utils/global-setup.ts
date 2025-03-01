@@ -3,6 +3,7 @@ import inspector, { Profiler } from "node:inspector";
 import { fileURLToPath } from "node:url";
 import esbuild from "esbuild";
 import c from "tinyrainbow";
+import { createInstrumenter } from "istanbul-lib-instrument";
 
 import { toVisualizer } from "./source-map-visualizer";
 import { toAstExplorer } from "./ast-explorer";
@@ -44,21 +45,47 @@ export async function setup() {
       "utf8",
     );
 
+    log("Generating Istanbul coverage for reference");
+    const instrumenter = createInstrumenter({
+      autoWrap: false,
+      esModules: true,
+      coverageVariable: `__istanbul_coverage_${directory}__`,
+    });
+    const instrumented = instrumenter.instrumentSync(
+      code,
+      `${root}/fixtures/${directory}/dist/index.js`,
+      JSON.parse(map) as any,
+    );
+    await writeFile(
+      `${root}/fixtures/${directory}/dist/instrumented.js`,
+      instrumented,
+      "utf8",
+    );
+
     log("Collecting coverage with", `fixtures/${directory}/execute.ts`);
-    const coverage = await collectCoverage(
+    const { v8, istanbul } = await collectCoverage(
       () => import(`${root}/fixtures/${directory}/execute.ts`),
+      directory,
     );
 
     log("Writing coverage to", `fixtures/${directory}/coverage.json\n`);
     await writeFile(
       `${root}/fixtures/${directory}/dist/coverage.json`,
-      JSON.stringify(coverage, null, 2),
+      JSON.stringify(v8, null, 2),
+      "utf8",
+    );
+    await writeFile(
+      `${root}/fixtures/${directory}/dist/coverage-istanbul.json`,
+      JSON.stringify(istanbul, null, 2),
       "utf8",
     );
   }
 }
 
-async function collectCoverage(method: () => void | Promise<void>) {
+async function collectCoverage(
+  method: () => void | Promise<void>,
+  directory: string,
+) {
   const session = new inspector.Session();
 
   session.connect();
@@ -71,7 +98,10 @@ async function collectCoverage(method: () => void | Promise<void>) {
 
   await method();
 
-  return await new Promise<Profiler.ScriptCoverage[]>((resolve, reject) => {
+  return await new Promise<{
+    v8: Profiler.ScriptCoverage[];
+    istanbul: unknown;
+  }>((resolve, reject) => {
     session.post("Profiler.takePreciseCoverage", async (error, data) => {
       if (error) return reject(error);
 
@@ -80,7 +110,10 @@ async function collectCoverage(method: () => void | Promise<void>) {
           entry.url.includes("test/fixtures") && entry.url.includes("/dist/"),
       );
 
-      resolve(filtered);
+      resolve({
+        v8: filtered,
+        istanbul: globalThis[`__istanbul_coverage_${directory}__`],
+      });
     });
   });
 }
