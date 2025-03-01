@@ -8,4 +8,8 @@ if (false) {
   noop();
 }
 
+if (true) {
+  noop();
+}
+
 function noop() {}

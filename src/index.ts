@@ -94,7 +94,7 @@ export default async function convert(options: {
 
     // Branches
     onIfStatement(node) {
-      onBranch(node, [node, node.alternate]);
+      onBranch(node, [node.consequent, node.alternate]);
       onStatement(node);
     },
     onSwitchCase() {},
@@ -227,28 +227,45 @@ export default async function convert(options: {
       );
     }
 
-    const start = node.start + wrapperLength;
-    const end = node.end + wrapperLength;
-    const offsets = branches.map((branch) =>
-      branch
-        ? {
-            start: branch?.start + wrapperLength,
-            end: branch?.end + wrapperLength,
-          }
-        : null,
-    );
+    const startOffset = node.start + wrapperLength;
+    const endOffset = node.end + wrapperLength;
+    const offsets = branches.map((branch, index) => {
+      if (!branch) {
+        return null;
+      }
+      const previous = branches[index - 1];
 
-    const closest: Profiler.CoverageRange[] = locations.map(() => ({
+      return {
+        startOffset: (previous?.end || branch?.start) + wrapperLength,
+        endOffset: branch?.end + wrapperLength,
+      };
+    });
+
+    let outer: Profiler.CoverageRange = {
       startOffset: -1,
       endOffset: Infinity,
-      count: 0,
-    }));
+      count: 1,
+    };
 
-    for (const { ranges } of options.coverage.functions) {
+    const closest: (Profiler.CoverageRange & { _init?: boolean })[] =
+      locations.map(() => ({
+        startOffset: -1,
+        endOffset: Infinity,
+        count: 1,
+        _init: true,
+      }));
+
+    for (const { ranges, isBlockCoverage } of options.coverage.functions) {
+      if (!isBlockCoverage) {
+        continue;
+      }
+
       for (const range of ranges) {
-        // Node must be between the overall range
-        if (range.startOffset > start || end > range.endOffset) {
-          continue;
+        const isBetweenNode = isBetween({ startOffset, endOffset }, range);
+
+        // Range is inside the previous one
+        if (isBetweenNode && isBetween(range, outer)) {
+          outer = range;
         }
 
         for (const [index, branch] of offsets.entries()) {
@@ -256,18 +273,9 @@ export default async function convert(options: {
             continue;
           }
 
-          // Node must be between the branch
           if (
-            range.startOffset > branch.start &&
-            branch.end > range.endOffset
-          ) {
-            continue;
-          }
-
-          // Range is inside the previous one
-          if (
-            range.startOffset > closest[index].startOffset &&
-            range.endOffset < closest[index].endOffset
+            branch.startOffset === range.startOffset &&
+            branch.endOffset == range.endOffset
           ) {
             closest[index] = range;
           }
@@ -275,10 +283,15 @@ export default async function convert(options: {
       }
     }
 
+    // Implicit else
+    if (outer.count && closest.every((range) => range._init)) {
+      closest[1].count = 0;
+    }
+
     addBranch({
       coverageMap,
       loc,
-      locations,
+      locations: [loc, locations[1]],
       type: "if",
       covered: closest.map((range) => range.count),
       filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
@@ -312,4 +325,14 @@ async function debugMappings(map: TraceMap) {
       to: { line: mapping.generatedLine, col: mapping.generatedColumn },
     });
   });
+}
+
+/** Check if `inner` is inside range of `outer` */
+function isBetween(
+  inner: { startOffset: number; endOffset: number },
+  outer: { startOffset: number; endOffset: number },
+) {
+  return (
+    outer.startOffset <= inner.startOffset && inner.endOffset <= outer.endOffset
+  );
 }

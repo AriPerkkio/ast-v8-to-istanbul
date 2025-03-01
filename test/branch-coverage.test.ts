@@ -2,13 +2,15 @@ import { expect } from "vitest";
 
 import { test } from "./utils";
 
-test("if-statement", async ({ actual, expected }) => {
+test("if-statement", async ({ actual, expected, debug }) => {
+  debug.generateReports = true;
+
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "3/4 (75%)",
+      "branches": "3/6 (50%)",
       "functions": "0/1 (0%)",
-      "lines": "3/5 (60%)",
-      "statements": "3/5 (60%)",
+      "lines": "5/7 (71.42%)",
+      "statements": "5/7 (71.42%)",
     }
   `);
 
