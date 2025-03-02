@@ -107,7 +107,8 @@ async function collectCoverage(
 
       const filtered = data.result.filter(
         (entry) =>
-          entry.url.includes("test/fixtures") && entry.url.includes("/dist/"),
+          entry.url.includes("test/fixtures") &&
+          entry.url.includes("/dist/index.js"),
       );
 
       resolve({
