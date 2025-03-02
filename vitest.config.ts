@@ -10,5 +10,8 @@ export default defineConfig({
       enabled: true,
       include: ["src"],
     },
+
+    // Make sure fixtures run directly on Node
+    server: { deps: { external: [/test\/fixtures/] } },
   },
 });

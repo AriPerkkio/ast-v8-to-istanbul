@@ -6,7 +6,7 @@ test("if-statement", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "3/4 (75%)",
-      "functions": "0/1 (0%)",
+      "functions": "1/1 (100%)",
       "lines": "3/5 (60%)",
       "statements": "3/5 (60%)",
     }

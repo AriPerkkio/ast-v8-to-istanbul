@@ -23,7 +23,7 @@ export const test = base.extend<{
     const coverageMap = await convert({
       getAst: parseAstAsync,
       code: fixture.transpiled,
-      wrapperLength: 185, // Tests are executed by vite-node in global setup
+      wrapperLength: 0,
       coverage: fixture.coverage[0],
       sourceMap: fixture.sourceMap,
     });
