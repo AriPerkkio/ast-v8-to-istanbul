@@ -16,6 +16,7 @@ import {
   createCoverageMap,
 } from "./coverage-map";
 import { offsetToNeedle } from "./location";
+import { getCount, normalize } from "./script-coverage";
 
 export default async function convert(options: {
   code: string;
@@ -25,18 +26,13 @@ export default async function convert(options: {
   getAst: (
     code: string,
   ) => Parameters<typeof walk>[0] | Promise<Parameters<typeof walk>[0]>;
-  debug?: boolean;
 }) {
   const wrapperLength = options.wrapperLength || 0;
 
   const map = new TraceMap(options.sourceMap);
-
   const coverageMap = createCoverageMap(options.coverage.url, map);
   const ast = await options.getAst(options.code);
-
-  if (options.debug) {
-    await debugMappings(map);
-  }
+  const ranges = normalize(options.coverage);
 
   await walk(ast, {
     // Functions
@@ -94,7 +90,7 @@ export default async function convert(options: {
 
     // Branches
     onIfStatement(node) {
-      onBranch(node, [node, node.alternate]);
+      onBranch(node, [node.consequent, node.alternate]);
       onStatement(node);
     },
     onSwitchCase() {},
@@ -118,37 +114,20 @@ export default async function convert(options: {
       end: getPosition(offsetToNeedle(positions.decl.end + 1, options.code)),
     };
 
-    let covered = 0;
-    const start = node.start + wrapperLength;
-    const end = node.end + wrapperLength;
-
-    for (const { ranges } of options.coverage.functions) {
-      for (const range of ranges) {
-        if (
-          range.count &&
-          range.startOffset === start &&
-          range.endOffset === end
-        ) {
-          covered += range.count;
-          // TODO: Can we break the loop here?
-        }
-      }
-    }
-
-    const originalFilename = loc.start.filename || loc.end.filename;
-
-    if (!originalFilename) {
-      throw new Error(
-        `Missing original filename for ${JSON.stringify(loc, null, 2)}`,
-      );
-    }
+    const covered = getCount(
+      {
+        startOffset: node.start + wrapperLength,
+        endOffset: node.end + wrapperLength,
+      },
+      ranges,
+    );
 
     addFunction({
       coverageMap,
       covered,
       loc,
       decl,
-      filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
+      filename: getFilename(loc),
       name: getFunctionName(node),
     });
   }
@@ -159,43 +138,19 @@ export default async function convert(options: {
       end: getPosition(offsetToNeedle(node.end, options.code)),
     };
 
-    const originalFilename = loc.start.filename || loc.end.filename;
-
-    if (!originalFilename) {
-      throw new Error(
-        `Missing original filename for ${JSON.stringify(loc, null, 2)}`,
-      );
-    }
-
-    const start = node.start + wrapperLength;
-    const end = node.end + wrapperLength;
-
-    let closest: Profiler.CoverageRange = {
-      count: 0,
-      startOffset: -1,
-      endOffset: Infinity,
-    };
-
-    for (const { ranges } of options.coverage.functions) {
-      for (const range of ranges) {
-        if (
-          // Node is between the range
-          range.startOffset <= start &&
-          end <= range.endOffset &&
-          // Range is inside the previous one
-          range.startOffset > closest.startOffset &&
-          range.endOffset < closest.endOffset
-        ) {
-          closest = range;
-        }
-      }
-    }
+    const covered = getCount(
+      {
+        startOffset: node.start + wrapperLength,
+        endOffset: node.end + wrapperLength,
+      },
+      ranges,
+    );
 
     addStatement({
       coverageMap,
       loc,
-      covered: closest.count,
-      filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
+      covered,
+      filename: getFilename(loc),
     });
   }
 
@@ -205,83 +160,58 @@ export default async function convert(options: {
       end: getPosition(offsetToNeedle(node.end, options.code)),
     };
 
-    const locations = branches.map((location) => {
-      if (!location) {
-        return {
+    const locations = [];
+    const covered = [];
+
+    for (const [index, branch] of branches.entries()) {
+      const previous = branches[index - 1];
+
+      if (!branch) {
+        locations.push({
           start: { line: undefined, column: undefined },
           end: { line: undefined, coolumn: undefined },
-        };
+        });
+
+        if (previous) {
+          covered.push(
+            getCount(
+              {
+                startOffset: previous.end + 1 + wrapperLength,
+                endOffset: previous.end + 1 + wrapperLength,
+              },
+              ranges,
+            ),
+          );
+        } else {
+          covered.push(0);
+        }
+
+        continue;
       }
 
-      return {
-        start: getPosition(offsetToNeedle(location.start, options.code)),
-        end: getPosition(offsetToNeedle(location.end, options.code)),
-      };
-    });
+      locations.push({
+        start: getPosition(offsetToNeedle(branch.start, options.code)),
+        end: getPosition(offsetToNeedle(branch.end, options.code)),
+      });
 
-    const originalFilename = loc.start.filename || loc.end.filename;
-
-    if (!originalFilename) {
-      throw new Error(
-        `Missing original filename for ${JSON.stringify(loc, null, 2)}`,
+      covered.push(
+        getCount(
+          {
+            startOffset: (previous?.end || branch.start) + wrapperLength,
+            endOffset: branch.end + wrapperLength,
+          },
+          ranges,
+        ),
       );
-    }
-
-    const start = node.start + wrapperLength;
-    const end = node.end + wrapperLength;
-    const offsets = branches.map((branch) =>
-      branch
-        ? {
-            start: branch?.start + wrapperLength,
-            end: branch?.end + wrapperLength,
-          }
-        : null,
-    );
-
-    const closest: Profiler.CoverageRange[] = locations.map(() => ({
-      startOffset: -1,
-      endOffset: Infinity,
-      count: 0,
-    }));
-
-    for (const { ranges } of options.coverage.functions) {
-      for (const range of ranges) {
-        // Node must be between the overall range
-        if (range.startOffset > start || end > range.endOffset) {
-          continue;
-        }
-
-        for (const [index, branch] of offsets.entries()) {
-          if (!branch) {
-            continue;
-          }
-
-          // Node must be between the branch
-          if (
-            range.startOffset > branch.start &&
-            branch.end > range.endOffset
-          ) {
-            continue;
-          }
-
-          // Range is inside the previous one
-          if (
-            range.startOffset > closest[index].startOffset &&
-            range.endOffset < closest[index].endOffset
-          ) {
-            closest[index] = range;
-          }
-        }
-      }
     }
 
     addBranch({
       coverageMap,
       loc,
-      locations,
+      locations: [loc, locations[1]],
       type: "if",
-      covered: closest.map((range) => range.count),
-      filename: fileURLToPath(new URL(originalFilename, options.coverage.url)),
+      covered,
+      filename: getFilename(loc),
     });
   }
 
@@ -300,16 +230,19 @@ export default async function convert(options: {
 
     return { line, column, filename: source };
   }
-}
 
-async function debugMappings(map: TraceMap) {
-  const { eachMapping } = await import("@jridgewell/trace-mapping");
+  function getFilename(position: {
+    start: { filename: string | null };
+    end: { filename: string | null };
+  }) {
+    const filename = position.start.filename || position.end.filename;
 
-  console.log("Mappings:");
-  eachMapping(map, (mapping) => {
-    console.log({
-      from: { line: mapping.originalLine, col: mapping.originalColumn },
-      to: { line: mapping.generatedLine, col: mapping.generatedColumn },
-    });
-  });
+    if (!filename) {
+      throw new Error(
+        `Missing original filename for ${JSON.stringify(position, null, 2)}`,
+      );
+    }
+
+    return fileURLToPath(new URL(filename, options.coverage.url));
+  }
 }
