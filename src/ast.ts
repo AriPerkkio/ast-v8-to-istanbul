@@ -22,7 +22,6 @@ import type {
   VariableDeclarator,
   WhileStatement,
   WithStatement,
-  SwitchCase,
   ConditionalExpression,
   LogicalExpression,
 } from "estree";
@@ -55,14 +54,13 @@ interface Visitors {
   onForOfStatement: (node: ForOfStatement) => void;
   onWhileStatement: (node: WhileStatement) => void;
   onDoWhileStatement: (node: DoWhileStatement) => void;
-  onSwitchStatement: (node: SwitchStatement) => void;
   onWithStatement: (node: WithStatement) => void;
   onLabeledStatement: (node: LabeledStatement) => void;
   onVariableDeclarator: (node: VariableDeclarator) => void;
 
   // Branches
   onIfStatement: (node: IfStatement) => void;
-  onSwitchCase: (node: SwitchCase) => void;
+  onSwitchStatement: (node: SwitchStatement) => void;
   onConditionalExpression: (node: ConditionalExpression) => void;
   onLogicalExpression: (node: LogicalExpression) => void;
 }
@@ -129,9 +127,6 @@ export async function walk(ast: Program, visitors: Visitors) {
         case "DoWhileStatement": {
           return visitors.onDoWhileStatement(node);
         }
-        case "SwitchStatement": {
-          return visitors.onSwitchStatement(node);
-        }
         case "WithStatement": {
           return visitors.onWithStatement(node);
         }
@@ -146,8 +141,8 @@ export async function walk(ast: Program, visitors: Visitors) {
         case "IfStatement": {
           return visitors.onIfStatement(node);
         }
-        case "SwitchCase": {
-          return visitors.onSwitchCase(node);
+        case "SwitchStatement": {
+          return visitors.onSwitchStatement(node);
         }
         case "ConditionalExpression": {
           return visitors.onConditionalExpression(node);

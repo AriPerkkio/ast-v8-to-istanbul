@@ -133,6 +133,14 @@ function toMatchBranches(
 function rangeDiff(a: Partial<Range>, b: Partial<Range>) {
   const diff: string[] = [];
 
+  if (!a) {
+    return [
+      `  actual: missing`,
+      `  expected: [start.line: ${b.start?.line}, start.col: ${b.start?.column}`,
+      `  expected: [end.line: ${b.end?.line}, end.col: ${b.end?.column}`,
+    ];
+  }
+
   // https://github.com/istanbuljs/istanbuljs/blob/istanbul-lib-source-maps-v5.0.6/packages/istanbul-lib-source-maps/lib/get-mapping.js#L70-L77
   const skipEndColumns =
     a.end?.column === Infinity || b.end?.column === Infinity;
