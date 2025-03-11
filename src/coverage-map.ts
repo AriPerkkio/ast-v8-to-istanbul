@@ -2,6 +2,14 @@ import { fileURLToPath } from "node:url";
 import { type Needle, type TraceMap } from "@jridgewell/trace-mapping";
 import libCoverage, { type CoverageMap } from "istanbul-lib-coverage";
 
+// https://github.com/istanbuljs/istanbuljs/blob/main/docs/raw-output.md#branch-types
+export type Branch =
+  | "if"
+  | "binary-expr"
+  | "cond-expr"
+  | "switch"
+  | "default-arg";
+
 export function createCoverageMap(filename: string, sourceMap: TraceMap) {
   const coverageMap: CoverageMap = libCoverage.createCoverageMap();
 
@@ -70,7 +78,7 @@ export function addStatement(options: {
 export function addBranch(options: {
   coverageMap: CoverageMap;
   filename: string;
-  type: "if" | "switch" | "conditional" | "binary";
+  type: Branch;
   loc: { start: Needle; end: Needle };
   locations: { start: Partial<Needle>; end: Partial<Needle> }[];
   covered?: number[];
