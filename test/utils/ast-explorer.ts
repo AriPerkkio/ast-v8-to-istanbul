@@ -1,7 +1,7 @@
 import { btoa } from "node:buffer";
 
 /**
- * Generates link for `https://ast.sxzz.dev`.
+ * Generates link for `https://ast-explorer.dev`.
  *
  * See https://github.com/sxzz/ast-explorer?tab=readme-ov-file#url-encode-algorithm
  */
@@ -18,5 +18,5 @@ export function toAstExplorer(opts: {
     ),
   });
 
-  return `https://ast.sxzz.dev/#${btoa(serialized)}`;
+  return `https://ast-explorer.dev/#${btoa(serialized)}`;
 }
