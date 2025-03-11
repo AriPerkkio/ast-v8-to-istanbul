@@ -5,8 +5,8 @@ expect.extend({ toMatchFunctions, toMatchStatements, toMatchBranches });
 
 function toMatchFunctions(
   this: { isNot?: boolean },
-  expected: FileCoverage["fnMap"],
   actual: FileCoverage["fnMap"],
+  expected: FileCoverage["fnMap"],
 ) {
   if (this.isNot) {
     return {
@@ -50,8 +50,8 @@ function toMatchFunctions(
 
 function toMatchStatements(
   this: { isNot?: boolean },
-  expected: FileCoverage["statementMap"],
   actual: FileCoverage["statementMap"],
+  expected: FileCoverage["statementMap"],
 ) {
   if (this.isNot) {
     return {
@@ -85,8 +85,8 @@ function toMatchStatements(
 
 function toMatchBranches(
   this: { isNot?: boolean },
-  expected: FileCoverage["branchMap"],
   actual: FileCoverage["branchMap"],
+  expected: FileCoverage["branchMap"],
 ) {
   if (this.isNot) {
     return {
