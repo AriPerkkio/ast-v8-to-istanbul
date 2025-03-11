@@ -13,9 +13,10 @@ import {
   addBranch,
   addFunction,
   addStatement,
+  type Branch,
   createCoverageMap,
 } from "./coverage-map";
-import { offsetToNeedle } from "./location";
+import { isLocationSame, offsetToNeedle } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
 export default async function convert(options: {
@@ -90,11 +91,13 @@ export default async function convert(options: {
 
     // Branches
     onIfStatement(node) {
-      onBranch(node, [node.consequent, node.alternate]);
+      onBranch("if", node, [node.consequent, node.alternate]);
       onStatement(node);
     },
+    onConditionalExpression(node) {
+      onBranch("cond-expr", node, [node.consequent, node.alternate]);
+    },
     onSwitchCase() {},
-    onConditionalExpression() {},
     onLogicalExpression() {},
   });
 
@@ -154,7 +157,11 @@ export default async function convert(options: {
     });
   }
 
-  function onBranch(node: Node, branches: (Node | null | undefined)[]) {
+  function onBranch(
+    type: Branch,
+    node: Node,
+    branches: (Node | null | undefined)[],
+  ) {
     const loc = {
       start: getPosition(offsetToNeedle(node.start, options.code)),
       end: getPosition(offsetToNeedle(node.end, options.code)),
@@ -175,10 +182,16 @@ export default async function convert(options: {
         continue;
       }
 
-      locations.push({
+      const location = {
         start: getPosition(offsetToNeedle(branch.start, options.code)),
         end: getPosition(offsetToNeedle(branch.end, options.code)),
-      });
+      };
+
+      if (isLocationSame(location.start, location.end)) {
+        location.end.column = Infinity;
+      }
+
+      locations.push(location);
 
       covered.push(
         getCount(
@@ -201,11 +214,15 @@ export default async function convert(options: {
       );
     }
 
+    if (type === "if") {
+      locations[0] = loc;
+    }
+
     addBranch({
       coverageMap,
       loc,
-      locations: [loc, locations[1]],
-      type: "if",
+      locations,
+      type,
       covered,
       filename: getFilename(loc),
     });

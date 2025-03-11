@@ -49,3 +49,7 @@ export function needleToOffset(
     `Unable to find offset for ${JSON.stringify(needle, null, 2)}`,
   );
 }
+
+export function isLocationSame(a: Needle, b: Needle) {
+  return a.line === b.line && a.column === b.column;
+}
