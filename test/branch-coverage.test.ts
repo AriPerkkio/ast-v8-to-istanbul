@@ -51,3 +51,17 @@ test("conditional expression", async ({ actual, expected }) => {
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
   expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
 });
+
+test("logical-expression", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "5/8 (62.5%)",
+      "functions": "1/1 (100%)",
+      "lines": "5/5 (100%)",
+      "statements": "5/5 (100%)",
+    }
+  `);
+
+  expect(actual.branchMap).toMatchBranches(expected.branchMap);
+  expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
+});
