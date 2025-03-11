@@ -82,7 +82,6 @@ export default async function convert(options: {
     onForOfStatement: onStatement,
     onWhileStatement: onStatement,
     onDoWhileStatement: onStatement,
-    onSwitchStatement: onStatement,
     onWithStatement: onStatement,
     onLabeledStatement: onStatement,
     onVariableDeclarator(node) {
@@ -100,7 +99,10 @@ export default async function convert(options: {
     onLogicalExpression(node) {
       onBranch("binary-expr", node, [node.left, node.right]);
     },
-    onSwitchCase() {},
+    onSwitchStatement(node) {
+      onBranch("switch", node, node.cases);
+      onStatement(node);
+    },
   });
 
   return coverageMap;
@@ -206,18 +208,18 @@ export default async function convert(options: {
       );
     }
 
-    if (covered[0] === 0 && covered[1] === 0) {
-      covered[1] = getCount(
-        {
-          startOffset: node.start + wrapperLength,
-          endOffset: node.end + wrapperLength,
-        },
-        ranges,
-      );
-    }
-
     if (type === "if") {
       locations[0] = loc;
+
+      if (covered[0] === 0 && covered[1] === 0) {
+        covered[1] = getCount(
+          {
+            startOffset: node.start + wrapperLength,
+            endOffset: node.end + wrapperLength,
+          },
+          ranges,
+        );
+      }
     }
 
     addBranch({

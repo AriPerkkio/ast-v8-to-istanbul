@@ -65,3 +65,17 @@ test("logical-expression", async ({ actual, expected }) => {
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
   expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
 });
+
+test("switch-case", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "1/5 (20%)",
+      "functions": "1/1 (100%)",
+      "lines": "4/7 (57.14%)",
+      "statements": "4/7 (57.14%)",
+    }
+  `);
+
+  expect(actual.branchMap).toMatchBranches(expected.branchMap);
+  expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
+});
