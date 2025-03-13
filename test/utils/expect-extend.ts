@@ -141,12 +141,6 @@ function rangeDiff(a: Partial<Range>, b: Partial<Range>) {
     ];
   }
 
-  // https://github.com/istanbuljs/istanbuljs/blob/istanbul-lib-source-maps-v5.0.6/packages/istanbul-lib-source-maps/lib/get-mapping.js#L70-L77
-  const skipEndColumns =
-    a.end?.column === Infinity || b.end?.column === Infinity;
-  const aEnd = { ...a.end, column: skipEndColumns ? 0 : a.end?.column };
-  const bEnd = { ...b.end, column: skipEndColumns ? 0 : b.end?.column };
-
   if (a.start?.line !== b.start?.line || a.start?.column !== b.start?.column) {
     diff.push(
       `  actual:   [start.line: ${a.start?.line}, start.col: ${a.start?.column}`,
@@ -155,9 +149,13 @@ function rangeDiff(a: Partial<Range>, b: Partial<Range>) {
       `  expected: [start.line: ${b.start?.line}, start.col: ${b.start?.column}`,
     );
   }
-  if (aEnd?.line !== bEnd?.line || aEnd?.column !== bEnd?.column) {
-    diff.push(`  actual:   [end.line: ${aEnd?.line}, end.col: ${aEnd?.column}`);
-    diff.push(`  expected: [end.line: ${bEnd?.line}, end.col: ${bEnd?.column}`);
+  if (a.end?.line !== b.end?.line || a.end?.column !== b.end?.column) {
+    diff.push(
+      `  actual:   [end.line: ${a.end?.line}, end.col: ${a.end?.column}`,
+    );
+    diff.push(
+      `  expected: [end.line: ${b.end?.line}, end.col: ${b.end?.column}`,
+    );
   }
 
   return diff;
