@@ -103,6 +103,11 @@ export default async function convert(options: {
       onBranch("switch", node, node.cases);
       onStatement(node);
     },
+    onAssignmentPattern(node) {
+      onBranch("default-arg", { ...node, end: node.end + 1 }, [
+        { ...node.right, end: node.right.end + 1 },
+      ]);
+    },
   });
 
   return coverageMap;
