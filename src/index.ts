@@ -88,7 +88,7 @@ export default async function convert(options: {
     onLabeledStatement: onStatement,
     onVariableDeclarator(node) {
       if (node.init) {
-        onStatement(node.init);
+        onStatement(node.init, node);
       }
     },
 
@@ -139,13 +139,13 @@ export default async function convert(options: {
     });
   }
 
-  function onStatement(node: Node) {
+  function onStatement(node: Node, parent?: Node) {
     const loc = getLoc(node);
 
     const covered = getCount(
       {
-        startOffset: node.start + wrapperLength,
-        endOffset: node.end + wrapperLength,
+        startOffset: (parent || node).start + wrapperLength,
+        endOffset: (parent || node).end + wrapperLength,
       },
       ranges,
     );

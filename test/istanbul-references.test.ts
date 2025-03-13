@@ -104,18 +104,21 @@ describe.each(suites)("$suite", async ({ suite, tests }) => {
       expect.soft(globalThis.output).toEqual(out);
 
       const fileCoverage = coverageMap.fileCoverageFor(fullname);
+      const message = `\nCode: \n\n${t.code}\n`;
 
       if (expected.statements) {
-        expect.soft(fileCoverage.s).toEqual(expected.statements);
+        expect.soft(fileCoverage.s, message).toEqual(expected.statements);
       }
       if (expected.functions) {
-        expect.soft(fileCoverage.f).toEqual(expected.functions);
+        expect.soft(fileCoverage.f, message).toEqual(expected.functions);
       }
       if (expected.brances) {
-        expect.soft(fileCoverage.b).toEqual(expected.brances);
+        expect.soft(fileCoverage.b, message).toEqual(expected.brances);
       }
       if (expected.lines) {
-        expect.soft(fileCoverage.getLineCoverage()).toEqual(expected.lines);
+        expect
+          .soft(fileCoverage.getLineCoverage(), message)
+          .toEqual(expected.lines);
       }
     });
   });
