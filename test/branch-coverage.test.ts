@@ -79,3 +79,18 @@ test("switch-case", async ({ actual, expected }) => {
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
   expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
 });
+
+test("assignment-pattern", async ({ actual, expected }) => {
+  // Uncovered branches are marked as covered due to https://github.com/nodejs/node/issues/57435
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "5/10 (50%)",
+      "functions": "1/2 (50%)",
+      "lines": "6/11 (54.54%)",
+      "statements": "6/11 (54.54%)",
+    }
+  `);
+
+  expect(actual.branchMap).toMatchBranches(expected.branchMap);
+  expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
+});

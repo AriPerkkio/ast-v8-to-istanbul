@@ -24,6 +24,7 @@ import type {
   WithStatement,
   ConditionalExpression,
   LogicalExpression,
+  AssignmentPattern,
 } from "estree";
 import { asyncWalk } from "estree-walker";
 
@@ -63,6 +64,7 @@ interface Visitors {
   onSwitchStatement: (node: SwitchStatement) => void;
   onConditionalExpression: (node: ConditionalExpression) => void;
   onLogicalExpression: (node: LogicalExpression) => void;
+  onAssignmentPattern: (node: AssignmentPattern) => void;
 }
 export type FunctionNodes = Parameters<
   Visitors[
@@ -149,6 +151,9 @@ export async function walk(ast: Program, visitors: Visitors) {
         }
         case "LogicalExpression": {
           return visitors.onLogicalExpression(node);
+        }
+        case "AssignmentPattern": {
+          return visitors.onAssignmentPattern(node);
         }
       }
     },

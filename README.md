@@ -44,5 +44,5 @@ const coverageMap: CoverageMap = await convert({
 
 ## Limitations
 
-- Unable to detect uncovered `AssignPattern`'s if line is otherwise covered
+- Unable to detect uncovered `AssignmentPattern`'s if line is otherwise covered
   - https://github.com/nodejs/node/issues/57435
