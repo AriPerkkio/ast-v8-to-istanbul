@@ -1,6 +1,8 @@
 import type { Profiler } from "node:inspector";
 import { fileURLToPath } from "node:url";
 import {
+  allGeneratedPositionsFor,
+  LEAST_UPPER_BOUND,
   originalPositionFor,
   TraceMap,
   type Needle,
@@ -16,7 +18,7 @@ import {
   type Branch,
   createCoverageMap,
 } from "./coverage-map";
-import { isLocationSame, offsetToNeedle } from "./location";
+import { offsetToNeedle } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
 export default async function convert(options: {
@@ -106,9 +108,7 @@ export default async function convert(options: {
       onStatement(node);
     },
     onAssignmentPattern(node) {
-      onBranch("default-arg", { ...node, end: node.end + 1 }, [
-        { ...node.right, end: node.right.end + 1 },
-      ]);
+      onBranch("default-arg", node, [node.right]);
     },
   });
 
@@ -118,15 +118,8 @@ export default async function convert(options: {
     node: FunctionNodes,
     positions: { loc: Node; decl: Node },
   ) {
-    const loc = {
-      start: getPosition(offsetToNeedle(positions.loc.start, options.code)),
-      end: getPosition(offsetToNeedle(positions.loc.end, options.code)),
-    };
-
-    const decl = {
-      start: getPosition(offsetToNeedle(positions.decl.start, options.code)),
-      end: getPosition(offsetToNeedle(positions.decl.end + 1, options.code)),
-    };
+    const loc = getLoc(positions.loc);
+    const decl = getLoc(positions.decl);
 
     const covered = getCount(
       {
@@ -147,10 +140,7 @@ export default async function convert(options: {
   }
 
   function onStatement(node: Node) {
-    const loc = {
-      start: getPosition(offsetToNeedle(node.start, options.code)),
-      end: getPosition(offsetToNeedle(node.end, options.code)),
-    };
+    const loc = getLoc(node);
 
     const covered = getCount(
       {
@@ -173,10 +163,7 @@ export default async function convert(options: {
     node: Node,
     branches: (Node | null | undefined)[],
   ) {
-    const loc = {
-      start: getPosition(offsetToNeedle(node.start, options.code)),
-      end: getPosition(offsetToNeedle(node.end, options.code)),
-    };
+    const loc = getLoc(node);
 
     const locations = [];
     const covered = [];
@@ -193,16 +180,7 @@ export default async function convert(options: {
         continue;
       }
 
-      const location = {
-        start: getPosition(offsetToNeedle(branch.start, options.code)),
-        end: getPosition(offsetToNeedle(branch.end, options.code)),
-      };
-
-      if (isLocationSame(location.start, location.end)) {
-        location.end.column = Infinity;
-      }
-
-      locations.push(location);
+      locations.push(getLoc(branch));
 
       covered.push(
         getCount(
@@ -253,6 +231,40 @@ export default async function convert(options: {
     }
 
     return { line, column, filename: source };
+  }
+
+  function getLoc(node: Node) {
+    // End-mapping tracing logic from istanbul-lib-source-maps
+    const endNeedle = offsetToNeedle(node.end, options.code);
+    endNeedle.column -= 1;
+
+    const loc = {
+      start: getPosition(offsetToNeedle(node.start, options.code)),
+      end: getPosition(endNeedle),
+    };
+
+    const afterEndMappings = allGeneratedPositionsFor(map, {
+      source: loc.end.filename!,
+      line: loc.end.line,
+      column: loc.end.column + 1,
+      bias: LEAST_UPPER_BOUND,
+    });
+
+    if (afterEndMappings.length === 0) {
+      loc.end.column = Infinity;
+    } else {
+      for (const mapping of afterEndMappings) {
+        if (mapping.line === null) continue;
+
+        const original = originalPositionFor(map, mapping);
+        if (original.line === loc.end.line) {
+          loc.end = { ...original, filename: original.source };
+          break;
+        }
+      }
+    }
+
+    return loc;
   }
 
   function getFilename(position: {

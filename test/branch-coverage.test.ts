@@ -26,28 +26,6 @@ test("conditional expression", async ({ actual, expected }) => {
     }
   `);
 
-  const mapping = {
-    actual: actual.branchMap[0].locations[0].end,
-    expected: expected.branchMap[0].locations[0].end,
-  };
-
-  // Istanbul's end column is not accurate, let's instead provide better ending
-  expect(mapping).toMatchInlineSnapshot(`
-    {
-      "actual": {
-        "column": 17,
-        "line": 3,
-      },
-      "expected": {
-        "column": 21,
-        "line": 3,
-      },
-    }
-  `);
-
-  expected.branchMap[0].locations[0].end.column =
-    actual.branchMap[0].locations[0].end.column;
-
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
   expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
 });
