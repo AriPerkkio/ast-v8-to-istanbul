@@ -5,6 +5,7 @@ export default defineConfig({
     reporters: "verbose",
     setupFiles: ["./test/utils/setup.ts"],
     globalSetup: ["./test/utils/global-setup.ts"],
+    passWithNoTests: true,
 
     coverage: {
       enabled: true,
@@ -12,6 +13,8 @@ export default defineConfig({
     },
 
     // Make sure fixtures run directly on Node
-    server: { deps: { external: [/test\/fixtures/] } },
+    server: {
+      deps: { external: [/test\/fixtures/, /test\/istanbul-references\//] },
+    },
   },
 });
