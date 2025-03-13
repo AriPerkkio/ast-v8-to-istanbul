@@ -85,7 +85,9 @@ export default async function convert(options: {
     onWithStatement: onStatement,
     onLabeledStatement: onStatement,
     onVariableDeclarator(node) {
-      onStatement(node.init || node);
+      if (node.init) {
+        onStatement(node.init);
+      }
     },
 
     // Branches
