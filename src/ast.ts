@@ -76,7 +76,7 @@ export type FunctionNodes = Parameters<
 
 export async function walk(ast: Program, visitors: Visitors) {
   return await asyncWalk(ast, {
-    async leave(node) {
+    async enter(node) {
       switch (node.type) {
         // Functions
         case "FunctionDeclaration": {

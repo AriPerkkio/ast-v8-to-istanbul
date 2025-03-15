@@ -23,9 +23,9 @@ test("arrow function expression", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "0/0 (100%)",
-      "functions": "1/5 (20%)",
-      "lines": "6/9 (66.66%)",
-      "statements": "6/9 (66.66%)",
+      "functions": "4/9 (44.44%)",
+      "lines": "11/14 (78.57%)",
+      "statements": "11/15 (73.33%)",
     }
   `);
 

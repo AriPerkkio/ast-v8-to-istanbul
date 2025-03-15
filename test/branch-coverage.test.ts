@@ -7,8 +7,8 @@ test("if-statement", async ({ actual, expected }) => {
     {
       "branches": "6/12 (50%)",
       "functions": "3/3 (100%)",
-      "lines": "8/11 (72.72%)",
-      "statements": "8/11 (72.72%)",
+      "lines": "12/16 (75%)",
+      "statements": "12/16 (75%)",
     }
   `);
 

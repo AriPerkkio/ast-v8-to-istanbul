@@ -55,6 +55,11 @@ export default async function convert(options: {
           end: node.start + 1,
         },
       });
+
+      // Implicit return-statement of bodyless arrow function
+      if (node.body.type !== "BlockStatement") {
+        onStatement(node.body, node);
+      }
     },
     onMethodDefinition(node) {
       onFunction(node, {

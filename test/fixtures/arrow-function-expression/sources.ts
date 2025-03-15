@@ -15,3 +15,14 @@ export const remainder = (a: number, b: number) => {
 };
 
 export const foo = (bar) => {};
+
+// prettier-ignore
+export const arrow = a => (
+  b => (
+    c => (
+      d => a + b + c + d
+    )
+  )
+)
+
+arrow(1)(2)(3);
