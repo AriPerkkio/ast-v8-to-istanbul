@@ -43,7 +43,7 @@ export function addFunction(options: {
     1 +
     (Object.keys(fileCoverage.f)
       .map((key) => parseInt(key))
-      .sort()
+      .sort((a, b) => a - b)
       .pop() ?? -1);
 
   const name = options.name || `(anonymous_${index})`;
@@ -68,7 +68,7 @@ export function addStatement(options: {
     1 +
     (Object.keys(fileCoverage.s)
       .map((key) => parseInt(key))
-      .sort()
+      .sort((a, b) => a - b)
       .pop() ?? -1);
 
   fileCoverage.data.statementMap[index] = pickLocation(options.loc);
@@ -88,7 +88,7 @@ export function addBranch(options: {
     1 +
     (Object.keys(fileCoverage.b)
       .map((key) => parseInt(key))
-      .sort()
+      .sort((a, b) => a - b)
       .pop() ?? -1);
 
   fileCoverage.data.branchMap[index] = {
