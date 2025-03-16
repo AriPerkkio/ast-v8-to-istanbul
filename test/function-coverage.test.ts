@@ -7,8 +7,8 @@ test("function declaration", async ({ actual, expected }) => {
     {
       "branches": "0/0 (100%)",
       "functions": "1/4 (25%)",
-      "lines": "1/4 (25%)",
-      "statements": "1/4 (25%)",
+      "lines": "2/5 (40%)",
+      "statements": "2/5 (40%)",
     }
   `);
 
@@ -24,8 +24,8 @@ test("arrow function expression", async ({ actual, expected }) => {
     {
       "branches": "0/0 (100%)",
       "functions": "4/9 (44.44%)",
-      "lines": "11/14 (78.57%)",
-      "statements": "11/15 (73.33%)",
+      "lines": "12/15 (80%)",
+      "statements": "12/16 (75%)",
     }
   `);
 
@@ -41,8 +41,8 @@ test("function expression", async ({ actual, expected }) => {
     {
       "branches": "0/0 (100%)",
       "functions": "2/4 (50%)",
-      "lines": "4/6 (66.66%)",
-      "statements": "4/6 (66.66%)",
+      "lines": "6/8 (75%)",
+      "statements": "6/8 (75%)",
     }
   `);
 

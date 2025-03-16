@@ -18,4 +18,5 @@ const MathObject = {
   },
 };
 
-export { MathClass, MathObject };
+new MathClass().subtract(2, 3);
+MathObject.multiply(2, 3);

@@ -62,9 +62,16 @@ export async function setup() {
       "utf8",
     );
 
-    log("Collecting coverage with", `fixtures/${directory}/execute.ts`);
+    log("Collecting coverage of", directory);
+    const cache = new Date().getTime();
     const { v8, istanbul } = await collectCoverage(
-      () => import(`${root}/fixtures/${directory}/execute.ts`),
+      () =>
+        Promise.all([
+          import(`${root}/fixtures/${directory}/dist/index.js?cache=${cache}`),
+          import(
+            `${root}/fixtures/${directory}/dist/instrumented.js?cache=${cache}`
+          ),
+        ]),
       directory,
     );
 
@@ -83,7 +90,7 @@ export async function setup() {
 }
 
 async function collectCoverage(
-  method: () => void | Promise<void>,
+  method: () => unknown | Promise<unknown>,
   directory: string,
 ) {
   const session = new inspector.Session();

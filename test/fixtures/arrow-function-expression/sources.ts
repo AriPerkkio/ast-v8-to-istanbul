@@ -26,3 +26,5 @@ export const arrow = a => (
 )
 
 arrow(1)(2)(3);
+
+subtract(2, 3);

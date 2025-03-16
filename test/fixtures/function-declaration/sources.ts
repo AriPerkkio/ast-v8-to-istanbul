@@ -14,5 +14,7 @@ export function remainder(a: number, b: number) {
   return a % b;
 }
 
+subtract(2, 3);
+
 // TODO:
 // function noop() {}

@@ -14,7 +14,9 @@ export default defineConfig({
 
     // Make sure fixtures run directly on Node
     server: {
-      deps: { external: [/test\/fixtures/, /test\/istanbul-references\//] },
+      deps: {
+        external: [/\/dist\//, /test\/istanbul-references\//],
+      },
     },
   },
 });
