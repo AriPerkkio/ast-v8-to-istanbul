@@ -46,3 +46,35 @@ const coverageMap: CoverageMap = await convert({
 
 - Unable to detect uncovered `AssignmentPattern`'s if line is otherwise covered
   - https://github.com/nodejs/node/issues/57435
+
+- Unable to detect uncovered parts when block execution stops due to function throwing:
+  - ```js
+    function first() {
+      throws()
+
+      // unreachable, but incorrectly covered
+      return "first";
+    }
+
+    const throws = ()  => { throw new Error() }
+
+    try { first(1) } catch {}
+    ```
+  - ```json
+    [
+      {
+        "ranges": [{ "startOffset": 0, "endOffset": 165, "count": 1 }],
+        "isBlockCoverage": true
+      },
+      {
+        "functionName": "first",
+        "ranges": [{ "startOffset": 0, "endOffset": 92, "count": 1 }],
+        "isBlockCoverage": true
+      },
+      {
+        "functionName": "throws",
+        "ranges": [{ "startOffset": 109, "endOffset": 137, "count": 1 }],
+        "isBlockCoverage": true
+      }
+    ]
+    ```

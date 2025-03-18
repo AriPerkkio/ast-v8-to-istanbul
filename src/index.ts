@@ -93,7 +93,6 @@ export default async function convert(options: {
     },
 
     // Statements
-    onExpressionStatement: onStatement,
     onBreakStatement: onStatement,
     onContinueStatement: onStatement,
     onDebuggerStatement: onStatement,
@@ -107,6 +106,16 @@ export default async function convert(options: {
     onDoWhileStatement: onStatement,
     onWithStatement: onStatement,
     onLabeledStatement: onStatement,
+    onExpressionStatement(node) {
+      if (
+        node.expression.type === "Literal" &&
+        node.expression.value === "use strict"
+      ) {
+        return;
+      }
+
+      onStatement(node);
+    },
     onVariableDeclarator(node) {
       if (node.init) {
         onStatement(node.init, node);
