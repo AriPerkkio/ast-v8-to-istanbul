@@ -10,6 +10,7 @@ opts:
   generateOnly: true
 tests:
   - name: export
+    out: 5
 
 ---
 name: covers import statements
@@ -23,4 +24,5 @@ opts:
   generateOnly: true
 tests:
   - name: import
-
+    args: ["Hello %s", "world"]
+    out: "Hello world"

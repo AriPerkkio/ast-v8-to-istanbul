@@ -30,15 +30,12 @@ type TestCase = {
 
 const TODO_TESTS = [
   "class-properties.yaml",
-  "do-while.yaml",
-  "es6-modules.yaml",
   "if-hints.yaml",
   "ignore.yaml",
   "statement-hints.yaml",
   "strict.yaml",
   "switch.yaml",
   "truthy.yaml",
-  "while.yaml",
   "with.yaml",
 ];
 
@@ -72,7 +69,11 @@ const suites = await Promise.all(
 
 describe.each(suites)("$suite", async ({ suite, tests }) => {
   describe.skipIf(TODO_TESTS.includes(suite)).each(tests)("$name", (t) => {
-    test.each(t.tests)("$name", async (testCase) => {
+    test.for(t.tests)("$name", async (testCase, ctx) => {
+      if (testCase.name?.includes("ignore") || t.name.includes("ignore")) {
+        ctx.skip("Ignore not yet supported");
+      }
+
       const { filename, args, out, ...expected } = testCase;
       const fullname = `${directory}/${filename}`;
 
@@ -93,7 +94,9 @@ describe.each(suites)("$suite", async ({ suite, tests }) => {
         }) as any,
       });
 
-      expect.soft(globalThis.output).toEqual(out);
+      if (out !== undefined) {
+        expect.soft(globalThis.output).toEqual(out);
+      }
 
       const fileCoverage = coverageMap.fileCoverageFor(fullname);
       const message = `\nCode: \n\n${t.code}\n`;

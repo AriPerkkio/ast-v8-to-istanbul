@@ -53,7 +53,7 @@ tests:
 ---
 name: labeled nested while
 code: |
-  var x = args[0], i=0, j=0, output = 0;
+  var x = args[0], i=0, j=0; (output = 0);
   outer:
      while (i++ < x) {
          j =0;

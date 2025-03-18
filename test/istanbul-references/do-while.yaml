@@ -47,7 +47,8 @@ code: |
   } while (false);
   output = 10
 tests:
-  - args: []
+  - name: correct lines and statements
+    args: []
     out: 10
     lines: {'1': 1, '5': 1}
     statements: {'0': 1, '1': 1 }
