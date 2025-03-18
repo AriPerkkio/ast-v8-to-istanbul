@@ -32,9 +32,9 @@ test("function expression", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "0/0 (100%)",
-      "functions": "2/4 (50%)",
-      "lines": "6/8 (75%)",
-      "statements": "6/8 (75%)",
+      "functions": "3/5 (60%)",
+      "lines": "7/9 (77.77%)",
+      "statements": "9/11 (81.81%)",
     }
   `);
 

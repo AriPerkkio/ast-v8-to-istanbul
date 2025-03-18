@@ -21,6 +21,17 @@ function toMatchFunctions(
     const fnActual = actual[key];
     const fnExpected = expected[key];
 
+    if (!fnActual) {
+      return {
+        pass: false,
+        message: () =>
+          [
+            "Function maps did not match:",
+            `Missing function at ${key}. Expected: ${fnExpected.name} at ${JSON.stringify(fnExpected.loc, null, 2)}`,
+          ].join("\n"),
+      };
+    }
+
     if (fnActual.name !== fnExpected.name) {
       mismatches.push(
         `Name did not match: ${fnActual.name} !== ${fnExpected.name}`,

@@ -18,5 +18,7 @@ const MathObject = {
   },
 };
 
+for (var x = function(){ return 100; }, y = true; y; y = false){ x(); }
+
 new MathClass().subtract(2, 3);
 MathObject.multiply(2, 3);

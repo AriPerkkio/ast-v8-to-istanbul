@@ -122,6 +122,8 @@ async function collectCoverage(
         v8: filtered,
         istanbul: globalThis[`__istanbul_coverage_${directory}__`],
       });
+
+      globalThis[`__istanbul_coverage_${directory}__`] = undefined;
     });
   });
 }
