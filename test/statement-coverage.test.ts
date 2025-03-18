@@ -13,5 +13,5 @@ test("variable declaration", async ({ actual, expected }) => {
   `);
 
   expect(actual.statementMap).toMatchStatements(expected.statementMap);
-  expect(Object.keys(actual.s)).toEqual(Object.keys(expected.s));
+  expect(actual.s).toEqual(expected.s);
 });

@@ -13,7 +13,7 @@ test("if-statement", async ({ actual, expected }) => {
   `);
 
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
+  expect(actual.b).toEqual(expected.b);
 });
 
 test("conditional expression", async ({ actual, expected }) => {
@@ -27,7 +27,7 @@ test("conditional expression", async ({ actual, expected }) => {
   `);
 
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
+  expect(actual.b).toEqual(expected.b);
 });
 
 test("logical-expression", async ({ actual, expected }) => {
@@ -41,7 +41,7 @@ test("logical-expression", async ({ actual, expected }) => {
   `);
 
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
+  expect(actual.b).toEqual(expected.b);
 });
 
 test("switch-case", async ({ actual, expected }) => {
@@ -55,14 +55,17 @@ test("switch-case", async ({ actual, expected }) => {
   `);
 
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
+  expect(actual.b).toEqual(expected.b);
 });
 
 test("assignment-pattern", async ({ actual, expected }) => {
   // Uncovered branches are marked as covered due to https://github.com/nodejs/node/issues/57435
+  actual.b["1"] = [0];
+  actual.b["4"] = [0];
+
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "5/10 (50%)",
+      "branches": "3/10 (30%)",
       "functions": "1/2 (50%)",
       "lines": "6/11 (54.54%)",
       "statements": "6/11 (54.54%)",
@@ -70,5 +73,5 @@ test("assignment-pattern", async ({ actual, expected }) => {
   `);
 
   expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(Object.keys(actual.b)).toEqual(Object.keys(expected.b));
+  expect(actual.b).toEqual(expected.b);
 });

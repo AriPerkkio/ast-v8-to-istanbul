@@ -13,10 +13,10 @@ test("function declaration", async ({ actual, expected }) => {
   `);
 
   expect(actual.fnMap).toMatchFunctions(expected.fnMap);
-  expect(Object.keys(actual.f)).toEqual(Object.keys(expected.f));
+  expect(actual.f).toEqual(expected.f);
 
   expect(actual.statementMap).toMatchStatements(expected.statementMap);
-  expect(Object.keys(actual.s)).toEqual(Object.keys(expected.s));
+  expect(actual.s).toEqual(expected.s);
 });
 
 test("arrow function expression", async ({ actual, expected }) => {
@@ -30,10 +30,10 @@ test("arrow function expression", async ({ actual, expected }) => {
   `);
 
   expect(actual.fnMap).toMatchFunctions(expected.fnMap);
-  expect(Object.keys(actual.f)).toEqual(Object.keys(expected.f));
+  expect(actual.f).toEqual(expected.f);
 
   expect(actual.statementMap).toMatchStatements(expected.statementMap);
-  expect(Object.keys(actual.s)).toEqual(Object.keys(expected.s));
+  expect(actual.s).toEqual(expected.s);
 });
 
 test("function expression", async ({ actual, expected }) => {
@@ -47,8 +47,8 @@ test("function expression", async ({ actual, expected }) => {
   `);
 
   expect(actual.fnMap).toMatchFunctions(expected.fnMap);
-  expect(Object.keys(actual.f)).toEqual(Object.keys(expected.f));
+  expect(actual.f).toEqual(expected.f);
 
   expect(actual.statementMap).toMatchStatements(expected.statementMap);
-  expect(Object.keys(actual.s)).toEqual(Object.keys(expected.s));
+  expect(actual.s).toEqual(expected.s);
 });
