@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 
-import { test } from "./utils";
+import { assertCoverage, test } from "./utils";
 
 test("variable declaration", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
@@ -12,6 +12,5 @@ test("variable declaration", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.statementMap).toMatchStatements(expected.statementMap);
-  expect(actual.s).toEqual(expected.s);
+  assertCoverage(actual, expected);
 });

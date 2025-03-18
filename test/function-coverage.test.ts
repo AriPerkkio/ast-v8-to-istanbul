@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 
-import { test } from "./utils";
+import { assertCoverage, test } from "./utils";
 
 test("function declaration", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
@@ -12,11 +12,7 @@ test("function declaration", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.fnMap).toMatchFunctions(expected.fnMap);
-  expect(actual.f).toEqual(expected.f);
-
-  expect(actual.statementMap).toMatchStatements(expected.statementMap);
-  expect(actual.s).toEqual(expected.s);
+  assertCoverage(actual, expected);
 });
 
 test("arrow function expression", async ({ actual, expected }) => {
@@ -29,11 +25,7 @@ test("arrow function expression", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.fnMap).toMatchFunctions(expected.fnMap);
-  expect(actual.f).toEqual(expected.f);
-
-  expect(actual.statementMap).toMatchStatements(expected.statementMap);
-  expect(actual.s).toEqual(expected.s);
+  assertCoverage(actual, expected);
 });
 
 test("function expression", async ({ actual, expected }) => {
@@ -46,9 +38,5 @@ test("function expression", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.fnMap).toMatchFunctions(expected.fnMap);
-  expect(actual.f).toEqual(expected.f);
-
-  expect(actual.statementMap).toMatchStatements(expected.statementMap);
-  expect(actual.s).toEqual(expected.s);
+  assertCoverage(actual, expected);
 });

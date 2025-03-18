@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 
-import { test } from "./utils";
+import { assertCoverage, test } from "./utils";
 
 test("if-statement", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
@@ -12,8 +12,7 @@ test("if-statement", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(actual.b).toEqual(expected.b);
+  assertCoverage(actual, expected);
 });
 
 test("conditional expression", async ({ actual, expected }) => {
@@ -26,8 +25,7 @@ test("conditional expression", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(actual.b).toEqual(expected.b);
+  assertCoverage(actual, expected);
 });
 
 test("logical-expression", async ({ actual, expected }) => {
@@ -40,8 +38,7 @@ test("logical-expression", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(actual.b).toEqual(expected.b);
+  assertCoverage(actual, expected);
 });
 
 test("switch-case", async ({ actual, expected }) => {
@@ -54,8 +51,7 @@ test("switch-case", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(actual.b).toEqual(expected.b);
+  assertCoverage(actual, expected);
 });
 
 test("assignment-pattern", async ({ actual, expected }) => {
@@ -72,6 +68,5 @@ test("assignment-pattern", async ({ actual, expected }) => {
     }
   `);
 
-  expect(actual.branchMap).toMatchBranches(expected.branchMap);
-  expect(actual.b).toEqual(expected.b);
+  assertCoverage(actual, expected);
 });

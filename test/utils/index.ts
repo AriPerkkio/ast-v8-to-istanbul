@@ -6,10 +6,12 @@ import { EncodedSourceMap } from "@jridgewell/trace-mapping";
 import {
   CoverageMap,
   createCoverageMap,
+  FileCoverage,
   FileCoverageData,
 } from "istanbul-lib-coverage";
 import libReport from "istanbul-lib-report";
 import reports from "istanbul-reports";
+import { expect } from "vitest";
 
 export { test } from "./test";
 
@@ -66,4 +68,22 @@ export function generateReports(
 
   reports.create("html").execute(context);
   reports.create("json").execute(context);
+}
+
+export function assertCoverage(actual: FileCoverage, expected: FileCoverage) {
+  try {
+    expect(actual.branchMap).toMatchBranches(expected.branchMap);
+    expect(actual.b).toEqual(expected.b);
+
+    expect(actual.fnMap).toMatchFunctions(expected.fnMap);
+    expect(actual.f).toEqual(expected.f);
+
+    expect(actual.statementMap).toMatchStatements(expected.statementMap);
+    expect(actual.s).toEqual(expected.s);
+
+    expect(actual.getLineCoverage()).toEqual(expected.getLineCoverage());
+  } catch (error) {
+    Error.captureStackTrace(error as Error, assertCoverage);
+    throw error;
+  }
 }
