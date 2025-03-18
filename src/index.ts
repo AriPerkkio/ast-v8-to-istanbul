@@ -1,13 +1,6 @@
 import type { Profiler } from "node:inspector";
 import { fileURLToPath } from "node:url";
-import {
-  allGeneratedPositionsFor,
-  LEAST_UPPER_BOUND,
-  originalPositionFor,
-  TraceMap,
-  type Needle,
-  type SourceMapInput,
-} from "@jridgewell/trace-mapping";
+import { TraceMap, type SourceMapInput } from "@jridgewell/trace-mapping";
 import type { Node } from "estree";
 
 import { type FunctionNodes, getFunctionName, walk } from "./ast";
@@ -18,7 +11,7 @@ import {
   type Branch,
   createCoverageMap,
 } from "./coverage-map";
-import { offsetToNeedle } from "./location";
+import { getLoc } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
 export default async function convert(options: {
@@ -148,8 +141,8 @@ export default async function convert(options: {
     node: FunctionNodes,
     positions: { loc: Node; decl: Node },
   ) {
-    const loc = getLoc(positions.loc);
-    const decl = getLoc(positions.decl);
+    const loc = getLoc(positions.loc, options.code, map);
+    const decl = getLoc(positions.decl, options.code, map);
 
     const covered = getCount(
       {
@@ -170,7 +163,7 @@ export default async function convert(options: {
   }
 
   function onStatement(node: Node, parent?: Node) {
-    const loc = getLoc(node);
+    const loc = getLoc(node, options.code, map);
 
     const covered = getCount(
       {
@@ -193,7 +186,7 @@ export default async function convert(options: {
     node: Node,
     branches: (Node | null | undefined)[],
   ) {
-    const loc = getLoc(node);
+    const loc = getLoc(node, options.code, map);
 
     const locations = [];
     const covered = [];
@@ -210,7 +203,7 @@ export default async function convert(options: {
         continue;
       }
 
-      locations.push(getLoc(branch));
+      locations.push(getLoc(branch, options.code, map));
 
       covered.push(
         getCount(
@@ -245,56 +238,6 @@ export default async function convert(options: {
       covered,
       filename: getFilename(loc),
     });
-  }
-
-  function getPosition(needle: Needle) {
-    const { line, column, source } = originalPositionFor(map, needle);
-
-    if (line == null || column == null) {
-      throw new Error(
-        `Position is InvalidOriginalMapping ${JSON.stringify(
-          { position: { line, column }, needle },
-          null,
-          2,
-        )}`,
-      );
-    }
-
-    return { line, column, filename: source };
-  }
-
-  function getLoc(node: Node) {
-    // End-mapping tracing logic from istanbul-lib-source-maps
-    const endNeedle = offsetToNeedle(node.end, options.code);
-    endNeedle.column -= 1;
-
-    const loc = {
-      start: getPosition(offsetToNeedle(node.start, options.code)),
-      end: getPosition(endNeedle),
-    };
-
-    const afterEndMappings = allGeneratedPositionsFor(map, {
-      source: loc.end.filename!,
-      line: loc.end.line,
-      column: loc.end.column + 1,
-      bias: LEAST_UPPER_BOUND,
-    });
-
-    if (afterEndMappings.length === 0) {
-      loc.end.column = Infinity;
-    } else {
-      for (const mapping of afterEndMappings) {
-        if (mapping.line === null) continue;
-
-        const original = originalPositionFor(map, mapping);
-        if (original.line === loc.end.line) {
-          loc.end = { ...original, filename: original.source };
-          break;
-        }
-      }
-    }
-
-    return loc;
   }
 
   function getFilename(position: {
