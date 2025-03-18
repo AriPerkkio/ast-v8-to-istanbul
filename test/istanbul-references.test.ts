@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { Session, type Profiler } from "node:inspector";
 import { resolve } from "node:path";
@@ -28,27 +29,19 @@ type TestCase = {
 };
 
 const TODO_TESTS = [
-  "arrow-fn.yaml",
   "class-properties.yaml",
   "do-while.yaml",
   "es6-modules.yaml",
-  "expressions.yaml",
-  "for-in.yaml",
-  "for-of.yaml",
   "for.yaml",
   "functions.yaml",
   "if-hints.yaml",
-  "if.yaml",
   "ignore.yaml",
-  "input-source-map.yaml",
   "statement-hints.yaml",
   "strict.yaml",
   "switch.yaml",
   "truthy.yaml",
-  "try.yaml",
   "while.yaml",
   "with.yaml",
-  "yield.yaml",
 ];
 
 const directory = resolve(import.meta.dirname, "./istanbul-references");
@@ -65,9 +58,10 @@ const suites = await Promise.all(
 
       parsed.forEach(({ tests }) => {
         tests.forEach((t) => {
-          const filename = `${suite}-${t.name}-${new Date().getTime()}.js`
+          const filename = `${suite}-${t.name}-${randomUUID()}.js`
             .replaceAll(".yaml", "")
             .replaceAll(" ", "-")
+            .replaceAll("%", "")
             .replaceAll("/", "-");
 
           t.filename = filename;

@@ -6,6 +6,7 @@ export default defineConfig({
     setupFiles: ["./test/utils/setup.ts"],
     globalSetup: ["./test/utils/global-setup.ts"],
     passWithNoTests: true,
+    hideSkippedTests: true,
 
     coverage: {
       enabled: true,
