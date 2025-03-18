@@ -32,8 +32,6 @@ const TODO_TESTS = [
   "class-properties.yaml",
   "do-while.yaml",
   "es6-modules.yaml",
-  "for.yaml",
-  "functions.yaml",
   "if-hints.yaml",
   "ignore.yaml",
   "statement-hints.yaml",

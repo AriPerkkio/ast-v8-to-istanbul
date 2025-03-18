@@ -45,6 +45,16 @@ export default async function convert(options: {
         decl: node.id,
       });
     },
+    onFunctionExpression(node) {
+      if (isCovered(node)) {
+        return;
+      }
+
+      onFunction(node, {
+        loc: node.body,
+        decl: node.id || { ...node, end: node.start + 1 },
+      });
+    },
     onArrowFunctionExpression(node) {
       onFunction(node, {
         loc: node.body,
@@ -62,6 +72,10 @@ export default async function convert(options: {
       }
     },
     onMethodDefinition(node) {
+      if (node.value.type === "FunctionExpression") {
+        setCovered(node.value);
+      }
+
       onFunction(node, {
         loc: node.value.body,
         decl: node.key,
@@ -69,6 +83,8 @@ export default async function convert(options: {
     },
     onProperty(node) {
       if (node.value.type === "FunctionExpression") {
+        setCovered(node.value);
+
         onFunction(node, {
           loc: node.value.body,
           decl: node.key,
@@ -286,4 +302,14 @@ export default async function convert(options: {
 
     return fileURLToPath(new URL(filename, options.coverage.url));
   }
+}
+
+function setCovered(node: Node) {
+  // @ts-expect-error -- internal
+  node.__covered = true;
+}
+
+function isCovered(node: Node) {
+  // @ts-expect-error -- internal
+  return node.__covered === true;
 }

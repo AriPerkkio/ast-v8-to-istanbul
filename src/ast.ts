@@ -25,6 +25,7 @@ import type {
   ConditionalExpression,
   LogicalExpression,
   AssignmentPattern,
+  FunctionExpression,
 } from "estree";
 import { asyncWalk } from "estree-walker";
 
@@ -38,6 +39,7 @@ declare module "estree" {
 interface Visitors {
   // Functions
   onFunctionDeclaration: (node: FunctionDeclaration) => void;
+  onFunctionExpression: (node: FunctionExpression) => void;
   onArrowFunctionExpression: (node: ArrowFunctionExpression) => void;
   onMethodDefinition: (node: MethodDefinition) => void;
   onProperty: (node: Property) => void;
@@ -70,6 +72,7 @@ export type FunctionNodes = Parameters<
   Visitors[
     | "onArrowFunctionExpression"
     | "onFunctionDeclaration"
+    | "onFunctionExpression"
     | "onMethodDefinition"
     | "onProperty"]
 >[0];
@@ -81,6 +84,9 @@ export async function walk(ast: Program, visitors: Visitors) {
         // Functions
         case "FunctionDeclaration": {
           return visitors.onFunctionDeclaration(node);
+        }
+        case "FunctionExpression": {
+          return visitors.onFunctionExpression(node);
         }
         case "MethodDefinition": {
           return visitors.onMethodDefinition(node);
