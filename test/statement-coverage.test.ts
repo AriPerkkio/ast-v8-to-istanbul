@@ -14,3 +14,16 @@ test("variable declaration", async ({ actual, expected }) => {
 
   assertCoverage(actual, expected);
 });
+
+test("class-properties", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "1/2 (50%)",
+      "functions": "0/0 (100%)",
+      "lines": "4/4 (100%)",
+      "statements": "4/4 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
