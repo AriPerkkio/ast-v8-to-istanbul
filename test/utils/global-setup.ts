@@ -1,7 +1,7 @@
-import { readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import inspector, { Profiler } from "node:inspector";
 import { fileURLToPath } from "node:url";
-import esbuild from "esbuild";
+import * as ts from "typescript";
 import c from "tinyrainbow";
 import { createInstrumenter } from "istanbul-lib-instrument";
 
@@ -19,21 +19,10 @@ export async function setup() {
       recursive: true,
       force: true,
     });
+    await mkdir(`${root}/fixtures/${directory}/dist`);
 
     log("Building", `fixtures/${directory}/sources.ts`);
-    await esbuild.build({
-      entryPoints: [`${root}/fixtures/${directory}/sources.ts`],
-      sourcemap: "linked",
-      bundle: true,
-      platform: "node",
-      format: "esm",
-      outfile: `${root}/fixtures/${directory}/dist/index.js`,
-    });
-
-    const [code, map] = await Promise.all([
-      readFile(`${root}/fixtures/${directory}/dist/index.js`, "utf8"),
-      readFile(`${root}/fixtures/${directory}/dist/index.js.map`, "utf8"),
-    ]);
+    const { code, map } = await transform(`${root}/fixtures/${directory}`);
 
     log("Generating links", `fixtures/${directory}/dist/links.md`);
     const visualizer = toVisualizer({ code, map: JSON.parse(map) });
@@ -120,7 +109,7 @@ async function collectCoverage(
 
       resolve({
         v8: filtered,
-        istanbul: globalThis[`__istanbul_coverage_${directory}__`],
+        istanbul: globalThis[`__istanbul_coverage_${directory}__`] || {},
       });
 
       globalThis[`__istanbul_coverage_${directory}__`] = undefined;
@@ -130,4 +119,28 @@ async function collectCoverage(
 
 function log(...messages: string[]) {
   console.log(c.bgBlueBright("[setup]"), ...messages);
+}
+
+async function transform(directory: string) {
+  const transformResult = ts.transpileModule(
+    await readFile(`${directory}/sources.ts`, "utf8"),
+    {
+      fileName: `${directory}/sources.ts`,
+      compilerOptions: {
+        outDir: `${directory}/dist`,
+        target: ts.ScriptTarget.ESNext,
+        module: ts.ModuleKind.NodeNext,
+        moduleResolution: ts.ModuleResolutionKind.Bundler,
+        inlineSources: true,
+        sourceMap: true,
+      },
+    },
+  );
+  const code = transformResult.outputText;
+  const map = transformResult.sourceMapText || "{}";
+
+  await writeFile(`${directory}/dist/index.js`, code);
+  await writeFile(`${directory}/dist/index.js.map`, map);
+
+  return { code, map };
 }

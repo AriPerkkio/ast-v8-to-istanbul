@@ -33,8 +33,8 @@ test("function expression", async ({ actual, expected }) => {
     {
       "branches": "0/0 (100%)",
       "functions": "3/5 (60%)",
-      "lines": "7/9 (77.77%)",
-      "statements": "9/11 (81.81%)",
+      "lines": "6/8 (75%)",
+      "statements": "10/12 (83.33%)",
     }
   `);
 

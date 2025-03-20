@@ -10,7 +10,9 @@ import {
   addStatement,
   type Branch,
   createCoverageMap,
+  createEmptyCoverageMap,
 } from "./coverage-map";
+import { getIgnoreHints } from "./ignore-hints";
 import { getLoc } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
@@ -23,14 +25,21 @@ export default async function convert(options: {
     code: string,
   ) => Parameters<typeof walk>[0] | Promise<Parameters<typeof walk>[0]>;
 }) {
-  const wrapperLength = options.wrapperLength || 0;
+  const ignoreHints = getIgnoreHints(options.code);
+
+  // File ignore contains always only 1 entry
+  if (ignoreHints.length === 1 && ignoreHints[0].type === "file") {
+    return createEmptyCoverageMap();
+  }
 
   const map = new TraceMap(options.sourceMap);
   const coverageMap = createCoverageMap(options.coverage.url, map);
+
   const ast = await options.getAst(options.code);
   const ranges = normalize(options.coverage);
+  const wrapperLength = options.wrapperLength || 0;
 
-  await walk(ast, {
+  await walk(ast, ignoreHints, {
     // Functions
     onFunctionDeclaration(node) {
       onFunction(node, {
@@ -123,8 +132,8 @@ export default async function convert(options: {
     },
 
     // Branches
-    onIfStatement(node) {
-      onBranch("if", node, [node.consequent, node.alternate]);
+    onIfStatement(node, branches) {
+      onBranch("if", node, branches);
       onStatement(node);
     },
     onConditionalExpression(node) {
@@ -237,7 +246,9 @@ export default async function convert(options: {
     }
 
     if (type === "if") {
-      locations[0] = loc;
+      if (locations.length > 0) {
+        locations[0] = loc;
+      }
 
       if (covered[0] === 0 && covered[1] === 0) {
         covered[1] = getCount(
@@ -248,6 +259,10 @@ export default async function convert(options: {
           ranges,
         );
       }
+    }
+
+    if (locations.length === 0) {
+      return;
     }
 
     addBranch({

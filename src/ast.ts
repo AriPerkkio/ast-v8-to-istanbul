@@ -27,8 +27,10 @@ import type {
   AssignmentPattern,
   FunctionExpression,
   ClassBody,
+  BlockStatement,
 } from "estree";
 import { asyncWalk } from "estree-walker";
+import { type IgnoreHint } from "./ignore-hints";
 
 declare module "estree" {
   interface BaseNode {
@@ -64,7 +66,10 @@ interface Visitors {
   onClassBody: (node: ClassBody) => void;
 
   // Branches
-  onIfStatement: (node: IfStatement) => void;
+  onIfStatement: (
+    node: IfStatement,
+    branches: (Node | null | undefined)[],
+  ) => void;
   onSwitchStatement: (node: SwitchStatement) => void;
   onConditionalExpression: (node: ConditionalExpression) => void;
   onLogicalExpression: (node: LogicalExpression) => void;
@@ -79,9 +84,30 @@ export type FunctionNodes = Parameters<
     | "onProperty"]
 >[0];
 
-export async function walk(ast: Program, visitors: Visitors) {
+export async function walk(
+  ast: Program,
+  ignoreHints: IgnoreHint[],
+  visitors: Visitors,
+) {
+  let nextIgnore: Node | false = false;
+
   return await asyncWalk(ast, {
     async enter(node) {
+      if (nextIgnore !== false) {
+        return;
+      }
+
+      const hint = getIgnoreHint(node);
+
+      if (hint === "next") {
+        nextIgnore = node;
+        return;
+      }
+
+      if (isSkipped(node)) {
+        nextIgnore = node;
+      }
+
       switch (node.type) {
         // Functions
         case "FunctionDeclaration": {
@@ -152,7 +178,39 @@ export async function walk(ast: Program, visitors: Visitors) {
 
         // Branches
         case "IfStatement": {
-          return visitors.onIfStatement(node);
+          const branches = [];
+
+          if (node.consequent.type !== "BlockStatement") {
+            node.consequent = {
+              type: "BlockStatement",
+              body: [node.consequent],
+              start: node.consequent.start,
+              end: node.consequent.end,
+            } satisfies BlockStatement;
+          }
+
+          if (node.alternate && node.alternate.type !== "BlockStatement") {
+            node.alternate = {
+              type: "BlockStatement",
+              body: [node.alternate],
+              start: node.alternate.start,
+              end: node.alternate.end,
+            } satisfies BlockStatement;
+          }
+
+          if (hint === "if") {
+            setSkipped(node.consequent);
+          } else {
+            branches.push(node.consequent);
+          }
+
+          if (hint === "else" && node.alternate) {
+            setSkipped(node.alternate);
+          } else if (hint !== "if") {
+            branches.push(node.alternate);
+          }
+
+          return visitors.onIfStatement(node, branches);
         }
         case "SwitchStatement": {
           return visitors.onSwitchStatement(node);
@@ -168,7 +226,22 @@ export async function walk(ast: Program, visitors: Visitors) {
         }
       }
     },
+    async leave(node) {
+      if (node === nextIgnore) {
+        nextIgnore = false;
+      }
+    },
   });
+
+  function getIgnoreHint(node: Node) {
+    for (const hint of ignoreHints) {
+      if (hint.loc.end === node.start) {
+        return hint.type;
+      }
+    }
+
+    return null;
+  }
 }
 
 export function getFunctionName(node: Node) {
@@ -179,4 +252,14 @@ export function getFunctionName(node: Node) {
   if ("id" in node && node.id) {
     return getFunctionName(node.id);
   }
+}
+
+function setSkipped(node: Node) {
+  // @ts-expect-error -- internal
+  node.__skipped = true;
+}
+
+function isSkipped(node: Node) {
+  // @ts-expect-error -- internal
+  return node.__skipped === true;
 }

@@ -10,8 +10,12 @@ export type Branch =
   | "switch"
   | "default-arg";
 
+export function createEmptyCoverageMap() {
+  return libCoverage.createCoverageMap();
+}
+
 export function createCoverageMap(filename: string, sourceMap: TraceMap) {
-  const coverageMap: CoverageMap = libCoverage.createCoverageMap();
+  const coverageMap = createEmptyCoverageMap();
 
   for (const source of sourceMap.sources) {
     const path = source ? fileURLToPath(new URL(source, filename)) : filename;

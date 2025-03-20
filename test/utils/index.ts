@@ -73,15 +73,17 @@ export function generateReports(
 export function assertCoverage(actual: FileCoverage, expected: FileCoverage) {
   try {
     expect(actual.branchMap).toMatchBranches(expected.branchMap);
-    expect(actual.b).toEqual(expected.b);
+    expect(actual.b, "Branches did not match").toEqual(expected.b);
 
     expect(actual.fnMap).toMatchFunctions(expected.fnMap);
-    expect(actual.f).toEqual(expected.f);
+    expect(actual.f, "Functions did not match").toEqual(expected.f);
 
     expect(actual.statementMap).toMatchStatements(expected.statementMap);
-    expect(actual.s).toEqual(expected.s);
+    expect(actual.s, "Statements did not match").toEqual(expected.s);
 
-    expect(actual.getLineCoverage()).toEqual(expected.getLineCoverage());
+    expect(actual.getLineCoverage(), "Lines did not match").toEqual(
+      expected.getLineCoverage(),
+    );
   } catch (error) {
     Error.captureStackTrace(error as Error, assertCoverage);
     throw error;

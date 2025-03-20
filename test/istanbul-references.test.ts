@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { Session, type Profiler } from "node:inspector";
 import { resolve } from "node:path";
+import { type FileCoverage } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
 import { describe, expect, onTestFinished, test } from "vitest";
@@ -59,7 +60,11 @@ const suites = await Promise.all(
 describe.each(suites)("$suite", async ({ tests }) => {
   describe.each(tests)("$name", (t) => {
     test.for(t.tests)("$name", async (testCase, ctx) => {
-      if (testCase.name?.includes("ignore") || t.name.includes("ignore")) {
+      // TODO: Add support for ignoreClassMethods
+      if (
+        testCase.name?.includes("ignore class") ||
+        t.name.includes("ignore class")
+      ) {
         ctx.skip("Ignore not yet supported");
       }
 
@@ -87,8 +92,12 @@ describe.each(suites)("$suite", async ({ tests }) => {
         expect.soft(globalThis.output).toEqual(out);
       }
 
-      const fileCoverage = coverageMap.fileCoverageFor(fullname);
       const message = `\nCode: \n\n${t.code}\n`;
+
+      const isEmpty = coverageMap.files().length === 0;
+      const fileCoverage = isEmpty
+        ? ({} as FileCoverage)
+        : coverageMap.fileCoverageFor(fullname);
 
       if (expected.statements) {
         expect.soft(fileCoverage.s, message).toEqual(expected.statements);
