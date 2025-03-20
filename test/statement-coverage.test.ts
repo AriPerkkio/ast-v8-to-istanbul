@@ -7,8 +7,8 @@ test("variable declaration", async ({ actual, expected }) => {
     {
       "branches": "1/2 (50%)",
       "functions": "0/1 (0%)",
-      "lines": "7/9 (77.77%)",
-      "statements": "8/11 (72.72%)",
+      "lines": "8/10 (80%)",
+      "statements": "9/12 (75%)",
     }
   `);
 
@@ -20,8 +20,8 @@ test("class-properties", async ({ actual, expected }) => {
     {
       "branches": "1/2 (50%)",
       "functions": "0/0 (100%)",
-      "lines": "4/4 (100%)",
-      "statements": "4/4 (100%)",
+      "lines": "3/3 (100%)",
+      "statements": "3/3 (100%)",
     }
   `);
 

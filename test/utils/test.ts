@@ -31,9 +31,12 @@ export const test = base.extend<{
     const copy = createCoverageMap(JSON.parse(JSON.stringify(coverageMap)));
 
     const normalized = normalizeMap(coverageMap);
-    const actual = normalized.fileCoverageFor(
-      `<process-cwd>/test/fixtures/${fixture.name}/sources.ts`,
-    );
+    const isEmpty = normalized.files().length === 0;
+    const actual = isEmpty
+      ? ({} as any)
+      : normalized.fileCoverageFor(
+          `<process-cwd>/test/fixtures/${fixture.name}/sources.ts`,
+        );
 
     debug.generateReports = false;
 
@@ -51,7 +54,8 @@ export const test = base.extend<{
     );
 
     debug.generateReports = false;
-    await use(coverageMap.fileCoverageFor(coverageMap.files()[0]));
+    const file = coverageMap.files()[0];
+    await use(file ? coverageMap.fileCoverageFor(file) : ({} as any));
 
     if (debug.generateReports) {
       generateReports(coverageMap, "./istanbul-coverage");

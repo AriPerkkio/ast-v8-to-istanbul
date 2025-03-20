@@ -63,7 +63,13 @@ export function getLoc(node: Node, code: string, map: TraceMap) {
   endNeedle.column -= 1;
 
   const start = getPosition(offsetToNeedle(node.start, code), map);
-  const end = getPosition(endNeedle, map);
+  let end = getPosition(endNeedle, map);
+
+  // e.g. tsc that doesnt include } in source maps
+  if (end === null) {
+    endNeedle.column++;
+    end = getPosition(endNeedle, map);
+  }
 
   if (start === null || end === null) {
     // Does not exist in source maps, e.g. generated code
