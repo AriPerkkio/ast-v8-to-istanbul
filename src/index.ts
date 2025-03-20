@@ -114,6 +114,13 @@ export default async function convert(options: {
         onStatement(node.init, node);
       }
     },
+    onClassBody(node) {
+      for (const child of node.body) {
+        if (child.type === "PropertyDefinition" && child.value) {
+          onStatement(child.value);
+        }
+      }
+    },
 
     // Branches
     onIfStatement(node) {

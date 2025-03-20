@@ -28,7 +28,7 @@ type TestCase = {
   }[];
 };
 
-const TODO_TESTS = ["class-properties.yaml", "with.yaml"];
+const TODO_TESTS = ["with.yaml"];
 
 const directory = resolve(import.meta.dirname, "./istanbul-references");
 const files = await readdir(directory);

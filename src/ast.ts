@@ -26,6 +26,7 @@ import type {
   LogicalExpression,
   AssignmentPattern,
   FunctionExpression,
+  ClassBody,
 } from "estree";
 import { asyncWalk } from "estree-walker";
 
@@ -60,6 +61,7 @@ interface Visitors {
   onWithStatement: (node: WithStatement) => void;
   onLabeledStatement: (node: LabeledStatement) => void;
   onVariableDeclarator: (node: VariableDeclarator) => void;
+  onClassBody: (node: ClassBody) => void;
 
   // Branches
   onIfStatement: (node: IfStatement) => void;
@@ -143,6 +145,9 @@ export async function walk(ast: Program, visitors: Visitors) {
         }
         case "VariableDeclarator": {
           return visitors.onVariableDeclarator(node);
+        }
+        case "ClassBody": {
+          return visitors.onClassBody(node);
         }
 
         // Branches
