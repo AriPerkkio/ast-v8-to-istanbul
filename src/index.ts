@@ -151,6 +151,10 @@ export default async function convert(options: {
     const loc = getLoc(positions.loc, options.code, map);
     const decl = getLoc(positions.decl, options.code, map);
 
+    if (loc === null || decl === null) {
+      return;
+    }
+
     const covered = getCount(
       {
         startOffset: node.start + wrapperLength,
@@ -171,6 +175,9 @@ export default async function convert(options: {
 
   function onStatement(node: Node, parent?: Node) {
     const loc = getLoc(node, options.code, map);
+    if (loc === null) {
+      return;
+    }
 
     const covered = getCount(
       {
@@ -194,6 +201,9 @@ export default async function convert(options: {
     branches: (Node | null | undefined)[],
   ) {
     const loc = getLoc(node, options.code, map);
+    if (loc === null) {
+      return;
+    }
 
     const locations = [];
     const covered = [];
@@ -210,7 +220,10 @@ export default async function convert(options: {
         continue;
       }
 
-      locations.push(getLoc(branch, options.code, map));
+      const location = getLoc(branch, options.code, map);
+      if (location !== null) {
+        locations.push(location);
+      }
 
       covered.push(
         getCount(
