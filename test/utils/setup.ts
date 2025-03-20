@@ -8,7 +8,7 @@ import { expect } from "vitest";
 import "./expect-extend";
 
 expect.addSnapshotSerializer({
-  test: (val) => val?.constructor.name === "CoverageMap",
+  test: (val) => val?.constructor?.name === "CoverageMap",
   serialize: (val: CoverageMap, config, indentation, depth, refs, printer) => {
     return printer(
       formatSummary(val.getCoverageSummary()),
@@ -21,7 +21,7 @@ expect.addSnapshotSerializer({
 });
 
 expect.addSnapshotSerializer({
-  test: (val) => val?.constructor.name === "FileCoverage",
+  test: (val) => val?.constructor?.name === "FileCoverage",
   serialize: (val: FileCoverage, config, indentation, depth, refs, printer) => {
     return printer(
       formatSummary(val.toSummary()),

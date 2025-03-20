@@ -62,11 +62,15 @@ export function getLoc(node: Node, code: string, map: TraceMap) {
   const endNeedle = offsetToNeedle(node.end, code);
   endNeedle.column -= 1;
 
-  const loc = {
-    start: getPosition(offsetToNeedle(node.start, code), map),
-    end: getPosition(endNeedle, map),
-    map,
-  };
+  const start = getPosition(offsetToNeedle(node.start, code), map);
+  const end = getPosition(endNeedle, map);
+
+  if (start === null || end === null) {
+    // Does not exist in source maps, e.g. generated code
+    return null;
+  }
+
+  const loc = { start, end };
 
   const afterEndMappings = allGeneratedPositionsFor(map, {
     source: loc.end.filename!,
@@ -96,13 +100,7 @@ function getPosition(needle: Needle, map: TraceMap) {
   const { line, column, source } = originalPositionFor(map, needle);
 
   if (line == null || column == null) {
-    throw new Error(
-      `Position is InvalidOriginalMapping ${JSON.stringify(
-        { position: { line, column }, needle },
-        null,
-        2,
-      )}`,
-    );
+    return null;
   }
 
   return { line, column, filename: source };
