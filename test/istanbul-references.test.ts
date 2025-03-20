@@ -28,8 +28,6 @@ type TestCase = {
   }[];
 };
 
-const TODO_TESTS = ["with.yaml"];
-
 const directory = resolve(import.meta.dirname, "./istanbul-references");
 const files = await readdir(directory);
 
@@ -58,8 +56,8 @@ const suites = await Promise.all(
     }),
 );
 
-describe.each(suites)("$suite", async ({ suite, tests }) => {
-  describe.skipIf(TODO_TESTS.includes(suite)).each(tests)("$name", (t) => {
+describe.each(suites)("$suite", async ({ tests }) => {
+  describe.each(tests)("$name", (t) => {
     test.for(t.tests)("$name", async (testCase, ctx) => {
       if (testCase.name?.includes("ignore") || t.name.includes("ignore")) {
         ctx.skip("Ignore not yet supported");
