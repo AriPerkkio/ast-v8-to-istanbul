@@ -1,8 +1,13 @@
 # `ast-v8-to-istanbul`
 
-Experimental AST-aware [`v8-to-istanbul`](https://www.npmjs.com/package/v8-to-istanbul). Work-in-progress.
+> - Speed of V8 coverage 🏎
+> - Accuracy of Istanbul coverage 🔍
 
-Passes all 195 tests<sup>[*](#istanbul-compatibility)</sup> of [`istanbul-lib-instrument`](https://github.com/istanbuljs/istanbuljs/tree/main/packages/istanbul-lib-instrument/test/specs) with identical coverage maps. ✅
+Experimental AST-aware [`v8-to-istanbul`](https://www.npmjs.com/package/v8-to-istanbul). Work-in-progress. 🚧
+
+Unopinionated - _bring-your-own_ AST parser and source maps.
+
+Passes all 195 tests<sup>[*](#istanbul-compatibility)</sup> of [`istanbul-lib-instrument`](https://github.com/istanbuljs/istanbuljs/tree/main/packages/istanbul-lib-instrument/test/specs). ✅
 
 ```ts
 import { convert } from "ast-v8-to-istanbul";
