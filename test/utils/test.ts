@@ -11,21 +11,29 @@ export const test = base.extend<{
   expected: FileCoverage;
   fixture: { name: string } & Awaited<ReturnType<typeof readFixture>>;
   debug: { generateReports: boolean };
+  ignoreClassMethods: string[];
 }>({
   debug: { generateReports: false },
+  ignoreClassMethods: [],
+
   fixture: async ({}, use) => {
-    const name = expect.getState().currentTestName!.replace(/ /g, "-");
+    const name = expect
+      .getState()
+      .currentTestName!.replace(/ /g, "-")
+      .split(">-")
+      .pop()!;
 
     return use({ name, ...(await readFixture(name)) });
   },
 
-  actual: async ({ fixture, debug }, use) => {
+  actual: async ({ fixture, debug, ignoreClassMethods }, use) => {
     const coverageMap = await convert({
       getAst: parseAstAsync,
       code: fixture.transpiled,
       wrapperLength: 0,
       coverage: fixture.coverage[0],
       sourceMap: fixture.sourceMap,
+      ignoreClassMethods,
     });
 
     const copy = createCoverageMap(JSON.parse(JSON.stringify(coverageMap)));

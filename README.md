@@ -2,6 +2,8 @@
 
 Experimental AST-aware [`v8-to-istanbul`](https://www.npmjs.com/package/v8-to-istanbul). Work-in-progress.
 
+Passes all 195 tests<sup>[*](#istanbul-compatibility)</sup> of [`istanbul-lib-instrument`](https://github.com/istanbuljs/istanbuljs/tree/main/packages/istanbul-lib-instrument/test/specs) with identical coverage maps. ✅
+
 ```ts
 import { convert } from "ast-v8-to-istanbul";
 import { parseAstAsync } from "vite";
@@ -41,6 +43,12 @@ const coverageMap: CoverageMap = await convert({
   },
 });
 ```
+
+## Istanbul Compatibility
+
+This project tests itself against test cases of `istanbul-lib-instrument` and verifies coverage maps are 100% identical. Some cases, like [deprecated `with()` statement](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with) and edge cases of strict mode are skipped, as all tests are run in strict mode.
+
+100% istanbul compatibility guarantees that coverage reports between V8 and Istanbul can be merged together.
 
 ## Limitations
 

@@ -1,4 +1,4 @@
-import { expect } from "vitest";
+import { describe, expect } from "vitest";
 
 import { assertCoverage, test } from "./utils";
 
@@ -32,4 +32,21 @@ test("ignore if else", async ({ actual, expected }) => {
   `);
 
   assertCoverage(actual, expected);
+});
+
+describe("class methods", () => {
+  test.scoped({ ignoreClassMethods: ["excluded"] });
+
+  test("ignore class methods", async ({ actual, expected }) => {
+    expect(actual).toMatchInlineSnapshot(`
+      {
+        "branches": "0/0 (100%)",
+        "functions": "3/4 (75%)",
+        "lines": "8/9 (88.88%)",
+        "statements": "8/9 (88.88%)",
+      }
+    `);
+
+    assertCoverage(actual, expected);
+  });
 });
