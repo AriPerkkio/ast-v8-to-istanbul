@@ -87,6 +87,7 @@ export type FunctionNodes = Parameters<
 export async function walk(
   ast: Program,
   ignoreHints: IgnoreHint[],
+  ignoreClassMethods: string[] | undefined,
   visitors: Visitors,
 ) {
   let nextIgnore: Node | false = false;
@@ -114,6 +115,12 @@ export async function walk(
           return visitors.onFunctionDeclaration(node);
         }
         case "FunctionExpression": {
+          if (ignoreClassMethods && node.id?.name) {
+            if (ignoreClassMethods.includes(node.id.name)) {
+              nextIgnore = node;
+              return;
+            }
+          }
           return visitors.onFunctionExpression(node);
         }
         case "MethodDefinition": {
@@ -173,6 +180,20 @@ export async function walk(
           return visitors.onVariableDeclarator(node);
         }
         case "ClassBody": {
+          if (ignoreClassMethods) {
+            for (const child of node.body) {
+              if (child.type === "MethodDefinition") {
+                const name = child.key.type === "Identifier" && child.key.name;
+
+                if (name && ignoreClassMethods.includes(name)) {
+                  setSkipped(child);
+                }
+              }
+            }
+
+            node.body = node.body.filter((child) => !isSkipped(child));
+          }
+
           return visitors.onClassBody(node);
         }
 

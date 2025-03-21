@@ -16,14 +16,17 @@ import { getIgnoreHints } from "./ignore-hints";
 import { getLoc } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
+// TODO: JSDocs
 export default async function convert(options: {
   code: string;
   wrapperLength?: number;
   sourceMap: SourceMapInput;
   coverage: Profiler.ScriptCoverage;
+  // TODO: Remove callback from API. Receive AST directly instead.
   getAst: (
     code: string,
   ) => Parameters<typeof walk>[0] | Promise<Parameters<typeof walk>[0]>;
+  ignoreClassMethods?: string[];
 }) {
   const ignoreHints = getIgnoreHints(options.code);
 
@@ -39,7 +42,7 @@ export default async function convert(options: {
   const ranges = normalize(options.coverage);
   const wrapperLength = options.wrapperLength || 0;
 
-  await walk(ast, ignoreHints, {
+  await walk(ast, ignoreHints, options.ignoreClassMethods, {
     // Functions
     onFunctionDeclaration(node) {
       onFunction(node, {

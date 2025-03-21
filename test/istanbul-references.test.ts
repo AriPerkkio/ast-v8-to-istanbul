@@ -27,6 +27,9 @@ type TestCase = {
     functions: { [key: string]: number };
     brances: { [key: string]: number };
   }[];
+  instrumentOpts?: {
+    ignoreClassMethods?: string[];
+  };
 };
 
 const directory = resolve(import.meta.dirname, "./istanbul-references");
@@ -59,15 +62,7 @@ const suites = await Promise.all(
 
 describe.each(suites)("$suite", async ({ tests }) => {
   describe.each(tests)("$name", (t) => {
-    test.for(t.tests)("$name", async (testCase, ctx) => {
-      // TODO: Add support for ignoreClassMethods
-      if (
-        testCase.name?.includes("ignore class") ||
-        t.name.includes("ignore class")
-      ) {
-        ctx.skip("Ignore not yet supported");
-      }
-
+    test.for(t.tests)("$name", async (testCase) => {
       const { filename, args, out, ...expected } = testCase;
       const fullname = `${directory}/${filename}`;
 
@@ -86,6 +81,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
           hires: "boundary",
           file: fullname,
         }) as any,
+        ignoreClassMethods: t.instrumentOpts?.ignoreClassMethods,
       });
 
       if (out !== undefined) {
