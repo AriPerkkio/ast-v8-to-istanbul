@@ -14,7 +14,6 @@ import type {
   MethodDefinition,
   Node,
   Property,
-  Program,
   ReturnStatement,
   SwitchStatement,
   ThrowStatement,
@@ -85,7 +84,7 @@ export type FunctionNodes = Parameters<
 >[0];
 
 export async function walk(
-  ast: Program,
+  ast: Node,
   ignoreHints: IgnoreHint[],
   ignoreClassMethods: string[] | undefined,
   visitors: Visitors,

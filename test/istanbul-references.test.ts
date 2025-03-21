@@ -76,7 +76,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
       const coverageMap = await convert({
         code: t.code,
         coverage,
-        getAst: parseAstAsync,
+        ast: parseAstAsync(t.code),
         sourceMap: new MagicString(t.code).generateMap({
           hires: "boundary",
           file: fullname,

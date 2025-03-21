@@ -2,6 +2,7 @@ import type { Profiler } from "node:inspector";
 import { fileURLToPath } from "node:url";
 import { TraceMap, type SourceMapInput } from "@jridgewell/trace-mapping";
 import type { Node } from "estree";
+import type { CoverageMap } from "istanbul-lib-coverage";
 
 import { type FunctionNodes, getFunctionName, walk } from "./ast";
 import {
@@ -16,18 +17,29 @@ import { getIgnoreHints } from "./ignore-hints";
 import { getLoc } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
-// TODO: JSDocs
+/**
+ * Maps V8 `ScriptCoverage` to Istanbul's `CoverageMap`.
+ * Results are identical with `istanbul-lib-instrument`.
+ */
 export default async function convert(options: {
+  /** Original source code, not the executed runtime code */
   code: string;
+
+  /** Length of the execution wrapper, e.g. wrapper used in node:vm */
   wrapperLength?: number;
+
+  /** Source map for the current file */
   sourceMap: SourceMapInput;
+
+  /** ScriptCoverage for the current file */
   coverage: Profiler.ScriptCoverage;
-  // TODO: Remove callback from API. Receive AST directly instead.
-  getAst: (
-    code: string,
-  ) => Parameters<typeof walk>[0] | Promise<Parameters<typeof walk>[0]>;
+
+  /** AST for the transpiled file that matches the coverage results */
+  ast: Node | Promise<Node>;
+
+  /** Class method names to ignore for coverage, identical to https://github.com/istanbuljs/nyc?tab=readme-ov-file#ignoring-methods */
   ignoreClassMethods?: string[];
-}) {
+}): Promise<CoverageMap> {
   const ignoreHints = getIgnoreHints(options.code);
 
   // File ignore contains always only 1 entry
@@ -38,7 +50,7 @@ export default async function convert(options: {
   const map = new TraceMap(options.sourceMap);
   const coverageMap = createCoverageMap(options.coverage.url, map);
 
-  const ast = await options.getAst(options.code);
+  const ast = await options.ast;
   const ranges = normalize(options.coverage);
   const wrapperLength = options.wrapperLength || 0;
 
@@ -63,12 +75,7 @@ export default async function convert(options: {
     onArrowFunctionExpression(node) {
       onFunction(node, {
         loc: node.body,
-        decl: {
-          ...node,
-
-          // TODO: This matches Istanbul's output, but is it correct? Using 'node.end' seems more correct.
-          end: node.start + 1,
-        },
+        decl: { ...node, end: node.start + 1 },
       });
 
       // Implicit return-statement of bodyless arrow function

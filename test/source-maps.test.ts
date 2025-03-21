@@ -56,7 +56,7 @@ export function uncovered() {
         },
       ],
     },
-    getAst: parseAstAsync,
+    ast: parseAstAsync(code),
   });
 
   const fileCoverage = coverage.fileCoverageFor("/some/file.ts");

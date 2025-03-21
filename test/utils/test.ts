@@ -28,7 +28,7 @@ export const test = base.extend<{
 
   actual: async ({ fixture, debug, ignoreClassMethods }, use) => {
     const coverageMap = await convert({
-      getAst: parseAstAsync,
+      ast: parseAstAsync(fixture.transpiled),
       code: fixture.transpiled,
       wrapperLength: 0,
       coverage: fixture.coverage[0],

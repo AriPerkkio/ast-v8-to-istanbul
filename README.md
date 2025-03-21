@@ -16,7 +16,7 @@ import type { CoverageMap } from "istanbul-lib-coverage";
 
 const coverageMap: CoverageMap = await convert({
   // Bring-your-own AST parser
-  getAst: parseAstAsync,
+  ast: parseAstAsync(<code>),
 
   // Code of the executed file (not the source file)
   code: "function sum(a, b) {\n  return a + b ...",
