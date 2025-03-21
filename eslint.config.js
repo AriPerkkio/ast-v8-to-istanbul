@@ -70,7 +70,7 @@ export default defineConfig([
     },
   },
   {
-    ignores: ["test/fixtures/**"],
+    ignores: ["dist/**", "test/fixtures/**"],
   },
   eslintPluginPrettierRecommended,
 ]);

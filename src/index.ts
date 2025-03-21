@@ -17,6 +17,8 @@ import { getIgnoreHints } from "./ignore-hints";
 import { getLoc } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
+export { convert };
+
 /**
  * Maps V8 `ScriptCoverage` to Istanbul's `CoverageMap`.
  * Results are identical with `istanbul-lib-instrument`.
