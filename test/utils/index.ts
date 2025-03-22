@@ -36,7 +36,7 @@ export async function readFixture(filename: string) {
 }
 
 export function normalizeMap(coverageMap: CoverageMap) {
-  const normalized = createCoverageMap();
+  const normalized: Record<string, FileCoverageData> = {};
 
   for (const filename of coverageMap.files()) {
     const coverage = coverageMap
@@ -45,10 +45,10 @@ export function normalizeMap(coverageMap: CoverageMap) {
 
     coverage.path = normalizeFilename(coverage.path);
 
-    normalized.addFileCoverage(coverage);
+    normalized[coverage.path] = coverage;
   }
 
-  return normalized;
+  return createCoverageMap(normalized);
 }
 
 function normalizeFilename(filename: string) {

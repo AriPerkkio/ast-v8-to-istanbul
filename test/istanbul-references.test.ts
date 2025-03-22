@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { Session, type Profiler } from "node:inspector";
-import { resolve } from "node:path";
+import { normalize, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { type FileCoverage } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
@@ -64,14 +65,17 @@ describe.each(suites)("$suite", async ({ tests }) => {
   describe.each(tests)("$name", (t) => {
     test.for(t.tests)("$name", async (testCase) => {
       const { filename, args, out, ...expected } = testCase;
-      const fullname = `${directory}/${filename}`;
+      const fullname = normalize(`${directory}/${filename}`);
 
       onTestFinished(() => rm(fullname, { force: true }));
       await writeFile(fullname, t.code);
 
       globalThis.args = args;
       globalThis.output = undefined;
-      const coverage = await collectCoverage(() => import(fullname), fullname);
+      const coverage = await collectCoverage(
+        () => import(fullname),
+        pathToFileURL(fullname).pathname,
+      );
 
       const coverageMap = await convert({
         code: t.code,

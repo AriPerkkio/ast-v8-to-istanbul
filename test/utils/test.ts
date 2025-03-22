@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
 import libSourceMaps from "istanbul-lib-source-maps";
 import { parseAstAsync } from "vite";
@@ -43,7 +44,7 @@ export const test = base.extend<{
     const actual = isEmpty
       ? ({} as any)
       : normalized.fileCoverageFor(
-          `<process-cwd>/test/fixtures/${fixture.name}/sources.ts`,
+          join("<process-cwd>", "test", "fixtures", fixture.name, "sources.ts"),
         );
 
     debug.generateReports = false;
