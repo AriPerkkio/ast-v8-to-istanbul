@@ -17,7 +17,11 @@ export function offsetToNeedle(offset: number, code: string): Needle {
       return { line, column };
     }
 
-    // TODO: Add tests for Windows \r\n eof
+    // Handle \r\n EOLs on next iteration
+    if (char === "\r") {
+      continue;
+    }
+
     if (char === "\n") {
       line++;
       column = 0;
