@@ -70,3 +70,17 @@ function sum(a, b) {
     end: { line: 2, column: 12 },
   });
 });
+
+test("windows end-of-line", () => {
+  const code = `\
+// test/fixtures/function-declaration/sources.ts
+function sum(a, b) {
+  return a + b;
+}
+    `
+    .split("\n")
+    .join("\r\n");
+
+  expect(offsetToNeedle(58, code)).toEqual({ line: 2, column: 9 });
+  expect(offsetToNeedle(61, code)).toEqual({ line: 2, column: 12 });
+});
