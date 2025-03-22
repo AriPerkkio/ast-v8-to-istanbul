@@ -1,4 +1,5 @@
 import type { Profiler } from "node:inspector";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { TraceMap, type SourceMapInput } from "@jridgewell/trace-mapping";
 import type { Node } from "estree";
@@ -49,12 +50,14 @@ export default async function convert(options: {
     return createEmptyCoverageMap();
   }
 
-  const map = new TraceMap(options.sourceMap);
-  const coverageMap = createCoverageMap(options.coverage.url, map);
-
-  const ast = await options.ast;
-  const ranges = normalize(options.coverage);
   const wrapperLength = options.wrapperLength || 0;
+  const filename = fileURLToPath(options.coverage.url);
+  const directory = dirname(filename);
+
+  const map = new TraceMap(options.sourceMap);
+  const coverageMap = createCoverageMap(filename, map);
+  const ranges = normalize(options.coverage);
+  const ast = await options.ast;
 
   await walk(ast, ignoreHints, options.ignoreClassMethods, {
     // Functions
@@ -189,7 +192,7 @@ export default async function convert(options: {
       covered,
       loc,
       decl,
-      filename: getFilename(loc),
+      filename: getSourceFilename(loc),
       name: getFunctionName(node),
     });
   }
@@ -212,7 +215,7 @@ export default async function convert(options: {
       coverageMap,
       loc,
       covered,
-      filename: getFilename(loc),
+      filename: getSourceFilename(loc),
     });
   }
 
@@ -283,23 +286,23 @@ export default async function convert(options: {
       locations,
       type,
       covered,
-      filename: getFilename(loc),
+      filename: getSourceFilename(loc),
     });
   }
 
-  function getFilename(position: {
+  function getSourceFilename(position: {
     start: { filename: string | null };
     end: { filename: string | null };
   }) {
-    const filename = position.start.filename || position.end.filename;
+    const sourceFilename = position.start.filename || position.end.filename;
 
-    if (!filename) {
+    if (!sourceFilename) {
       throw new Error(
         `Missing original filename for ${JSON.stringify(position, null, 2)}`,
       );
     }
 
-    return fileURLToPath(new URL(filename, options.coverage.url));
+    return resolve(directory, sourceFilename);
   }
 }
 

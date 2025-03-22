@@ -1,4 +1,4 @@
-import { fileURLToPath } from "node:url";
+import { resolve, dirname } from "node:path";
 import { type Needle, type TraceMap } from "@jridgewell/trace-mapping";
 import libCoverage, { type CoverageMap } from "istanbul-lib-coverage";
 
@@ -16,9 +16,10 @@ export function createEmptyCoverageMap() {
 
 export function createCoverageMap(filename: string, sourceMap: TraceMap) {
   const coverageMap = createEmptyCoverageMap();
+  const directory = dirname(filename);
 
   for (const source of sourceMap.sources) {
-    const path = source ? fileURLToPath(new URL(source, filename)) : filename;
+    const path = source ? resolve(directory, source) : filename;
 
     coverageMap.addFileCoverage({
       path,
