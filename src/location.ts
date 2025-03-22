@@ -7,8 +7,6 @@ import {
 } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
 
-const EOF_PATTERN = /(?<=\r?\n)/u;
-
 export function offsetToNeedle(offset: number, code: string): Needle {
   let current = 0;
   let line = 1;
@@ -31,30 +29,6 @@ export function offsetToNeedle(offset: number, code: string): Needle {
   }
 
   return { line, column };
-}
-
-export function needleToOffset(
-  needle: { column: number; line: number } | { column: null; line: null },
-  code: string,
-  bias = 0,
-): number {
-  let offset = 0;
-
-  if (needle.line == null) {
-    throw new Error("Line is null");
-  }
-
-  for (const [index, line] of code.split(EOF_PATTERN).entries()) {
-    if (index >= needle.line - 1) {
-      return offset + needle.column + bias;
-    }
-
-    offset += line.length;
-  }
-
-  throw new Error(
-    `Unable to find offset for ${JSON.stringify(needle, null, 2)}`,
-  );
 }
 
 export function getLoc(node: Node, code: string, map: TraceMap) {

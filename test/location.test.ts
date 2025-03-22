@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { needleToOffset, offsetToNeedle } from "../src/location";
+import { offsetToNeedle } from "../src/location";
 
 const code = `\
 function sum(a, b) {
@@ -52,28 +52,6 @@ test("offsetToNeedle picks correct positions", () => {
     start: { line: 13, column: 0 },
     end: { line: 15, column: 1 },
   });
-});
-
-test("needleToOffset returns correct positions", () => {
-  expect({
-    start: needleToOffset({ line: 1, column: 0 }, code),
-    end: needleToOffset({ line: 3, column: 1 }, code),
-  }).toEqual({ start: 0, end: 38 });
-
-  expect({
-    start: needleToOffset({ line: 5, column: 0 }, code),
-    end: needleToOffset({ line: 7, column: 1 }, code),
-  }).toEqual({ start: 153, end: 196 });
-
-  expect({
-    start: needleToOffset({ line: 9, column: 0 }, code),
-    end: needleToOffset({ line: 11, column: 1 }, code),
-  }).toEqual({ start: 321, end: 364 });
-
-  expect({
-    start: needleToOffset({ line: 13, column: 0 }, code),
-    end: needleToOffset({ line: 15, column: 1 }, code),
-  }).toEqual({ start: 489, end: 533 });
 });
 
 test("bug repro #1", () => {
