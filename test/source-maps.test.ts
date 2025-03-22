@@ -1,9 +1,14 @@
+import { normalize, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
 import { expect, test } from "vitest";
+
 import convert from "../src";
 
 test("function not in source maps is excluded", async () => {
+  const filename = normalize(resolve("/some/file.ts"));
+
   const code = new MagicString(`\
 export function covered() {
   return "Hello world";
@@ -30,13 +35,13 @@ export function covered() {
 export function uncovered() {
   return "Hello world";
 }
-`).generateMap({ hires: "boundary", file: "/some/file.ts" });
+`).generateMap({ hires: "boundary", file: filename });
 
   const coverage = await convert({
     code,
     sourceMap: sourceMap as any,
     coverage: {
-      url: "file:///some/file.ts",
+      url: pathToFileURL(filename).href,
       scriptId: "1",
       functions: [
         {
@@ -59,7 +64,7 @@ export function uncovered() {
     ast: parseAstAsync(code),
   });
 
-  const fileCoverage = coverage.fileCoverageFor("/some/file.ts");
+  const fileCoverage = coverage.fileCoverageFor(filename);
 
   expect(fileCoverage).toMatchInlineSnapshot(`
     {
