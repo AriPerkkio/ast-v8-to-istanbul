@@ -1,5 +1,7 @@
 # `ast-v8-to-istanbul`
 
+[![Version][version-badge]][npm-url]
+
 > - Speed of V8 coverage 🏎
 > - Accuracy of Istanbul coverage 🔍
 
@@ -91,3 +93,6 @@ This project tests itself against test cases of `istanbul-lib-instrument` and ve
       }
     ]
     ```
+
+[version-badge]: https://img.shields.io/npm/v/ast-v8-to-istanbul
+[npm-url]: https://www.npmjs.com/package/ast-v8-to-istanbul
