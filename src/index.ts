@@ -25,7 +25,7 @@ export { convert };
  * Results are identical with `istanbul-lib-instrument`.
  */
 export default async function convert(options: {
-  /** Original source code, not the executed runtime code */
+  /** Code of the executed runtime file, not the original source file */
   code: string;
 
   /** Length of the execution wrapper, e.g. wrapper used in node:vm */
