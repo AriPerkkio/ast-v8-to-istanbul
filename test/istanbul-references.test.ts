@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { Session, type Profiler } from "node:inspector";
+import { type Profiler } from "node:inspector";
 import { normalize, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { Worker } from "node:worker_threads";
 import { type FileCoverage } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
@@ -70,12 +70,20 @@ describe.each(suites)("$suite", async ({ tests }) => {
       onTestFinished(() => rm(fullname, { force: true }));
       await writeFile(fullname, t.code);
 
-      globalThis.args = args;
-      globalThis.output = undefined;
-      const coverage = await collectCoverage(
-        () => import(fullname),
-        pathToFileURL(fullname).pathname,
+      const worker = new Worker(
+        resolve(import.meta.dirname, "./utils/collect-coverage-in-worker.mjs"),
+        { workerData: { args, filename: fullname } },
       );
+
+      const { coverage, output } = await new Promise<{
+        coverage: Profiler.ScriptCoverage;
+        output: unknown;
+      }>((res, rej) => {
+        worker.on("error", rej);
+        worker.on("message", (message) => res(JSON.parse(message)));
+      });
+
+      await worker.terminate();
 
       const coverageMap = await convert({
         code: t.code,
@@ -89,7 +97,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
       });
 
       if (out !== undefined) {
-        expect.soft(globalThis.output).toEqual(out);
+        expect.soft(output).toEqual(out);
       }
 
       const message = `\nCode: \n\n${t.code}\n`;
@@ -116,44 +124,3 @@ describe.each(suites)("$suite", async ({ tests }) => {
     });
   });
 });
-
-async function collectCoverage(
-  method: () => void | Promise<void>,
-  filename: string,
-) {
-  const session = new Session();
-
-  session.connect();
-  session.post("Profiler.enable");
-  session.post("Runtime.enable");
-  session.post("Profiler.startPreciseCoverage", {
-    callCount: true,
-    detailed: true,
-  });
-
-  await method();
-
-  const coverage = await new Promise<Profiler.ScriptCoverage>(
-    (resolve, reject) => {
-      session.post("Profiler.takePreciseCoverage", (error, data) => {
-        if (error) return reject(error);
-
-        const filtered = data.result.filter((entry) =>
-          entry.url.includes(filename),
-        );
-
-        if (filtered.length !== 1) {
-          reject(new Error(`Expected 1 entry, got ${filtered.length}`));
-        }
-
-        resolve(filtered[0]);
-      });
-    },
-  );
-
-  session.post("Profiler.disable");
-  session.post("Runtime.disable");
-  session.disconnect();
-
-  return coverage;
-}
