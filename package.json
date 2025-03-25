@@ -13,7 +13,10 @@
   "packageManager": "pnpm@10.4.1",
   "homepage": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
   "bugs": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
-  "repository": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AriPerkkio/ast-v8-to-istanbul.git"
+  },
   "scripts": {
     "build": "tsup",
     "test": "vitest",
