@@ -31,11 +31,7 @@ export function second() {
     ast: parseAstAsync(code),
   });
 
-  expect(coverage.files()).toMatchInlineSnapshot(`
-    [
-      "/some/file.ts",
-    ]
-  `);
+  expect(coverage.files()).toStrictEqual([filename]);
 
   expect(coverage).toMatchInlineSnapshot(`
     {
