@@ -30,7 +30,15 @@ function nested2(arg) {
   }
 }
 
+function nested3(arg) {
+  if (arg) {
+    noop();
+  }
+}
+
 nested(true);
 nested2(true);
+nested3(true);
+nested3(false);
 
 function noop() {}

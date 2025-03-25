@@ -230,7 +230,7 @@ export default async function convert(options: {
     }
 
     const locations = [];
-    const covered = [];
+    const covered: number[] = [];
 
     for (const branch of branches) {
       if (!branch) {
@@ -239,7 +239,15 @@ export default async function convert(options: {
           end: { line: undefined, coolumn: undefined },
         });
 
-        covered.push(0);
+        const count = getCount(
+          {
+            startOffset: node.start + wrapperLength,
+            endOffset: node.end + wrapperLength,
+          },
+          ranges,
+        );
+        const previous = covered.at(-1) || 0;
+        covered.push(count - previous);
 
         continue;
       }
@@ -263,16 +271,6 @@ export default async function convert(options: {
     if (type === "if") {
       if (locations.length > 0) {
         locations[0] = loc;
-      }
-
-      if (covered[0] === 0 && covered[1] === 0) {
-        covered[1] = getCount(
-          {
-            startOffset: node.start + wrapperLength,
-            endOffset: node.end + wrapperLength,
-          },
-          ranges,
-        );
       }
     }
 
