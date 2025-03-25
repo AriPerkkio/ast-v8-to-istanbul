@@ -55,6 +55,14 @@ test("normalizes multiple function coverages", async () => {
   ]);
 });
 
+test("normalizes empty coverage set", async () => {
+  expect(
+    normalize({
+      functions: [],
+    }),
+  ).toStrictEqual([]);
+});
+
 test("normalizes, bug repro #1", () => {
   const normalized = normalize({
     functions: [

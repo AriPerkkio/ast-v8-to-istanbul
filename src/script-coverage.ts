@@ -51,7 +51,9 @@ export function normalize(
     }
   }
 
-  normalized.push(current);
+  if (current) {
+    normalized.push(current);
+  }
 
   return normalized;
 }
