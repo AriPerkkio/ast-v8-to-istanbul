@@ -41,3 +41,22 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+  publish-preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
+      - uses: ./.github/actions/setup-and-cache
+        with:
+          node-version: 22
+
+      - name: Install & Build & Publish
+        run: |
+          pnpm install
+          pnpm build
+          npx pkg-pr-new publish
