@@ -26,7 +26,6 @@ export function second() {
     sourceMap: sourceMap as any,
     coverage: {
       url: pathToFileURL(filename).href,
-      scriptId: "1",
       functions: [],
     },
     ast: parseAstAsync(code),

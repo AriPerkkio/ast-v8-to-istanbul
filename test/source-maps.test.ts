@@ -42,7 +42,6 @@ export function uncovered() {
     sourceMap: sourceMap as any,
     coverage: {
       url: pathToFileURL(filename).href,
-      scriptId: "1",
       functions: [
         {
           functionName: "covered",

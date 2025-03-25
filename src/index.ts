@@ -35,7 +35,7 @@ export default async function convert(options: {
   sourceMap: SourceMapInput;
 
   /** ScriptCoverage for the current file */
-  coverage: Profiler.ScriptCoverage;
+  coverage: Pick<Profiler.ScriptCoverage, "functions" | "url">;
 
   /** AST for the transpiled file that matches the coverage results */
   ast: Node | Promise<Node>;
