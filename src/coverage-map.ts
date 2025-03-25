@@ -23,12 +23,12 @@ export function createCoverageMap(filename: string, sourceMap: TraceMap) {
 
     coverageMap.addFileCoverage({
       path,
-      branchMap: {},
-      b: {},
       statementMap: {},
-      s: {},
       fnMap: {},
+      branchMap: {},
+      s: {},
       f: {},
+      b: {},
     });
   }
 
