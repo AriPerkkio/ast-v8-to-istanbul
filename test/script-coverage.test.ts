@@ -110,3 +110,32 @@ test("getCount uncovered", () => {
     ]),
   ).toBe(0);
 });
+
+test("overlapping ranges", () => {
+  const coverage = {
+    functions: [
+      {
+        functionName: "",
+        ranges: [{ startOffset: 0, endOffset: 10, count: 1 }],
+        isBlockCoverage: true,
+      },
+      {
+        functionName: "",
+        ranges: [{ startOffset: 3, endOffset: 10, count: 2 }],
+        isBlockCoverage: true,
+      },
+      {
+        functionName: "normalize",
+        ranges: [{ startOffset: 5, endOffset: 8, count: 3 }],
+        isBlockCoverage: true,
+      },
+    ],
+  };
+
+  expect(normalize(coverage)).toStrictEqual([
+    { startOffset: 0, endOffset: 2, count: 1, isBlockCoverage: true },
+    { startOffset: 3, endOffset: 4, count: 2, isBlockCoverage: true },
+    { startOffset: 5, endOffset: 8, count: 3, isBlockCoverage: true },
+    { startOffset: 9, endOffset: 10, count: 1, isBlockCoverage: true },
+  ]);
+});
