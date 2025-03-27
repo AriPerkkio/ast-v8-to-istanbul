@@ -257,11 +257,13 @@ export default async function convert(options: {
         locations.push(location);
       }
 
+      const bias = branch.type === "BlockStatement" ? 1 : 0;
+
       covered.push(
         getCount(
           {
-            startOffset: branch.start + wrapperLength,
-            endOffset: branch.end + wrapperLength,
+            startOffset: branch.start + bias + wrapperLength,
+            endOffset: branch.end - bias + wrapperLength,
           },
           ranges,
         ),

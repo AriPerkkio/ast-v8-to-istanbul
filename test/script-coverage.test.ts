@@ -17,10 +17,9 @@ test("normalizes single function coverage", async () => {
       ],
     }),
   ).toStrictEqual([
-    { count: 1, endOffset: 24, isBlockCoverage: true, startOffset: 0 },
-    { count: 0, endOffset: 50, isBlockCoverage: true, startOffset: 25 },
-    { count: 0, endOffset: 75, isBlockCoverage: true, startOffset: 51 },
-    { count: 1, endOffset: 100, isBlockCoverage: true, startOffset: 76 },
+    { count: 1, end: 24, start: 0 },
+    { count: 0, end: 75, start: 25 },
+    { count: 1, end: 100, start: 76 },
   ]);
 });
 
@@ -45,13 +44,11 @@ test("normalizes multiple function coverages", async () => {
       ],
     }),
   ).toStrictEqual([
-    { startOffset: 0, endOffset: 49, count: 1, isBlockCoverage: true },
-    { startOffset: 50, endOffset: 80, count: 0, isBlockCoverage: true },
-    { startOffset: 81, endOffset: 99, count: 1, isBlockCoverage: true },
-    { startOffset: 100, endOffset: 125, count: 0, isBlockCoverage: true },
-    { startOffset: 126, endOffset: 149, count: 1, isBlockCoverage: true },
-    { startOffset: 150, endOffset: 175, count: 1, isBlockCoverage: true },
-    { startOffset: 176, endOffset: 200, count: 1, isBlockCoverage: true },
+    { start: 0, end: 49, count: 1 },
+    { start: 50, end: 80, count: 0 },
+    { start: 81, end: 99, count: 1 },
+    { start: 100, end: 125, count: 0 },
+    { start: 126, end: 200, count: 1 },
   ]);
 });
 
@@ -84,21 +81,20 @@ test("normalizes, bug repro #1", () => {
   });
 
   expect(normalized).toStrictEqual([
-    { startOffset: 0, endOffset: 63, count: 1, isBlockCoverage: true },
-    { startOffset: 64, endOffset: 83, count: 0, isBlockCoverage: true },
-    { startOffset: 84, endOffset: 94, count: 1, isBlockCoverage: true },
-    { startOffset: 95, endOffset: 108, count: 0, isBlockCoverage: true },
-    { startOffset: 109, endOffset: 128, count: 1, isBlockCoverage: true },
-    { startOffset: 129, endOffset: 163, count: 1, isBlockCoverage: true },
+    { start: 0, end: 63, count: 1 },
+    { start: 64, end: 83, count: 0 },
+    { start: 84, end: 94, count: 1 },
+    { start: 95, end: 108, count: 0 },
+    { start: 109, end: 163, count: 1 },
   ]);
 });
 
 test("getCount covered", () => {
   expect(
     getCount({ startOffset: 25, endOffset: 50 }, [
-      { startOffset: 0, endOffset: 24, count: 0, isBlockCoverage: true },
-      { startOffset: 25, endOffset: 50, count: 15, isBlockCoverage: true },
-      { startOffset: 51, endOffset: 100, count: 0, isBlockCoverage: true },
+      { start: 0, end: 24, count: 0 },
+      { start: 25, end: 50, count: 15 },
+      { start: 51, end: 100, count: 0 },
     ]),
   ).toBe(15);
 });
@@ -106,7 +102,39 @@ test("getCount covered", () => {
 test("getCount uncovered", () => {
   expect(
     getCount({ startOffset: 25, endOffset: 50 }, [
-      { startOffset: 0, endOffset: 100, count: 0, isBlockCoverage: true },
+      { start: 0, end: 100, count: 0 },
     ]),
   ).toBe(0);
+});
+
+test("overlapping ranges", () => {
+  const coverage = {
+    functions: [
+      {
+        functionName: "",
+        ranges: [{ startOffset: 0, endOffset: 12, count: 1 }],
+        isBlockCoverage: true,
+      },
+      {
+        functionName: "",
+        ranges: [{ startOffset: 3, endOffset: 10, count: 2 }],
+        isBlockCoverage: true,
+      },
+      {
+        functionName: "normalize",
+        ranges: [{ startOffset: 5, endOffset: 8, count: 3 }],
+        isBlockCoverage: true,
+      },
+    ],
+  };
+
+  const output = normalize(coverage);
+
+  expect(output).toStrictEqual([
+    { start: 0, end: 2, count: 1 },
+    { start: 3, end: 4, count: 2 },
+    { start: 5, end: 8, count: 3 },
+    { start: 9, end: 10, count: 2 },
+    { start: 11, end: 12, count: 1 },
+  ]);
 });

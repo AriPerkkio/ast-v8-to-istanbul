@@ -1,7 +1,6 @@
 import { type Profiler } from "node:inspector";
 
-type Normalized = Profiler.CoverageRange &
-  Pick<Profiler.ScriptCoverage["functions"][number], "isBlockCoverage">;
+type Normalized = { start: number; end: number; count: number };
 
 export function normalize(
   scriptCoverage: Pick<Profiler.ScriptCoverage, "functions">,
@@ -9,50 +8,56 @@ export function normalize(
   const ranges: Normalized[] = scriptCoverage.functions
     .map((fn) =>
       fn.ranges.map((range) => ({
-        ...range,
-        isBlockCoverage: fn.isBlockCoverage,
+        start: range.startOffset,
+        end: range.endOffset,
+        count: range.count,
       })),
     )
     .flat()
-    .sort((a, b) => a.startOffset - b.startOffset);
+    .sort((a, b) => {
+      const diff = a.start - b.start;
+      if (diff !== 0) return diff;
+      return a.end - b.end;
+    });
 
-  const normalized = [];
-  let current = ranges[0];
+  const maxEnd = Math.max(...ranges.map((r) => r.end));
+  const hits: number[] = [];
 
-  for (const next of ranges.slice(1)) {
-    if (current.endOffset < next.startOffset) {
-      normalized.push(current);
-      current = next;
-    } else {
-      if (current.startOffset < next.startOffset) {
-        normalized.push({
-          startOffset: current.startOffset,
-          endOffset: next.startOffset - 1,
-          count: current.count,
-          isBlockCoverage: current.isBlockCoverage,
-        });
-      }
+  for (let cursor = 0; cursor <= maxEnd; cursor++) {
+    let match: (Normalized & { diff: number }) | undefined;
 
-      normalized.push({
-        startOffset: next.startOffset,
-        endOffset: Math.min(current.endOffset, next.endOffset),
-        count: next.count,
-        isBlockCoverage: next.isBlockCoverage,
-      });
+    for (const range of ranges) {
+      if (range.start <= cursor && cursor <= range.end) {
+        const diff = range.end - range.start;
 
-      if (current.endOffset > next.endOffset) {
-        current = {
-          ...current,
-          startOffset: next.endOffset + 1,
-        };
-      } else {
-        current = next;
+        if (!match || diff < match.diff) {
+          match = { ...range, diff };
+        }
       }
     }
+
+    hits.push(match?.count ?? 0);
   }
 
-  if (current) {
-    normalized.push(current);
+  const normalized: Normalized[] = [];
+
+  let previous = hits[0];
+  let start = 0;
+
+  for (let end = 0; end < hits.length; end++) {
+    const count = hits[end];
+    const isLast = end === hits.length - 1;
+
+    if (count !== previous || isLast) {
+      normalized.push({
+        start,
+        end: isLast ? end : end - 1,
+        count: previous,
+      });
+
+      previous = count;
+      start = end;
+    }
   }
 
   return normalized;
@@ -66,11 +71,11 @@ export function getCount(
 
   for (const coverage of coverages) {
     // Coverages should be sorted
-    if (coverage.startOffset > offset.startOffset) {
+    if (coverage.start > offset.startOffset) {
       continue;
     }
 
-    const diff = Math.abs(coverage.startOffset - offset.startOffset);
+    const diff = Math.abs(coverage.start - offset.startOffset);
 
     if (!closest) {
       closest = { ...coverage, diff };
