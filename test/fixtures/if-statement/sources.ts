@@ -18,6 +18,22 @@ if (true) {
   noop();
 }
 
+if(true)
+  noop()
+
+if(false)
+  noop()
+
+if(true)
+  noop()
+else
+  noop()
+
+if(false)
+  noop()
+else
+  noop()
+
 function nested(arg) {
   if (arg) {
     noop();

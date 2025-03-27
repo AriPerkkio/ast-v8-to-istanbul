@@ -5,10 +5,10 @@ import { assertCoverage, test } from "./utils";
 test("if-statement", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "8/14 (57.14%)",
+      "branches": "12/22 (54.54%)",
       "functions": "4/4 (100%)",
-      "lines": "16/20 (80%)",
-      "statements": "16/20 (80%)",
+      "lines": "23/30 (76.66%)",
+      "statements": "23/30 (76.66%)",
     }
   `);
 
