@@ -57,6 +57,8 @@ This project tests itself against test cases of `istanbul-lib-instrument` and ve
 
 100% istanbul compatibility guarantees that coverage reports between V8 and Istanbul can be merged together.
 
+<img src="https://github.com/user-attachments/assets/f74f129c-d63a-403e-8091-aefa53f6f97e" width="400" />
+
 ## Limitations
 
 - Unable to detect uncovered `AssignmentPattern`'s if line is otherwise covered
