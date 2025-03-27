@@ -71,7 +71,10 @@ interface Visitors {
   ) => void;
   onSwitchStatement: (node: SwitchStatement) => void;
   onConditionalExpression: (node: ConditionalExpression) => void;
-  onLogicalExpression: (node: LogicalExpression) => void;
+  onLogicalExpression: (
+    node: LogicalExpression,
+    branches: (Node | null | undefined)[],
+  ) => void;
   onAssignmentPattern: (node: AssignmentPattern) => void;
 }
 export type FunctionNodes = Parameters<
@@ -239,7 +242,24 @@ export async function walk(
           return visitors.onConditionalExpression(node);
         }
         case "LogicalExpression": {
-          return visitors.onLogicalExpression(node);
+          if (isSkipped(node)) return;
+
+          const branches: Node[] = [];
+
+          function visit(child: Node) {
+            if (child.type === "LogicalExpression") {
+              setSkipped(child);
+
+              if (getIgnoreHint(child) !== "next") {
+                visit(child.left);
+                return visit(child.right);
+              }
+            }
+            branches.push(child);
+          }
+
+          visit(node);
+          return visitors.onLogicalExpression(node, branches);
         }
         case "AssignmentPattern": {
           return visitors.onAssignmentPattern(node);

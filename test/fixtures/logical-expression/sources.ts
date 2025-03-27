@@ -4,12 +4,21 @@ condition && noop();
 
 condition || noop();
 
-/* prettier-ignore */ /* @ts-expect-error */
+/* @ts-expect-error */
 condition === false &&
    noop();
 
-/* prettier-ignore */
 condition === true ||
    noop();
+
+let a = 1, b = 2;
+
+if (
+   a === 2 ||
+   b === 2 ||
+   a === b
+) {
+  noop();
+}
 
 function noop() {}
