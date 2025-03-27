@@ -154,8 +154,8 @@ export default async function convert(options: {
     onConditionalExpression(node) {
       onBranch("cond-expr", node, [node.consequent, node.alternate]);
     },
-    onLogicalExpression(node) {
-      onBranch("binary-expr", node, [node.left, node.right]);
+    onLogicalExpression(node, branches) {
+      onBranch("binary-expr", node, branches);
     },
     onSwitchStatement(node) {
       onBranch("switch", node, node.cases);

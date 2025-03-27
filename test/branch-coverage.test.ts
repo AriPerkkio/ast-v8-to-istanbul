@@ -31,10 +31,10 @@ test("conditional expression", async ({ actual, expected }) => {
 test("logical-expression", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "5/8 (62.5%)",
+      "branches": "8/13 (61.53%)",
       "functions": "1/1 (100%)",
-      "lines": "5/5 (100%)",
-      "statements": "5/5 (100%)",
+      "lines": "8/8 (100%)",
+      "statements": "9/9 (100%)",
     }
   `);
 
