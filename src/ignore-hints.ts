@@ -48,10 +48,8 @@ export function getIgnoreHints(code: string): IgnoreHint[] {
         // End of multiline comment
         .replace(/\*\*\/$/, "")
         .replace(/\*\/$/, "")
-        // Start of inline comment
-        .replace(/^\/\//, "")
-        // End of inline comment
-        .replace(/\/\/$/, "");
+        // Inline comment
+        .replace(/^\/\//, "");
 
       const groups = comment.match(IGNORE_PATTERN);
       const type = groups?.[1];
