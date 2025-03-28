@@ -302,6 +302,10 @@ export default async function convert(options: {
       );
     }
 
+    if (sourceFilename.startsWith("file://")) {
+      return fileURLToPath(sourceFilename);
+    }
+
     return resolve(directory, sourceFilename);
   }
 }
