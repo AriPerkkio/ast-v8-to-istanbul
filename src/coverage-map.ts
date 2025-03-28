@@ -106,10 +106,10 @@ export function addBranch(options: {
       .pop() ?? -1);
 
   fileCoverage.data.branchMap[index] = {
+    loc: pickLocation(options.loc),
     type: options.type,
     // @ts-expect-error -- Istanbul cheats types for implicit else
     locations: options.locations.map((loc) => pickLocation(loc)),
-    loc: pickLocation(options.loc),
     line: options.loc.start.line,
   };
   fileCoverage.b[index] =
