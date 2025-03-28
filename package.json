@@ -18,6 +18,7 @@
     "url": "git+https://github.com/AriPerkkio/ast-v8-to-istanbul.git"
   },
   "scripts": {
+    "dev": "tsup --watch --sourcemap",
     "build": "tsup",
     "test": "vitest",
     "lint": "eslint . --max-warnings 0",
