@@ -1,5 +1,5 @@
 import { normalize, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
 import { expect, test } from "vitest";
@@ -87,6 +87,52 @@ export function uncovered() {
     {
       "10": 0,
       "2": 1,
+    }
+  `);
+});
+
+test("map.sources can be file urls", async () => {
+  const source = pathToFileURL(normalize(resolve("/some/path/to/source.ts")));
+  const target = pathToFileURL(normalize(resolve("/other/path/to/target.js")));
+
+  const s = new MagicString(`\
+export function covered() {
+  return "Hello world";
+}
+`);
+
+  const code = s.toString();
+  const sourceMap = s.generateMap({
+    file: target.href,
+    hires: "boundary",
+  });
+
+  sourceMap.sources = [source.href];
+
+  const coverage = await convert({
+    code,
+    sourceMap: sourceMap as any,
+    coverage: {
+      url: target.href,
+      functions: [
+        {
+          functionName: "covered",
+          isBlockCoverage: true,
+          ranges: [{ startOffset: 0, endOffset: 55, count: 1 }],
+        },
+      ],
+    },
+    ast: parseAstAsync(code),
+  });
+
+  const fileCoverage = coverage.fileCoverageFor(fileURLToPath(source));
+
+  expect(fileCoverage).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "1/1 (100%)",
+      "statements": "1/1 (100%)",
     }
   `);
 });
