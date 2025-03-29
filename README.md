@@ -51,6 +51,47 @@ const coverageMap: CoverageMap = await convert({
 });
 ```
 
+## Ignoring code
+
+### Ignoring source code
+
+The typical ignore hints from `nyc` are supported: https://github.com/istanbuljs/nyc?tab=readme-ov-file#parsing-hints-ignoring-lines.
+
+In addition to `istanbul` keyword, you can use `v8`, `c8` and `node:coverage`:
+
+- `/* istanbul ignore if */`
+- `/* v8 ignore else */`
+- `/* c8 ignore file */`
+- `/* node:coverage ignore next */`
+
+### Ignoring generated code
+
+This API is mostly for developers integrating `ast-v8-to-istanbul` with other tooling.
+
+If your code transform pipeline is adding generated code that's included in the source maps, it will be included in coverage too.
+You can exclude these known patterns by defining `ignoreNode` for filtering such nodes.
+
+```ts
+function ignoreNode(node: Node, type: "branch" | "function" | "statement"): boolean | void;
+```
+
+```ts
+import { convert } from "ast-v8-to-istanbul";
+
+await convert({
+  ignoreNode: (node, type) => {
+    // Ignore all `await __vite_ssr_import__( ... )` calls that Vite SSR transform adds
+    return (
+      type === "statement" &&
+      node.type === "AwaitExpression" &&
+      node.argument.type === "CallExpression" &&
+      node.argument.callee.type === "Identifier" &&
+      node.argument.callee.name === "__vite_ssr_import__"
+    );
+  },
+});
+```
+
 ## Istanbul Compatibility
 
 This project tests itself against test cases of `istanbul-lib-instrument` and verifies coverage maps are 100% identical. Some cases, like [deprecated `with()` statement](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with) and edge cases of strict mode are skipped, as all tests are run in strict mode.
