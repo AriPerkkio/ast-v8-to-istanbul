@@ -42,6 +42,12 @@ export default async function convert(options: {
 
   /** Class method names to ignore for coverage, identical to https://github.com/istanbuljs/nyc?tab=readme-ov-file#ignoring-methods */
   ignoreClassMethods?: string[];
+
+  /** Filter to ignore code based on AST nodes */
+  ignoreNode?: (
+    node: Node,
+    type: "function" | "statement" | "branch",
+  ) => boolean | void;
 }): Promise<CoverageMap> {
   const ignoreHints = getIgnoreHints(options.code);
 
@@ -172,6 +178,10 @@ export default async function convert(options: {
     node: FunctionNodes,
     positions: { loc: Node; decl: Node },
   ) {
+    if (options.ignoreNode?.(node, "function")) {
+      return;
+    }
+
     const loc = getLoc(positions.loc, options.code, map);
     const decl = getLoc(positions.decl, options.code, map);
 
@@ -198,6 +208,10 @@ export default async function convert(options: {
   }
 
   function onStatement(node: Node, parent?: Node) {
+    if (options.ignoreNode?.(node, "statement")) {
+      return;
+    }
+
     const loc = getLoc(node, options.code, map);
     if (loc === null) {
       return;
@@ -224,6 +238,10 @@ export default async function convert(options: {
     node: Node,
     branches: (Node | null | undefined)[],
   ) {
+    if (options.ignoreNode?.(node, "branch")) {
+      return;
+    }
+
     const loc = getLoc(node, options.code, map);
     if (loc === null) {
       return;
