@@ -4,7 +4,6 @@ import {
   originalPositionFor,
   type TraceMap,
   type Needle,
-  type SourceMapInput,
 } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
 import MagicString from "magic-string";
@@ -98,5 +97,5 @@ export function createEmptySourceMap(filename: string, sourceContent: string) {
     hires: "boundary",
     includeContent: true,
     source: filename,
-  }) as SourceMapInput;
+  });
 }

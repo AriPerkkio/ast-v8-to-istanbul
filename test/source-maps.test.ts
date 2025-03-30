@@ -39,7 +39,7 @@ export function uncovered() {
 
   const coverage = await convert({
     code,
-    sourceMap: sourceMap as any,
+    sourceMap,
     coverage: {
       url: pathToFileURL(filename).href,
       functions: [
@@ -111,7 +111,7 @@ export function covered() {
 
   const coverage = await convert({
     code,
-    sourceMap: sourceMap as any,
+    sourceMap,
     coverage: {
       url: target.href,
       functions: [
