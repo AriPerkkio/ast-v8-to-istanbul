@@ -136,3 +136,42 @@ export function covered() {
     }
   `);
 });
+
+test("source map is optional", async () => {
+  const filename = normalize(resolve("/some/file.ts"));
+
+  const s = new MagicString(`\
+export function covered() {
+  return "Hello world";
+}
+`);
+
+  const code = s.toString();
+
+  const coverage = await convert({
+    code,
+    sourceMap: undefined,
+    ast: parseAstAsync(code),
+    coverage: {
+      url: pathToFileURL(filename).href,
+      functions: [
+        {
+          functionName: "covered",
+          isBlockCoverage: true,
+          ranges: [{ startOffset: 0, endOffset: 53, count: 1 }],
+        },
+      ],
+    },
+  });
+
+  const fileCoverage = coverage.fileCoverageFor(filename);
+
+  expect(fileCoverage).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "1/1 (100%)",
+      "statements": "1/1 (100%)",
+    }
+  `);
+});

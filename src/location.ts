@@ -4,8 +4,10 @@ import {
   originalPositionFor,
   type TraceMap,
   type Needle,
+  type SourceMapInput,
 } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
+import MagicString from "magic-string";
 
 export function offsetToNeedle(offset: number, code: string): Needle {
   let current = 0;
@@ -88,4 +90,13 @@ function getPosition(needle: Needle, map: TraceMap) {
   }
 
   return { line, column, filename: source };
+}
+
+export function createEmptySourceMap(filename: string, sourceContent: string) {
+  return new MagicString(sourceContent, { filename }).generateMap({
+    file: filename,
+    hires: "boundary",
+    includeContent: true,
+    source: filename,
+  }) as SourceMapInput;
 }
