@@ -1,7 +1,7 @@
 import type { Profiler } from "node:inspector";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { TraceMap, type SourceMapInput } from "@jridgewell/trace-mapping";
+import { type EncodedSourceMap, TraceMap } from "@jridgewell/trace-mapping";
 import type { Node } from "estree";
 import type { CoverageMap } from "istanbul-lib-coverage";
 
@@ -15,7 +15,7 @@ import {
   createEmptyCoverageMap,
 } from "./coverage-map";
 import { getIgnoreHints } from "./ignore-hints";
-import { getLoc } from "./location";
+import { createEmptySourceMap, getLoc } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
 export { convert };
@@ -32,7 +32,7 @@ export default async function convert(options: {
   wrapperLength?: number;
 
   /** Source map for the current file */
-  sourceMap: SourceMapInput;
+  sourceMap?: Omit<EncodedSourceMap, "version"> & { version: number };
 
   /** ScriptCoverage for the current file */
   coverage: Pick<Profiler.ScriptCoverage, "functions" | "url">;
@@ -60,7 +60,11 @@ export default async function convert(options: {
   const filename = fileURLToPath(options.coverage.url);
   const directory = dirname(filename);
 
-  const map = new TraceMap(options.sourceMap);
+  const map = new TraceMap(
+    (options.sourceMap as typeof options.sourceMap & { version: 3 }) ||
+      createEmptySourceMap(filename, options.code),
+  );
+
   const coverageMap = createCoverageMap(filename, map);
   const ranges = normalize(options.coverage);
   const ast = await options.ast;

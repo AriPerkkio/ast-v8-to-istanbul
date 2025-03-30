@@ -23,7 +23,7 @@ export function second() {
 
   const coverage = await convert({
     code,
-    sourceMap: sourceMap as any,
+    sourceMap,
     coverage: {
       url: pathToFileURL(filename).href,
       functions: [],

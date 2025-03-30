@@ -92,7 +92,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
         sourceMap: new MagicString(t.code).generateMap({
           hires: "boundary",
           file: fullname,
-        }) as any,
+        }),
         ignoreClassMethods: t.instrumentOpts?.ignoreClassMethods,
       });
 

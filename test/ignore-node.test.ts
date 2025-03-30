@@ -46,7 +46,7 @@ test("ignoreNode can ignore Vite's imports", async () => {
     code,
     ast: parseAstAsync(code),
     coverage: { functions: [], url: pathToFileURL(sourceMap.file).href },
-    sourceMap: sourceMap as any,
+    sourceMap,
     ignoreNode: (node, type) => {
       return (
         type === "statement" &&
