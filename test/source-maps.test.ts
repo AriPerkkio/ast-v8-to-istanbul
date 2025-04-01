@@ -1,9 +1,12 @@
+import { randomUUID } from "node:crypto";
+import { rmSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
 import { normalize, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
-import { expect, test } from "vitest";
+import { expect, onTestFinished, test } from "vitest";
 
 import convert from "../src";
 import { createEmptySourceMap } from "../src/location";
@@ -195,4 +198,110 @@ function hello(name) {
   const actual = createEmptySourceMap(filename, code);
 
   expect(actual.mappings).toStrictEqual(expected.mappings);
+});
+
+test("inline source map as base64", async () => {
+  const filename = normalize(resolve("/some/file.ts"));
+
+  const s = new MagicString(`\
+    export function covered() {
+      return "Hello world";
+    }
+`);
+
+  s.replace("export function", "\n\n\nexport function");
+
+  let code = s.toString();
+  const map = s.generateDecodedMap({ hires: "boundary", source: filename });
+  const encoded = Buffer.from(JSON.stringify(map)).toString("base64");
+
+  code += `\n//# sourceMappingURL=data:application/json;base64,${encoded}\n`;
+
+  const coverage = await convert({
+    code,
+    sourceMap: undefined,
+    ast: parseAstAsync(code),
+    coverage: {
+      url: pathToFileURL(filename).href,
+      functions: [
+        {
+          functionName: "covered",
+          isBlockCoverage: true,
+          ranges: [{ startOffset: 0, endOffset: 53, count: 1 }],
+        },
+      ],
+    },
+  });
+
+  const fileCoverage = coverage.fileCoverageFor(filename);
+
+  expect(fileCoverage).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "1/1 (100%)",
+      "statements": "1/1 (100%)",
+    }
+  `);
+  expect(fileCoverage.getLineCoverage()).toMatchInlineSnapshot(`
+    {
+      "2": 1,
+    }
+  `);
+});
+
+test("inline source map as filename", async () => {
+  const uuid = randomUUID();
+  const filename = normalize(resolve(import.meta.dirname, `file-${uuid}.ts`));
+  const mapName = normalize(
+    resolve(import.meta.dirname, `file-${uuid}.js.map`),
+  );
+
+  const s = new MagicString(`\
+    export function covered() {
+      return "Hello world";
+    }
+`);
+
+  s.replace("export function", "\n\n\nexport function");
+
+  let code = s.toString();
+  const map = s.generateDecodedMap({ hires: "boundary", source: filename });
+
+  onTestFinished(() => rmSync(mapName, { force: true }));
+  await writeFile(mapName, JSON.stringify(map, null, 2), "utf8");
+
+  code += `\n//# sourceMappingURL=file-${uuid}.js.map\n`;
+
+  const coverage = await convert({
+    code,
+    sourceMap: undefined,
+    ast: parseAstAsync(code),
+    coverage: {
+      url: pathToFileURL(filename).href,
+      functions: [
+        {
+          functionName: "covered",
+          isBlockCoverage: true,
+          ranges: [{ startOffset: 0, endOffset: 53, count: 1 }],
+        },
+      ],
+    },
+  });
+
+  const fileCoverage = coverage.fileCoverageFor(filename);
+
+  expect(fileCoverage).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "1/1 (100%)",
+      "statements": "1/1 (100%)",
+    }
+  `);
+  expect(fileCoverage.getLineCoverage()).toMatchInlineSnapshot(`
+    {
+      "2": 1,
+    }
+  `);
 });

@@ -15,7 +15,7 @@ import {
   createEmptyCoverageMap,
 } from "./coverage-map";
 import { getIgnoreHints } from "./ignore-hints";
-import { createEmptySourceMap, getLoc } from "./location";
+import { createEmptySourceMap, getInlineSourceMap, getLoc } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
 export { convert };
@@ -62,6 +62,7 @@ export default async function convert(options: {
 
   const map = new TraceMap(
     (options.sourceMap as typeof options.sourceMap & { version: 3 }) ||
+      (await getInlineSourceMap(filename, options.code)) ||
       createEmptySourceMap(filename, options.code),
   );
 

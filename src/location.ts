@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import {
   allGeneratedPositionsFor,
   LEAST_UPPER_BOUND,
@@ -6,10 +8,13 @@ import {
   type Needle,
   type SourceMapSegment,
   type DecodedSourceMap,
+  type SourceMap,
 } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
 
 const WORD_PATTERN = /(\w+|\s|[^\w\s])/g;
+const INLINE_MAP_PATTERN = /#\s*sourceMappingURL=(.*)\s*$/m;
+const BASE_64_PREFIX = "data:application/json;base64,";
 
 export function offsetToNeedle(offset: number, code: string): Needle {
   let current = 0;
@@ -122,4 +127,25 @@ export function createEmptySourceMap(
     sourcesContent: [code],
     names: [],
   };
+}
+
+export async function getInlineSourceMap(filename: string, code: string) {
+  const matches = code.match(INLINE_MAP_PATTERN);
+  const match = matches?.[1];
+
+  if (!match) return null;
+
+  try {
+    if (match.includes(BASE_64_PREFIX)) {
+      const encoded = match.split(BASE_64_PREFIX).at(-1) || "";
+      const decoded = atob(encoded);
+      return JSON.parse(decoded) as SourceMap;
+    }
+
+    const directory = dirname(filename);
+    const content = await readFile(resolve(directory, match), "utf-8");
+    return JSON.parse(content) as SourceMap;
+  } catch {
+    return null;
+  }
 }
