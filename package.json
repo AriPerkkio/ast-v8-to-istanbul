@@ -20,7 +20,7 @@
   "scripts": {
     "dev": "tsup --watch --sourcemap",
     "build": "tsup",
-    "test": "vitest",
+    "test": "vitest --run && vitest --run --coverage.provider=istanbul",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "debug": "open fixture-coverage/index.html istanbul-coverage/index.html"
@@ -40,8 +40,8 @@
     "@types/istanbul-lib-source-maps": "^4.0.4",
     "@types/istanbul-reports": "^3.0.4",
     "@types/node": "^22.10.9",
-    "@vitest/coverage-istanbul": "^3.1.0",
-    "@vitest/coverage-v8": "^3.1.0",
+    "@vitest/coverage-istanbul": "https://pkg.pr.new/@vitest/coverage-istanbul@47a3e21",
+    "@vitest/coverage-v8": "https://pkg.pr.new/@vitest/coverage-v8@47a3e21",
     "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-import-x": "^4.6.1",
@@ -59,7 +59,7 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.0.7",
-    "vitest": "^3.1.0",
+    "vitest": "https://pkg.pr.new/vitest@47a3e21",
     "yaml": "^2.7.0"
   },
   "prettier": {}
