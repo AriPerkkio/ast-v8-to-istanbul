@@ -1,10 +1,12 @@
 import { normalize, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
 import { expect, test } from "vitest";
 
 import convert from "../src";
+import { createEmptySourceMap } from "../src/location";
 
 test("function not in source maps is excluded", async () => {
   const filename = normalize(resolve("/some/file.ts"));
@@ -174,4 +176,23 @@ export function covered() {
       "statements": "1/1 (100%)",
     }
   `);
+});
+
+test("empty source map mappings match magic-string", async () => {
+  const filename = "hello.js";
+  const code = `\
+function hello(name) {
+  return "Hello " + name;
+}`;
+
+  const expected = new MagicString(code, { filename }).generateDecodedMap({
+    file: filename,
+    hires: "boundary",
+    includeContent: true,
+    source: filename,
+  });
+
+  const actual = createEmptySourceMap(filename, code);
+
+  expect(actual.mappings).toStrictEqual(expected.mappings);
 });

@@ -4,9 +4,12 @@ import {
   originalPositionFor,
   type TraceMap,
   type Needle,
+  type SourceMapSegment,
+  type DecodedSourceMap,
 } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
-import MagicString from "magic-string";
+
+const WORD_PATTERN = /(\w+|\s|[^\w\s])/g;
 
 export function offsetToNeedle(offset: number, code: string): Needle {
   let current = 0;
@@ -91,11 +94,32 @@ function getPosition(needle: Needle, map: TraceMap) {
   return { line, column, filename: source };
 }
 
-export function createEmptySourceMap(filename: string, sourceContent: string) {
-  return new MagicString(sourceContent, { filename }).generateMap({
+export function createEmptySourceMap(
+  filename: string,
+  code: string,
+): DecodedSourceMap {
+  const mappings: SourceMapSegment[][] = [];
+
+  // Identical mappings as "magic-string"'s { hires: "boundary" }
+  for (const [line, content] of code.split("\n").entries()) {
+    const parts = content.match(WORD_PATTERN) || [];
+    const segments: SourceMapSegment[] = [];
+    let column = 0;
+
+    for (const part of parts) {
+      segments.push([column, 0, line, column]);
+      column += part.length;
+    }
+
+    mappings.push(segments);
+  }
+
+  return {
+    version: 3,
+    mappings,
     file: filename,
-    hires: "boundary",
-    includeContent: true,
-    source: filename,
-  });
+    sources: [filename],
+    sourcesContent: [code],
+    names: [],
+  };
 }

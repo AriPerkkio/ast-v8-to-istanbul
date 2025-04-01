@@ -29,8 +29,7 @@
     "@jridgewell/trace-mapping": "^0.3.25",
     "estree-walker": "^3.0.3",
     "istanbul-lib-coverage": "^3.2.2",
-    "js-tokens": "^9.0.1",
-    "magic-string": "^0.30.17"
+    "js-tokens": "^9.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
@@ -52,6 +51,7 @@
     "istanbul-lib-report": "^3.0.1",
     "istanbul-lib-source-maps": "^5.0.6",
     "istanbul-reports": "^3.1.7",
+    "magic-string": "^0.30.17",
     "prettier": "^3.5.1",
     "rollup": "^4.32.1",
     "tinyrainbow": "^2.0.0",
