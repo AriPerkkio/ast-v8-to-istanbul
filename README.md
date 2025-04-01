@@ -5,7 +5,11 @@
 > - Speed of V8 coverage 🏎
 > - Accuracy of Istanbul coverage 🔍
 
-Experimental AST-aware [`v8-to-istanbul`](https://www.npmjs.com/package/v8-to-istanbul). Work-in-progress. 🚧
+[Ignoring code](#ignoring-code) | [Source maps](#source-maps) | [Istanbul Compatibility](#istanbul-compatibility)
+
+---
+
+AST-aware [`v8-to-istanbul`](https://www.npmjs.com/package/v8-to-istanbul).
 
 Unopinionated - _bring-your-own_ AST parser and source maps.
 
@@ -91,6 +95,50 @@ await convert({
   },
 });
 ```
+
+## Source maps
+
+Source maps are optional and supported by various ways:
+
+- Pass directly to `convert` as argument:
+  ```ts
+  import { convert } from "ast-v8-to-istanbul";
+
+  await convert({
+    sourceMap: {
+      version: 3,
+      sources: ["../sources.ts"],
+      sourcesContent: ["export function sum(a: number, b: number) {\n..."],
+      mappings: ";AAAO,SAAS,...",
+      names: [],
+    }
+  });
+  ```
+- Include base64 encoded inline maps in `code`:
+  ```ts
+  await convert({
+    code: `\
+    function hello() {}
+    //# sourceMappingURL=data:application/json;base64,eyJzb3VyY2VzIjpbIi9zb21lL...
+    `
+  });
+  ```
+- Include inline maps with filename in `code`:
+  ```ts
+  await convert({
+    code: `\
+    function hello() {}
+    //# sourceMappingURL=some-file-on-file-system.js.map
+    `
+  });
+  ```
+- Don't use source maps at all, and pass original source code in `code`:
+  ```ts
+  await convert({
+    code: `function hello() {}`,
+    sourceMap: undefined,
+  });
+  ```
 
 ## Istanbul Compatibility
 
