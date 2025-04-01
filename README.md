@@ -5,7 +5,7 @@
 > - Speed of V8 coverage 🏎
 > - Accuracy of Istanbul coverage 🔍
 
-[Ignoring code](#ignoring-code) | [Source maps](#source-maps) | [Istanbul Compatibility](#istanbul-compatibility)
+[Ignoring code](#ignoring-code) | [Source maps](#source-maps) | [Istanbul Compatibility](#istanbul-compatibility) | [Limitations](#limitations)
 
 ---
 
@@ -149,6 +149,8 @@ This project tests itself against test cases of `istanbul-lib-instrument` and ve
 <img src="https://github.com/user-attachments/assets/f74f129c-d63a-403e-8091-aefa53f6f97e" width="400" />
 
 ## Limitations
+
+The way how V8 reports runtime coverage has some limitations when compared to pre-instrumented coverage:
 
 - Unable to detect uncovered `AssignmentPattern`'s if line is otherwise covered
   - https://github.com/nodejs/node/issues/57435
