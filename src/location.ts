@@ -16,77 +16,121 @@ const WORD_PATTERN = /(\w+|\s|[^\w\s])/g;
 const INLINE_MAP_PATTERN = /#\s*sourceMappingURL=(.*)\s*$/m;
 const BASE_64_PREFIX = "data:application/json;base64,";
 
-export function offsetToNeedle(offset: number, code: string): Needle {
-  let current = 0;
-  let line = 1;
-  let column = 0;
+export class Locator {
+  #cache = new Map<number, Needle>();
+  #codeParts: string[];
+  #map: TraceMap;
 
-  for (const char of code) {
-    if (current === offset) {
-      return { line, column };
+  constructor(code: string, map: TraceMap) {
+    this.#codeParts = code.split("");
+    this.#map = map;
+  }
+
+  reset() {
+    this.#cache.clear();
+    this.#codeParts = [];
+  }
+
+  offsetToNeedle(offset: number): Needle {
+    const cacheHit = this.getClosestCacheHit(offset);
+
+    let current = cacheHit?.offset ?? 0;
+    let line = cacheHit?.line ?? 1;
+    let column = cacheHit?.column ?? 0;
+
+    for (let i = current; i <= this.#codeParts.length; i++) {
+      const char = this.#codeParts[i];
+
+      if (current === offset) {
+        this.#cache.set(offset, { line, column });
+
+        return { line, column };
+      }
+
+      // Handle \r\n EOLs on next iteration
+      if (char === "\r") {
+        continue;
+      }
+
+      if (char === "\n") {
+        line++;
+        column = 0;
+      } else {
+        column++;
+      }
+
+      current++;
     }
 
-    // Handle \r\n EOLs on next iteration
-    if (char === "\r") {
-      continue;
+    this.#cache.set(offset, { line, column });
+
+    return { line, column };
+  }
+
+  private getClosestCacheHit(
+    offset: number,
+  ): Partial<Needle> & { offset?: number } {
+    if (this.#cache.has(offset)) {
+      return { ...this.#cache.get(offset), offset };
     }
 
-    if (char === "\n") {
-      line++;
-      column = 0;
+    let hit = {};
+    let closest = 0;
+
+    this.#cache.forEach((val, key) => {
+      if (key <= offset && closest < key) {
+        hit = val;
+        closest = key;
+      }
+    });
+
+    return { ...hit, offset: closest };
+  }
+
+  getLoc(node: Node) {
+    // End-mapping tracing logic from istanbul-lib-source-maps
+    const endNeedle = this.offsetToNeedle(node.end);
+    endNeedle.column -= 1;
+
+    const start = getPosition(this.offsetToNeedle(node.start), this.#map);
+    let end = getPosition(endNeedle, this.#map);
+
+    // e.g. tsc that doesnt include } in source maps
+    if (end === null) {
+      endNeedle.column++;
+      end = getPosition(endNeedle, this.#map);
+    }
+
+    if (start === null || end === null) {
+      // Does not exist in source maps, e.g. generated code
+      return null;
+    }
+
+    const loc = { start, end };
+
+    const afterEndMappings = allGeneratedPositionsFor(this.#map, {
+      source: loc.end.filename!,
+      line: loc.end.line,
+      column: loc.end.column + 1,
+      bias: LEAST_UPPER_BOUND,
+    });
+
+    if (afterEndMappings.length === 0) {
+      loc.end.column = Infinity;
     } else {
-      column++;
-    }
+      for (const mapping of afterEndMappings) {
+        if (mapping.line === null) continue;
 
-    current++;
-  }
-
-  return { line, column };
-}
-
-export function getLoc(node: Node, code: string, map: TraceMap) {
-  // End-mapping tracing logic from istanbul-lib-source-maps
-  const endNeedle = offsetToNeedle(node.end, code);
-  endNeedle.column -= 1;
-
-  const start = getPosition(offsetToNeedle(node.start, code), map);
-  let end = getPosition(endNeedle, map);
-
-  // e.g. tsc that doesnt include } in source maps
-  if (end === null) {
-    endNeedle.column++;
-    end = getPosition(endNeedle, map);
-  }
-
-  if (start === null || end === null) {
-    // Does not exist in source maps, e.g. generated code
-    return null;
-  }
-
-  const loc = { start, end };
-
-  const afterEndMappings = allGeneratedPositionsFor(map, {
-    source: loc.end.filename!,
-    line: loc.end.line,
-    column: loc.end.column + 1,
-    bias: LEAST_UPPER_BOUND,
-  });
-
-  if (afterEndMappings.length === 0) {
-    loc.end.column = Infinity;
-  } else {
-    for (const mapping of afterEndMappings) {
-      if (mapping.line === null) continue;
-
-      const original = originalPositionFor(map, mapping);
-      if (original.line === loc.end.line) {
-        loc.end = { ...original, filename: original.source };
-        break;
+        const original = originalPositionFor(this.#map, mapping);
+        if (original.line === loc.end.line) {
+          loc.end = { ...original, filename: original.source };
+          break;
+        }
       }
     }
-  }
 
-  return loc;
+    return loc;
+  }
 }
 
 function getPosition(needle: Needle, map: TraceMap) {

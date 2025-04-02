@@ -15,7 +15,7 @@ import {
   createEmptyCoverageMap,
 } from "./coverage-map";
 import { getIgnoreHints } from "./ignore-hints";
-import { createEmptySourceMap, getInlineSourceMap, getLoc } from "./location";
+import { createEmptySourceMap, getInlineSourceMap, Locator } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
 export { convert };
@@ -65,6 +65,7 @@ export default async function convert(options: {
       (await getInlineSourceMap(filename, options.code)) ||
       createEmptySourceMap(filename, options.code),
   );
+  const locator = new Locator(options.code, map);
 
   const coverageMap = createCoverageMap(filename, map);
   const ranges = normalize(options.coverage);
@@ -177,6 +178,8 @@ export default async function convert(options: {
     },
   });
 
+  locator.reset();
+
   return coverageMap;
 
   function onFunction(
@@ -187,8 +190,8 @@ export default async function convert(options: {
       return;
     }
 
-    const loc = getLoc(positions.loc, options.code, map);
-    const decl = getLoc(positions.decl, options.code, map);
+    const loc = locator.getLoc(positions.loc);
+    const decl = locator.getLoc(positions.decl);
 
     if (loc === null || decl === null) {
       return;
@@ -217,7 +220,7 @@ export default async function convert(options: {
       return;
     }
 
-    const loc = getLoc(node, options.code, map);
+    const loc = locator.getLoc(node);
     if (loc === null) {
       return;
     }
@@ -247,7 +250,7 @@ export default async function convert(options: {
       return;
     }
 
-    const loc = getLoc(node, options.code, map);
+    const loc = locator.getLoc(node);
     if (loc === null) {
       return;
     }
@@ -275,7 +278,7 @@ export default async function convert(options: {
         continue;
       }
 
-      const location = getLoc(branch, options.code, map);
+      const location = locator.getLoc(branch);
       if (location !== null) {
         locations.push(location);
       }

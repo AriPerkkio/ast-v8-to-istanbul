@@ -19,6 +19,7 @@
   },
   "scripts": {
     "dev": "tsup --watch --sourcemap",
+    "bench": "node --experimental-strip-types --cpu-prof --cpu-prof-dir=./bench-profile ./benchmark/run.ts",
     "build": "tsup",
     "test": "vitest",
     "lint": "eslint . --max-warnings 0",
