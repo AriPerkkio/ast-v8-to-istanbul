@@ -70,7 +70,7 @@ export default defineConfig([
     },
   },
   {
-    ignores: ["dist/**", "test/fixtures/**"],
+    ignores: ["dist/**", "test/fixtures/**", ...tsconfig.exclude],
   },
   eslintPluginPrettierRecommended,
 ]);
