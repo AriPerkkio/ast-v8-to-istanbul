@@ -1,7 +1,10 @@
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Needle, type TraceMap } from "@jridgewell/trace-mapping";
-import libCoverage, { type CoverageMap } from "istanbul-lib-coverage";
+import libCoverage, {
+  type CoverageMap,
+  type FileCoverageData,
+} from "istanbul-lib-coverage";
 
 // https://github.com/istanbuljs/istanbuljs/blob/main/docs/raw-output.md#branch-types
 export type Branch =
@@ -10,6 +13,14 @@ export type Branch =
   | "cond-expr"
   | "switch"
   | "default-arg";
+
+type FileCoverageDataWithMeta = FileCoverageData & { meta: Meta };
+
+type Meta = {
+  lastFunction: number;
+  lastBranch: number;
+  lastStatement: number;
+};
 
 export function createEmptyCoverageMap() {
   return libCoverage.createCoverageMap();
@@ -30,6 +41,12 @@ export function createCoverageMap(filename: string, sourceMap: TraceMap) {
       }
     }
 
+    const meta: Meta = {
+      lastBranch: 0,
+      lastFunction: 0,
+      lastStatement: 0,
+    };
+
     coverageMap.addFileCoverage({
       path,
       statementMap: {},
@@ -38,6 +55,9 @@ export function createCoverageMap(filename: string, sourceMap: TraceMap) {
       s: {},
       f: {},
       b: {},
+
+      // @ts-expect-error -- internal
+      meta,
     });
   }
 
@@ -53,22 +73,17 @@ export function addFunction(options: {
   loc: { start: Needle; end: Needle };
 }) {
   const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
-  const index =
-    1 +
-    (Object.keys(fileCoverage.f)
-      .map((key) => parseInt(key))
-      .sort((a, b) => a - b)
-      .pop() ?? -1);
+  const meta = (fileCoverage.data as FileCoverageDataWithMeta).meta;
 
-  const name = options.name || `(anonymous_${index})`;
-
-  fileCoverage.data.fnMap[index] = {
-    name,
+  fileCoverage.data.fnMap[meta.lastFunction] = {
+    name: options.name || `(anonymous_${meta.lastFunction})`,
     decl: pickLocation(options.decl),
     loc: pickLocation(options.loc),
     line: options.loc.start.line,
   };
-  fileCoverage.f[index] = options.covered || 0;
+  fileCoverage.f[meta.lastFunction] = options.covered || 0;
+
+  meta.lastFunction++;
 }
 
 export function addStatement(options: {
@@ -78,15 +93,14 @@ export function addStatement(options: {
   loc: { start: Needle; end: Needle };
 }) {
   const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
-  const index =
-    1 +
-    (Object.keys(fileCoverage.s)
-      .map((key) => parseInt(key))
-      .sort((a, b) => a - b)
-      .pop() ?? -1);
+  const meta = (fileCoverage.data as FileCoverageDataWithMeta).meta;
 
-  fileCoverage.data.statementMap[index] = pickLocation(options.loc);
-  fileCoverage.s[index] = options.covered || 0;
+  fileCoverage.data.statementMap[meta.lastStatement] = pickLocation(
+    options.loc,
+  );
+  fileCoverage.s[meta.lastStatement] = options.covered || 0;
+
+  meta.lastStatement++;
 }
 
 export function addBranch(options: {
@@ -98,22 +112,19 @@ export function addBranch(options: {
   covered?: number[];
 }) {
   const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
-  const index =
-    1 +
-    (Object.keys(fileCoverage.b)
-      .map((key) => parseInt(key))
-      .sort((a, b) => a - b)
-      .pop() ?? -1);
+  const meta = (fileCoverage.data as FileCoverageDataWithMeta).meta;
 
-  fileCoverage.data.branchMap[index] = {
+  fileCoverage.data.branchMap[meta.lastBranch] = {
     loc: pickLocation(options.loc),
     type: options.type,
     // @ts-expect-error -- Istanbul cheats types for implicit else
     locations: options.locations.map((loc) => pickLocation(loc)),
     line: options.loc.start.line,
   };
-  fileCoverage.b[index] =
+  fileCoverage.b[meta.lastBranch] =
     options.covered || Array(options.locations.length).fill(0);
+
+  meta.lastBranch++;
 }
 
 function pickLocation<T extends { start: Needle; end: Needle }>(original: T) {
