@@ -7,10 +7,18 @@ import { parseAstAsync } from "vite";
 
 import convert from "../dist/index.js";
 
-type Filename = "checker.ts" | "vitest-cli-api-bundled.js";
+type Filename =
+  | "checker.ts"
+  | "vitest-cli-api-bundled.js"
+  | "functions.ts"
+  | (string & {});
+
+const filename: Filename = "checker.ts";
+
+const functions = await getFunctions(filename);
 
 const transformTimer = startTimer("Transforming");
-const { code, map } = await transform("checker.ts");
+const { code, map } = await transform(filename);
 transformTimer();
 
 const parserTimer = startTimer("AST parsing");
@@ -22,7 +30,7 @@ const coverage = await convert({
   code,
   ast,
   sourceMap: map,
-  coverage: { url: pathToFileURL(map.file!).href, functions: [] },
+  coverage: { url: pathToFileURL(map.file!).href, functions },
 });
 coverageTimer();
 
@@ -59,4 +67,17 @@ function startTimer(label: string) {
     const elapsedSeconds = ((endTime - startTime) / 1000).toFixed(2);
     console.log(`${label} took ${elapsedSeconds}s`);
   };
+}
+
+async function getFunctions(filename: Filename) {
+  if (filename !== "functions.ts") {
+    return [];
+  }
+
+  return JSON.parse(
+    await readFile(
+      resolve(import.meta.dirname, "fixtures", "functions.json"),
+      "utf8",
+    ),
+  );
 }
