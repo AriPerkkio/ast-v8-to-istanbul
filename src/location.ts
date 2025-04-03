@@ -16,6 +16,9 @@ const WORD_PATTERN = /(\w+|\s|[^\w\s])/g;
 const INLINE_MAP_PATTERN = /#\s*sourceMappingURL=(.*)\s*$/m;
 const BASE_64_PREFIX = "data:application/json;base64,";
 
+/** How often should offset calculations be cached */
+const CACHE_THRESHOLD = 250;
+
 export class Locator {
   #cache = new Map<number, Needle>();
   #codeParts: string[];
@@ -32,9 +35,11 @@ export class Locator {
   }
 
   offsetToNeedle(offset: number): Needle {
-    const cacheHit = this.getClosestCacheHit(offset);
+    const closestThreshold =
+      Math.floor(offset / CACHE_THRESHOLD) * CACHE_THRESHOLD;
+    const cacheHit = this.#cache.get(closestThreshold);
 
-    let current = cacheHit?.offset ?? 0;
+    let current = cacheHit ? closestThreshold : 0;
     let line = cacheHit?.line ?? 1;
     let column = cacheHit?.column ?? 0;
 
@@ -42,14 +47,16 @@ export class Locator {
       const char = this.#codeParts[i];
 
       if (current === offset) {
-        this.#cache.set(offset, { line, column });
-
         return { line, column };
       }
 
       // Handle \r\n EOLs on next iteration
       if (char === "\r") {
         continue;
+      }
+
+      if (current % CACHE_THRESHOLD === 0) {
+        this.#cache.set(current, { line, column });
       }
 
       if (char === "\n") {
@@ -62,29 +69,7 @@ export class Locator {
       current++;
     }
 
-    this.#cache.set(offset, { line, column });
-
     return { line, column };
-  }
-
-  private getClosestCacheHit(
-    offset: number,
-  ): Partial<Needle> & { offset?: number } {
-    if (this.#cache.has(offset)) {
-      return { ...this.#cache.get(offset), offset };
-    }
-
-    let hit = {};
-    let closest = 0;
-
-    this.#cache.forEach((val, key) => {
-      if (key <= offset && closest < key) {
-        hit = val;
-        closest = key;
-      }
-    });
-
-    return { ...hit, offset: closest };
   }
 
   getLoc(node: Node) {
