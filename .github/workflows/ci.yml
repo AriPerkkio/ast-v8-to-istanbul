@@ -42,6 +42,10 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Bench
+        if: matrix.node-version == '22'
+        run: pnpm bench:ci
+
   publish-preview:
     runs-on: ubuntu-latest
 
