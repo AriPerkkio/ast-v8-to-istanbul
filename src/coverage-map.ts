@@ -77,8 +77,8 @@ export function addFunction(options: {
 
   fileCoverage.data.fnMap[meta.lastFunction] = {
     name: options.name || `(anonymous_${meta.lastFunction})`,
-    decl: pickLocation(options.decl),
-    loc: pickLocation(options.loc),
+    decl: options.decl,
+    loc: options.loc,
     line: options.loc.start.line,
   };
   fileCoverage.f[meta.lastFunction] = options.covered || 0;
@@ -95,9 +95,7 @@ export function addStatement(options: {
   const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
   const meta = (fileCoverage.data as FileCoverageDataWithMeta).meta;
 
-  fileCoverage.data.statementMap[meta.lastStatement] = pickLocation(
-    options.loc,
-  );
+  fileCoverage.data.statementMap[meta.lastStatement] = options.loc;
   fileCoverage.s[meta.lastStatement] = options.covered || 0;
 
   meta.lastStatement++;
@@ -115,21 +113,14 @@ export function addBranch(options: {
   const meta = (fileCoverage.data as FileCoverageDataWithMeta).meta;
 
   fileCoverage.data.branchMap[meta.lastBranch] = {
-    loc: pickLocation(options.loc),
+    loc: options.loc,
     type: options.type,
     // @ts-expect-error -- Istanbul cheats types for implicit else
-    locations: options.locations.map((loc) => pickLocation(loc)),
+    locations: options.locations,
     line: options.loc.start.line,
   };
   fileCoverage.b[meta.lastBranch] =
     options.covered || Array(options.locations.length).fill(0);
 
   meta.lastBranch++;
-}
-
-function pickLocation<T extends { start: Needle; end: Needle }>(original: T) {
-  return {
-    start: { line: original.start.line, column: original.start.column },
-    end: { line: original.end.line, column: original.end.column },
-  };
 }
