@@ -5,38 +5,30 @@ type Normalized = { start: number; end: number; count: number };
 export function normalize(
   scriptCoverage: Pick<Profiler.ScriptCoverage, "functions">,
 ) {
-  const ranges: Normalized[] = scriptCoverage.functions
+  const ranges: (Normalized & { area: number })[] = scriptCoverage.functions
     .map((fn) =>
       fn.ranges.map((range) => ({
         start: range.startOffset,
         end: range.endOffset,
         count: range.count,
+        area: range.endOffset - range.startOffset,
       })),
     )
     .flat()
     .sort((a, b) => {
-      const diff = a.start - b.start;
+      const diff = b.area - a.area;
       if (diff !== 0) return diff;
+
       return a.end - b.end;
     });
 
-  const maxEnd = Math.max(...ranges.map((r) => r.end));
-  const hits: number[] = [];
+  const maxEnd = Math.max(...ranges.map((r) => r.end), 0);
+  const hits: number[] = Array(maxEnd).fill(0);
 
-  for (let cursor = 0; cursor <= maxEnd; cursor++) {
-    let match: (Normalized & { diff: number }) | undefined;
-
-    for (const range of ranges) {
-      if (range.start <= cursor && cursor <= range.end) {
-        const diff = range.end - range.start;
-
-        if (!match || diff < match.diff) {
-          match = { ...range, diff };
-        }
-      }
+  for (const range of ranges) {
+    for (let i = range.start; i <= range.end; i++) {
+      hits[i] = range.count;
     }
-
-    hits.push(match?.count ?? 0);
   }
 
   const normalized: Normalized[] = [];
