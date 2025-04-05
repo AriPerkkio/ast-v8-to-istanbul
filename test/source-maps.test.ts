@@ -4,6 +4,7 @@ import { writeFile } from "node:fs/promises";
 import { normalize, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { createCoverageMap } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
 import { expect, onTestFinished, test } from "vitest";
@@ -42,7 +43,7 @@ export function uncovered() {
 }
 `).generateMap({ hires: "boundary", file: filename });
 
-  const coverage = await convert({
+  const data = await convert({
     code,
     sourceMap,
     coverage: {
@@ -68,6 +69,7 @@ export function uncovered() {
     ast: parseAstAsync(code),
   });
 
+  const coverage = createCoverageMap(data);
   const fileCoverage = coverage.fileCoverageFor(filename);
 
   expect(fileCoverage).toMatchInlineSnapshot(`
@@ -114,7 +116,7 @@ export function covered() {
 
   sourceMap.sources = [source.href];
 
-  const coverage = await convert({
+  const data = await convert({
     code,
     sourceMap,
     coverage: {
@@ -130,6 +132,7 @@ export function covered() {
     ast: parseAstAsync(code),
   });
 
+  const coverage = createCoverageMap(data);
   const fileCoverage = coverage.fileCoverageFor(fileURLToPath(source));
 
   expect(fileCoverage).toMatchInlineSnapshot(`
@@ -153,7 +156,7 @@ export function covered() {
 
   const code = s.toString();
 
-  const coverage = await convert({
+  const data = await convert({
     code,
     sourceMap: undefined,
     ast: parseAstAsync(code),
@@ -169,6 +172,7 @@ export function covered() {
     },
   });
 
+  const coverage = createCoverageMap(data);
   const fileCoverage = coverage.fileCoverageFor(filename);
 
   expect(fileCoverage).toMatchInlineSnapshot(`
@@ -217,7 +221,7 @@ test("inline source map as base64", async () => {
 
   code += `\n//# sourceMappingURL=data:application/json;base64,${encoded}\n`;
 
-  const coverage = await convert({
+  const data = await convert({
     code,
     sourceMap: undefined,
     ast: parseAstAsync(code),
@@ -233,6 +237,7 @@ test("inline source map as base64", async () => {
     },
   });
 
+  const coverage = createCoverageMap(data);
   const fileCoverage = coverage.fileCoverageFor(filename);
 
   expect(fileCoverage).toMatchInlineSnapshot(`
@@ -273,7 +278,7 @@ test("inline source map as filename", async () => {
 
   code += `\n//# sourceMappingURL=file-${uuid}.js.map\n`;
 
-  const coverage = await convert({
+  const data = await convert({
     code,
     sourceMap: undefined,
     ast: parseAstAsync(code),
@@ -289,6 +294,7 @@ test("inline source map as filename", async () => {
     },
   });
 
+  const coverage = createCoverageMap(data);
   const fileCoverage = coverage.fileCoverageFor(filename);
 
   expect(fileCoverage).toMatchInlineSnapshot(`

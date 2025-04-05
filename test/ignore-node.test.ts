@@ -1,4 +1,5 @@
 import { pathToFileURL } from "node:url";
+import { createCoverageMap } from "istanbul-lib-coverage";
 import { parseAstAsync } from "vite";
 import { expect, test } from "vitest";
 
@@ -42,7 +43,7 @@ Object.defineProperty(__vite_ssr_exports__, "uncovered", { enumerable: true, con
 `;
 
 test("ignoreNode can ignore Vite's imports", async () => {
-  const coverageMap = await convert({
+  const data = await convert({
     code,
     ast: parseAstAsync(code),
     coverage: { functions: [], url: pathToFileURL(sourceMap.file).href },
@@ -58,6 +59,7 @@ test("ignoreNode can ignore Vite's imports", async () => {
     },
   });
 
+  const coverageMap = createCoverageMap(data);
   const fileCoverage = coverageMap.fileCoverageFor(coverageMap.files()[0]);
 
   const lines = Object.keys(fileCoverage.getLineCoverage()).map((l) =>

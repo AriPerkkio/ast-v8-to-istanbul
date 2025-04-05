@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type EncodedSourceMap, TraceMap } from "@jridgewell/trace-mapping";
 import type { Node } from "estree";
-import type { CoverageMap } from "istanbul-lib-coverage";
+import type { CoverageMapData } from "istanbul-lib-coverage";
 
 import { type FunctionNodes, getFunctionName, walk } from "./ast";
 import {
@@ -11,8 +11,7 @@ import {
   addFunction,
   addStatement,
   type Branch,
-  createCoverageMap,
-  createEmptyCoverageMap,
+  createCoverageMapData,
 } from "./coverage-map";
 import { getIgnoreHints } from "./ignore-hints";
 import { createEmptySourceMap, getInlineSourceMap, Locator } from "./location";
@@ -48,12 +47,12 @@ export default async function convert(options: {
     node: Node,
     type: "function" | "statement" | "branch",
   ) => boolean | void;
-}): Promise<CoverageMap> {
+}): Promise<CoverageMapData> {
   const ignoreHints = getIgnoreHints(options.code);
 
   // File ignore contains always only 1 entry
   if (ignoreHints.length === 1 && ignoreHints[0].type === "file") {
-    return createEmptyCoverageMap();
+    return {};
   }
 
   const wrapperLength = options.wrapperLength || 0;
@@ -67,7 +66,7 @@ export default async function convert(options: {
   );
   const locator = new Locator(options.code, map);
 
-  const coverageMap = createCoverageMap(filename, map);
+  const coverageMapData = createCoverageMapData(filename, map);
   const ranges = normalize(options.coverage);
   const ast = await options.ast;
 
@@ -180,7 +179,7 @@ export default async function convert(options: {
 
   locator.reset();
 
-  return coverageMap;
+  return coverageMapData;
 
   function onFunction(
     node: FunctionNodes,
@@ -206,7 +205,7 @@ export default async function convert(options: {
     );
 
     addFunction({
-      coverageMap,
+      coverageMapData,
       covered,
       loc,
       decl,
@@ -234,7 +233,7 @@ export default async function convert(options: {
     );
 
     addStatement({
-      coverageMap,
+      coverageMapData,
       loc,
       covered,
       filename: getSourceFilename(loc),
@@ -307,7 +306,7 @@ export default async function convert(options: {
     }
 
     addBranch({
-      coverageMap,
+      coverageMapData,
       loc,
       locations,
       type,
