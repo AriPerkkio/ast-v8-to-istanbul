@@ -28,7 +28,7 @@ export const test = base.extend<{
   },
 
   actual: async ({ fixture, debug, ignoreClassMethods }, use) => {
-    const coverageMap = await convert({
+    const data = await convert({
       ast: parseAstAsync(fixture.transpiled),
       code: fixture.transpiled,
       wrapperLength: 0,
@@ -37,9 +37,9 @@ export const test = base.extend<{
       ignoreClassMethods,
     });
 
-    const copy = createCoverageMap(JSON.parse(JSON.stringify(coverageMap)));
+    const copy = createCoverageMap(JSON.parse(JSON.stringify(data)));
 
-    const normalized = normalizeMap(coverageMap);
+    const normalized = normalizeMap(createCoverageMap(data));
     const isEmpty = normalized.files().length === 0;
     const actual = isEmpty
       ? ({} as any)

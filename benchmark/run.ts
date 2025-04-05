@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { type EncodedSourceMap } from "@jridgewell/trace-mapping";
+import libCoverage from "istanbul-lib-coverage";
 import * as ts from "typescript";
 import { parseAstAsync } from "vite";
 
@@ -34,7 +35,7 @@ const coverage = await convert({
 });
 coverageTimer();
 
-console.log(coverage.getCoverageSummary());
+console.log(libCoverage.createCoverageMap(coverage).getCoverageSummary());
 
 async function transform(filename: Filename) {
   const directory = resolve(import.meta.dirname, "./fixtures");

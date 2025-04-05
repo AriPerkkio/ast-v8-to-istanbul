@@ -18,9 +18,9 @@ Passes all 195 tests<sup>[*](#istanbul-compatibility)</sup> of [`istanbul-lib-in
 ```ts
 import { convert } from "ast-v8-to-istanbul";
 import { parseAstAsync } from "vite";
-import type { CoverageMap } from "istanbul-lib-coverage";
+import type { CoverageMapData } from "istanbul-lib-coverage";
 
-const coverageMap: CoverageMap = await convert({
+const data: CoverageMapData = await convert({
   // Bring-your-own AST parser
   ast: parseAstAsync(<code>),
 

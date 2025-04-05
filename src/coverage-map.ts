@@ -1,8 +1,8 @@
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Needle, type TraceMap } from "@jridgewell/trace-mapping";
-import libCoverage, {
-  type CoverageMap,
+import {
+  type CoverageMapData as IstanbulCoverageMapData,
   type FileCoverageData,
 } from "istanbul-lib-coverage";
 
@@ -14,6 +14,10 @@ export type Branch =
   | "switch"
   | "default-arg";
 
+type CoverageMapData = IstanbulCoverageMapData & {
+  [key: string]: FileCoverageData;
+};
+
 type FileCoverageDataWithMeta = FileCoverageData & { meta: Meta };
 
 type Meta = {
@@ -22,12 +26,8 @@ type Meta = {
   lastStatement: number;
 };
 
-export function createEmptyCoverageMap() {
-  return libCoverage.createCoverageMap();
-}
-
-export function createCoverageMap(filename: string, sourceMap: TraceMap) {
-  const coverageMap = createEmptyCoverageMap();
+export function createCoverageMapData(filename: string, sourceMap: TraceMap) {
+  const data: CoverageMapData = {};
   const directory = dirname(filename);
 
   for (const source of sourceMap.sources) {
@@ -47,7 +47,7 @@ export function createCoverageMap(filename: string, sourceMap: TraceMap) {
       lastStatement: 0,
     };
 
-    coverageMap.addFileCoverage({
+    data[path] = {
       path,
       statementMap: {},
       fnMap: {},
@@ -58,24 +58,24 @@ export function createCoverageMap(filename: string, sourceMap: TraceMap) {
 
       // @ts-expect-error -- internal
       meta,
-    });
+    };
   }
 
-  return coverageMap;
+  return data;
 }
 
 export function addFunction(options: {
-  coverageMap: CoverageMap;
+  coverageMapData: CoverageMapData;
   filename: string;
   name?: string;
   covered?: number;
   decl: { start: Needle; end: Needle };
   loc: { start: Needle; end: Needle };
 }) {
-  const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
-  const meta = (fileCoverage.data as FileCoverageDataWithMeta).meta;
+  const fileCoverage = options.coverageMapData[options.filename];
+  const meta = (fileCoverage as FileCoverageDataWithMeta).meta;
 
-  fileCoverage.data.fnMap[meta.lastFunction] = {
+  fileCoverage.fnMap[meta.lastFunction] = {
     name: options.name || `(anonymous_${meta.lastFunction})`,
     decl: options.decl,
     loc: options.loc,
@@ -87,32 +87,32 @@ export function addFunction(options: {
 }
 
 export function addStatement(options: {
-  coverageMap: CoverageMap;
+  coverageMapData: CoverageMapData;
   filename: string;
   covered?: number;
   loc: { start: Needle; end: Needle };
 }) {
-  const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
-  const meta = (fileCoverage.data as FileCoverageDataWithMeta).meta;
+  const fileCoverage = options.coverageMapData[options.filename];
+  const meta = (fileCoverage as FileCoverageDataWithMeta).meta;
 
-  fileCoverage.data.statementMap[meta.lastStatement] = options.loc;
+  fileCoverage.statementMap[meta.lastStatement] = options.loc;
   fileCoverage.s[meta.lastStatement] = options.covered || 0;
 
   meta.lastStatement++;
 }
 
 export function addBranch(options: {
-  coverageMap: CoverageMap;
+  coverageMapData: CoverageMapData;
   filename: string;
   type: Branch;
   loc: { start: Needle; end: Needle };
   locations: { start: Partial<Needle>; end: Partial<Needle> }[];
   covered?: number[];
 }) {
-  const fileCoverage = options.coverageMap.fileCoverageFor(options.filename);
-  const meta = (fileCoverage.data as FileCoverageDataWithMeta).meta;
+  const fileCoverage = options.coverageMapData[options.filename];
+  const meta = (fileCoverage as FileCoverageDataWithMeta).meta;
 
-  fileCoverage.data.branchMap[meta.lastBranch] = {
+  fileCoverage.branchMap[meta.lastBranch] = {
     loc: options.loc,
     type: options.type,
     // @ts-expect-error -- Istanbul cheats types for implicit else
