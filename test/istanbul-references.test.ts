@@ -3,7 +3,7 @@ import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { type Profiler } from "node:inspector";
 import { normalize, resolve } from "node:path";
 import { Worker } from "node:worker_threads";
-import { type FileCoverage } from "istanbul-lib-coverage";
+import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
 import { describe, expect, onTestFinished, test } from "vitest";
@@ -85,7 +85,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
 
       await worker.terminate();
 
-      const coverageMap = await convert({
+      const data = await convert({
         code: t.code,
         coverage,
         ast: parseAstAsync(t.code),
@@ -102,6 +102,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
 
       const message = `\nCode: \n\n${t.code}\n`;
 
+      const coverageMap = createCoverageMap(data);
       const isEmpty = coverageMap.files().length === 0;
       const fileCoverage = isEmpty
         ? ({} as FileCoverage)

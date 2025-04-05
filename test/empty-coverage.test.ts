@@ -1,5 +1,6 @@
 import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { createCoverageMap } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
 import { parseAstAsync } from "vite";
 import { expect, test } from "vitest";
@@ -21,7 +22,7 @@ export function second() {
   const code = s.toString();
   const sourceMap = s.generateMap({ hires: "boundary", file: filename });
 
-  const coverage = await convert({
+  const data = await convert({
     code,
     sourceMap,
     coverage: {
@@ -31,6 +32,7 @@ export function second() {
     ast: parseAstAsync(code),
   });
 
+  const coverage = createCoverageMap(data);
   expect(coverage.files()).toStrictEqual([filename]);
 
   expect(coverage).toMatchInlineSnapshot(`
