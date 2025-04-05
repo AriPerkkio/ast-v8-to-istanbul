@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { test, expect } from "vitest";
 import { normalize, getCount } from "../src/script-coverage";
 
@@ -137,4 +139,22 @@ test("overlapping ranges", () => {
     { start: 9, end: 10, count: 2 },
     { start: 11, end: 12, count: 1 },
   ]);
+});
+
+test("normalized functions.json matches snapshot", async () => {
+  const functions = await readFile(
+    resolve(
+      import.meta.dirname,
+      "..",
+      "benchmark",
+      "fixtures",
+      "functions.json",
+    ),
+    "utf8",
+  );
+  const normalized = normalize({ functions: JSON.parse(functions) });
+
+  await expect(JSON.stringify(normalized, null, 2)).toMatchFileSnapshot(
+    "__snapshots__/functions.json",
+  );
 });
