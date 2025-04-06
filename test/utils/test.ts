@@ -1,11 +1,10 @@
 import { join } from "node:path";
 import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
 import libSourceMaps from "istanbul-lib-source-maps";
-import { parseAstAsync } from "vite";
 import { expect, test as base } from "vitest";
 
 import convert from "../../src/index";
-import { readFixture, normalizeMap, generateReports } from "./index";
+import { readFixture, normalizeMap, generateReports, parse } from "./index";
 
 export const test = base.extend<{
   actual: FileCoverage;
@@ -29,7 +28,7 @@ export const test = base.extend<{
 
   actual: async ({ fixture, debug, ignoreClassMethods }, use) => {
     const data = await convert({
-      ast: parseAstAsync(fixture.transpiled),
+      ast: parse(fixture.transpiled),
       code: fixture.transpiled,
       wrapperLength: 0,
       coverage: fixture.coverage[0],

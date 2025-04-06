@@ -12,8 +12,18 @@ import {
 import libReport from "istanbul-lib-report";
 import reports from "istanbul-reports";
 import { expect } from "vitest";
+import { parseAstAsync as viteParser } from "vite";
+import { parse as acornParser } from "acorn";
+import { type Node } from "estree";
+import { parseSync as oxcParser } from "oxc-parser";
 
 export { test } from "./test";
+
+// env variable controlled by test config. Defaults to Vite.
+const PARSER = (process.env.TEST_PARSER ?? "vite") as
+  | "vite"
+  | "acorn"
+  | "oxc-parser";
 
 export async function readFixture(filename: string) {
   const root = fileURLToPath(
@@ -88,4 +98,20 @@ export function assertCoverage(actual: FileCoverage, expected: FileCoverage) {
     Error.captureStackTrace(error as Error, assertCoverage);
     throw error;
   }
+}
+
+export async function parse(code: string): Promise<Node> {
+  if (PARSER === "acorn") {
+    return acornParser(code, {
+      ecmaVersion: "latest",
+      sourceType: "module",
+    }) as Node;
+  }
+
+  if (PARSER === "oxc-parser") {
+    return oxcParser("example.js", code, { sourceType: "module" })
+      .program as Node;
+  }
+
+  return viteParser(code);
 }

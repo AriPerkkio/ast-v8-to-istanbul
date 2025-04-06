@@ -2,8 +2,6 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    reporters: "verbose",
-    setupFiles: ["./test/utils/setup.ts"],
     globalSetup: ["./test/utils/global-setup.ts"],
     passWithNoTests: true,
     hideSkippedTests: true,
@@ -19,5 +17,29 @@ export default defineConfig({
         external: [/\/dist\//, /test\/istanbul-references\//],
       },
     },
+
+    workspace: [
+      {
+        test: {
+          name: "vite's parser",
+          env: { TEST_PARSER: "vite" },
+          setupFiles: ["./test/utils/setup.ts"],
+        },
+      },
+      {
+        test: {
+          name: "acorn",
+          env: { TEST_PARSER: "acorn" },
+          setupFiles: ["./test/utils/setup.ts"],
+        },
+      },
+      {
+        test: {
+          name: "oxc-parser",
+          env: { TEST_PARSER: "oxc-parser" },
+          setupFiles: ["./test/utils/setup.ts"],
+        },
+      },
+    ],
   },
 });

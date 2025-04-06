@@ -14,17 +14,16 @@ export async function setup() {
   const fixtures = await readdir(`${root}/fixtures`);
 
   for (const directory of fixtures) {
-    log("Cleaning", `fixtures/${directory}/dist`);
+    console.log(c.bgBlueBright("[setup]"), `Creating fixtures/${directory}`);
+
     await rm(`${root}/fixtures/${directory}/dist`, {
       recursive: true,
       force: true,
     });
     await mkdir(`${root}/fixtures/${directory}/dist`);
 
-    log("Building", `fixtures/${directory}/sources.ts`);
     const { code, map } = await transform(`${root}/fixtures/${directory}`);
 
-    log("Generating links", `fixtures/${directory}/dist/links.md`);
     const visualizer = toVisualizer({ code, map: JSON.parse(map) });
     const astExplorer = toAstExplorer({ code });
 
@@ -34,7 +33,6 @@ export async function setup() {
       "utf8",
     );
 
-    log("Generating Istanbul coverage for reference");
     const instrumenter = createInstrumenter({
       autoWrap: false,
       esModules: true,
@@ -53,7 +51,6 @@ export async function setup() {
       "utf8",
     );
 
-    log("Collecting coverage of", directory);
     const cache = new Date().getTime();
     const { v8, istanbul } = await collectCoverage(
       () =>
@@ -66,7 +63,6 @@ export async function setup() {
       directory,
     );
 
-    log("Writing coverage to", `fixtures/${directory}/coverage.json\n`);
     await writeFile(
       `${root}/fixtures/${directory}/dist/coverage.json`,
       JSON.stringify(v8, null, 2),
@@ -78,6 +74,8 @@ export async function setup() {
       "utf8",
     );
   }
+
+  console.log("");
 }
 
 async function collectCoverage(
@@ -117,10 +115,6 @@ async function collectCoverage(
       globalThis[`__istanbul_coverage_${directory}__`] = undefined;
     });
   });
-}
-
-function log(...messages: string[]) {
-  console.log(c.bgBlueBright("[setup]"), ...messages);
 }
 
 async function transform(directory: string) {
