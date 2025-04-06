@@ -59,7 +59,12 @@ const data: CoverageMapData = await convert({
 
 ### Ignoring source code
 
-The typical ignore hints from `nyc` are supported: https://github.com/istanbuljs/nyc?tab=readme-ov-file#parsing-hints-ignoring-lines.
+The typical ignore hints from `nyc` are supported: https://github.com/istanbuljs/nyc?tab=readme-ov-file#parsing-hints-ignoring-lines:
+
+> * `/* istanbul ignore if */`: ignore the next if statement.
+> * `/* istanbul ignore else */`: ignore the else portion of an if statement.
+> * `/* istanbul ignore next */`: ignore the next _thing_ in the source-code (functions, if statements, classes, you name it).
+> * `/* istanbul ignore file */`: ignore an entire source-file (this should be placed at the top of the file).
 
 In addition to `istanbul` keyword, you can use `v8`, `c8` and `node:coverage`:
 
@@ -67,6 +72,18 @@ In addition to `istanbul` keyword, you can use `v8`, `c8` and `node:coverage`:
 - `/* v8 ignore else */`
 - `/* c8 ignore file */`
 - `/* node:coverage ignore next */`
+
+The `ignore-class-method` from `nyc` is also supported: https://github.com/istanbuljs/nyc?tab=readme-ov-file#ignoring-methods
+
+> You can ignore every instance of a method simply by adding its name to the `ignore-class-method` array in your `nyc` config.
+
+```ts
+import { convert } from "ast-v8-to-istanbul";
+
+await convert({
+  ignoreClassMethods: ['render']
+});
+```
 
 ### Ignoring generated code
 
