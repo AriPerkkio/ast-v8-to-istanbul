@@ -4,6 +4,7 @@ import type {
   ContinueStatement,
   DebuggerStatement,
   DoWhileStatement,
+  Expression,
   ExpressionStatement,
   ForInStatement,
   ForOfStatement,
@@ -37,6 +38,11 @@ declare module "estree" {
     end: number;
   }
 }
+
+type ParenthesizedExpression = {
+  type: "ParenthesizedExpression";
+  expression: Expression;
+};
 
 interface Visitors {
   // Functions
@@ -132,6 +138,16 @@ export async function walk(
           return visitors.onProperty(node);
         }
         case "ArrowFunctionExpression": {
+          // Get inner body in cases where parenthesis are preserverd, e.g. acorn, oxc: https://oxc.rs/docs/learn/ecmascript/grammar.html#parenthesized-expression
+          if (
+            (node.body as unknown as ParenthesizedExpression)?.type ===
+            "ParenthesizedExpression"
+          ) {
+            node.body = (
+              node.body as unknown as ParenthesizedExpression
+            ).expression;
+          }
+
           return visitors.onArrowFunctionExpression(node);
         }
 
