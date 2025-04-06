@@ -6,11 +6,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { createCoverageMap } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
-import { parseAstAsync } from "vite";
 import { expect, onTestFinished, test } from "vitest";
 
 import convert from "../src";
 import { createEmptySourceMap } from "../src/location";
+import { parse } from "./utils";
 
 test("function not in source maps is excluded", async () => {
   const filename = normalize(resolve("/some/file.ts"));
@@ -66,7 +66,7 @@ export function uncovered() {
         },
       ],
     },
-    ast: parseAstAsync(code),
+    ast: parse(code),
   });
 
   const coverage = createCoverageMap(data);
@@ -129,7 +129,7 @@ export function covered() {
         },
       ],
     },
-    ast: parseAstAsync(code),
+    ast: parse(code),
   });
 
   const coverage = createCoverageMap(data);
@@ -159,7 +159,7 @@ export function covered() {
   const data = await convert({
     code,
     sourceMap: undefined,
-    ast: parseAstAsync(code),
+    ast: parse(code),
     coverage: {
       url: pathToFileURL(filename).href,
       functions: [
@@ -224,7 +224,7 @@ test("inline source map as base64", async () => {
   const data = await convert({
     code,
     sourceMap: undefined,
-    ast: parseAstAsync(code),
+    ast: parse(code),
     coverage: {
       url: pathToFileURL(filename).href,
       functions: [
@@ -281,7 +281,7 @@ test("inline source map as filename", async () => {
   const data = await convert({
     code,
     sourceMap: undefined,
-    ast: parseAstAsync(code),
+    ast: parse(code),
     coverage: {
       url: pathToFileURL(filename).href,
       functions: [

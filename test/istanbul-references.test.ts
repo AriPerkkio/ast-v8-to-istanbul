@@ -5,10 +5,11 @@ import { normalize, resolve } from "node:path";
 import { Worker } from "node:worker_threads";
 import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
-import { parseAstAsync } from "vite";
 import { describe, expect, onTestFinished, test } from "vitest";
 import yaml from "yaml";
+
 import convert from "../src";
+import { parse } from "./utils";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -88,7 +89,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
       const data = await convert({
         code: t.code,
         coverage,
-        ast: parseAstAsync(t.code),
+        ast: parse(t.code),
         sourceMap: new MagicString(t.code).generateMap({
           hires: "boundary",
           file: fullname,

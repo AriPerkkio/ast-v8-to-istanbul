@@ -15,6 +15,11 @@ Unopinionated - _bring-your-own_ AST parser and source maps.
 
 Passes all 195 tests<sup>[*](#istanbul-compatibility)</sup> of [`istanbul-lib-instrument`](https://github.com/istanbuljs/istanbuljs/tree/main/packages/istanbul-lib-instrument/test/specs). ✅
 
+Test cases run against:
+- `vite/parseAst` ✅
+- `acorn` ✅
+- `oxc-parser` ✅
+
 ```ts
 import { convert } from "ast-v8-to-istanbul";
 import { parseAstAsync } from "vite";

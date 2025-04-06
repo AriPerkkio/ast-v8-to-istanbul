@@ -2,10 +2,10 @@ import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createCoverageMap } from "istanbul-lib-coverage";
 import MagicString from "magic-string";
-import { parseAstAsync } from "vite";
 import { expect, test } from "vitest";
 
 import convert from "../src";
+import { parse } from "./utils";
 
 test("generates empty coverage for non-executed file", async () => {
   const filename = normalize(resolve("/some/file.ts"));
@@ -29,7 +29,7 @@ export function second() {
       url: pathToFileURL(filename).href,
       functions: [],
     },
-    ast: parseAstAsync(code),
+    ast: parse(code),
   });
 
   const coverage = createCoverageMap(data);
