@@ -21,7 +21,7 @@ export default defineConfig({
     workspace: [
       {
         test: {
-          name: "vite's parser",
+          name: "vite/parseAstAsync",
           env: { TEST_PARSER: "vite" },
           setupFiles: ["./test/utils/setup.ts"],
         },
