@@ -59,25 +59,24 @@ export function getCount(
   offset: Pick<Profiler.CoverageRange, "startOffset" | "endOffset">,
   coverages: Normalized[],
 ) {
-  let closest: (Normalized & { diff: number }) | undefined = undefined;
+  let low = 0;
+  let high = coverages.length - 1;
 
-  for (const coverage of coverages) {
-    // Coverages should be sorted
-    if (coverage.start > offset.startOffset) {
-      continue;
-    }
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const coverage = coverages[mid];
 
-    const diff = Math.abs(coverage.start - offset.startOffset);
-
-    if (!closest) {
-      closest = { ...coverage, diff };
-      continue;
-    }
-
-    if (closest.diff > diff) {
-      closest = { ...coverage, diff };
+    if (
+      coverage.start <= offset.startOffset &&
+      offset.startOffset <= coverage.end
+    ) {
+      return coverage.count;
+    } else if (offset.startOffset < coverage.start) {
+      high = mid - 1;
+    } else {
+      low = mid + 1;
     }
   }
 
-  return closest?.count || 0;
+  return 0;
 }
