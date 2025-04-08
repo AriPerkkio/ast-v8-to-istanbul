@@ -5,8 +5,12 @@ type Normalized = { start: number; end: number; count: number };
 export function normalize(
   scriptCoverage: Pick<Profiler.ScriptCoverage, "functions">,
 ) {
+  if (scriptCoverage.functions.length === 0) {
+    return [];
+  }
+
   const ranges: (Normalized & { area: number })[] = scriptCoverage.functions
-    .map((fn) =>
+    .flatMap((fn) =>
       fn.ranges.map((range) => ({
         start: range.startOffset,
         end: range.endOffset,
@@ -14,7 +18,6 @@ export function normalize(
         area: range.endOffset - range.startOffset,
       })),
     )
-    .flat()
     .sort((a, b) => {
       const diff = b.area - a.area;
       if (diff !== 0) return diff;
@@ -22,32 +25,34 @@ export function normalize(
       return a.end - b.end;
     });
 
-  const maxEnd = Math.max(...ranges.map((r) => r.end), 0);
-  const hits: number[] = Array(maxEnd).fill(0);
+  let maxEnd = 0;
+  for (const r of ranges) {
+    if (r.end > maxEnd) {
+      maxEnd = r.end;
+    }
+  }
+
+  const hits = new Uint32Array(maxEnd + 1);
 
   for (const range of ranges) {
-    for (let i = range.start; i <= range.end; i++) {
-      hits[i] = range.count;
-    }
+    hits.fill(range.count, range.start, range.end + 1);
   }
 
   const normalized: Normalized[] = [];
 
-  let previous = hits[0];
   let start = 0;
 
-  for (let end = 0; end < hits.length; end++) {
-    const count = hits[end];
-    const isLast = end === hits.length - 1;
+  for (let end = 1; end <= hits.length; end++) {
+    const isLast = end === hits.length;
+    const current = isLast ? null : hits[end];
+    const previous = hits[start];
 
-    if (count !== previous || isLast) {
+    if (current !== previous || isLast) {
       normalized.push({
         start,
-        end: isLast ? end : end - 1,
+        end: end - 1,
         count: previous,
       });
-
-      previous = count;
       start = end;
     }
   }
