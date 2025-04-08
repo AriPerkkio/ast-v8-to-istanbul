@@ -66,7 +66,10 @@ export function getCount(
     const mid = Math.floor((low + high) / 2);
     const coverage = coverages[mid];
 
-    if (coverage.start <= offset.startOffset && offset.startOffset <= coverage.end) {
+    if (
+      coverage.start <= offset.startOffset &&
+      offset.startOffset <= coverage.end
+    ) {
       return coverage.count;
     } else if (offset.startOffset < coverage.start) {
       high = mid - 1;
