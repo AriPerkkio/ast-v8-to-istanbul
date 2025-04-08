@@ -14,7 +14,7 @@ type Filename =
   | "functions.ts"
   | (string & {});
 
-const filename: Filename = "checker.ts";
+const filename: Filename = process.argv[2] || 'checker.ts'
 
 const functions = await getFunctions(filename);
 
