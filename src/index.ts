@@ -190,11 +190,10 @@ export default async function convert(options: {
     }
 
     const loc = locator.getLoc(positions.loc);
-    const decl = locator.getLoc(positions.decl);
+    if (loc === null) return;
 
-    if (loc === null || decl === null) {
-      return;
-    }
+    const decl = locator.getLoc(positions.decl);
+    if (decl === null) return;
 
     const covered = getCount(
       {
@@ -220,9 +219,7 @@ export default async function convert(options: {
     }
 
     const loc = locator.getLoc(node);
-    if (loc === null) {
-      return;
-    }
+    if (loc === null) return;
 
     const covered = getCount(
       {
@@ -250,9 +247,7 @@ export default async function convert(options: {
     }
 
     const loc = locator.getLoc(node);
-    if (loc === null) {
-      return;
-    }
+    if (loc === null) return;
 
     const locations = [];
     const covered: number[] = [];

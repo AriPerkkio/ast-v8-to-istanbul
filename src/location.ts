@@ -73,11 +73,17 @@ export class Locator {
   }
 
   getLoc(node: Node) {
+    const start = getPosition(this.offsetToNeedle(node.start), this.#map);
+
+    if (start === null) {
+      // Does not exist in source maps, e.g. generated code
+      return null;
+    }
+
     // End-mapping tracing logic from istanbul-lib-source-maps
     const endNeedle = this.offsetToNeedle(node.end);
     endNeedle.column -= 1;
 
-    const start = getPosition(this.offsetToNeedle(node.start), this.#map);
     let end = getPosition(endNeedle, this.#map);
 
     // e.g. tsc that doesnt include } in source maps
@@ -86,7 +92,7 @@ export class Locator {
       end = getPosition(endNeedle, this.#map);
     }
 
-    if (start === null || end === null) {
+    if (end === null) {
       // Does not exist in source maps, e.g. generated code
       return null;
     }
