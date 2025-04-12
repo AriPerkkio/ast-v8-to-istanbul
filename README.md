@@ -19,6 +19,7 @@ Test cases run against:
 - `vite/parseAst` ✅
 - `acorn` ✅
 - `oxc-parser` ✅
+- `@babel/parser` ✅
 
 ```ts
 import { convert } from "ast-v8-to-istanbul";

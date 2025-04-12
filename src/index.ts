@@ -119,6 +119,51 @@ export default async function convert(options: {
         });
       }
     },
+    onClassMethod(babelNode) {
+      const node: Node = {
+        type: "FunctionExpression",
+        start: babelNode.start!,
+        end: babelNode.end!,
+        body: {
+          type: "BlockStatement",
+          start: babelNode.body.start!,
+          end: babelNode.body.end!,
+          body: [],
+        },
+        params: [],
+      };
+
+      onFunction(node, {
+        loc: node.body,
+        decl: {
+          start: babelNode.key.start!,
+          end: babelNode.key.end!,
+        },
+      });
+    },
+
+    onObjectMethod(babelNode) {
+      const node: Node = {
+        type: "FunctionExpression",
+        start: babelNode.start!,
+        end: babelNode.end!,
+        body: {
+          type: "BlockStatement",
+          start: babelNode.body.start!,
+          end: babelNode.body.end!,
+          body: [],
+        },
+        params: [],
+      };
+
+      onFunction(node, {
+        loc: node.body,
+        decl: {
+          start: babelNode.key.start!,
+          end: babelNode.key.end!,
+        },
+      });
+    },
 
     // Statements
     onBreakStatement: onStatement,
@@ -151,8 +196,13 @@ export default async function convert(options: {
     },
     onClassBody(node) {
       for (const child of node.body) {
-        if (child.type === "PropertyDefinition" && child.value) {
-          onStatement(child.value);
+        if (
+          (child.type === "PropertyDefinition" ||
+            child.type === "ClassProperty" ||
+            child.type === "ClassPrivateProperty") &&
+          child.value
+        ) {
+          onStatement(child.value as Node);
         }
       }
     },
@@ -183,7 +233,10 @@ export default async function convert(options: {
 
   function onFunction(
     node: FunctionNodes,
-    positions: { loc: Node; decl: Node },
+    positions: {
+      loc: Pick<Node, "start" | "end">;
+      decl: Pick<Node, "start" | "end">;
+    },
   ) {
     if (options.ignoreNode?.(node, "function")) {
       return;

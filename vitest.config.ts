@@ -40,6 +40,13 @@ export default defineConfig({
           setupFiles: ["./test/utils/setup.ts"],
         },
       },
+      {
+        test: {
+          name: "babel",
+          env: { TEST_PARSER: "babel" },
+          setupFiles: ["./test/utils/setup.ts"],
+        },
+      },
     ],
   },
 });
