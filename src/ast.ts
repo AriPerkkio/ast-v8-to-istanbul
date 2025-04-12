@@ -101,14 +101,14 @@ export type FunctionNodes = Parameters<
 >[0];
 
 export async function walk(
-  ast: Node,
+  ast: unknown,
   ignoreHints: IgnoreHint[],
   ignoreClassMethods: string[] | undefined,
   visitors: Visitors,
 ) {
   let nextIgnore: Node | false = false;
 
-  return await asyncWalk(ast, {
+  return await asyncWalk(ast as Node, {
     async enter(node) {
       if (nextIgnore !== false) {
         return;

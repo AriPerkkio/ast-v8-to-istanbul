@@ -119,5 +119,5 @@ export async function parse(code: string): Promise<Node> {
     return babelParser(code, { sourceType: "module" }).program as Node;
   }
 
-  return viteParser(code);
+  return await viteParser(code);
 }

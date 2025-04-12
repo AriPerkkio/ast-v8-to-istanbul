@@ -21,6 +21,16 @@ export default defineConfig({
     workspace: [
       {
         test: {
+          name: "Public API",
+          include: [],
+          typecheck: {
+            enabled: true,
+            include: ["test/public-api.test-d.ts"],
+          },
+        },
+      },
+      {
+        test: {
           name: "vite/parseAstAsync",
           env: { TEST_PARSER: "vite" },
           setupFiles: ["./test/utils/setup.ts"],

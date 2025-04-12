@@ -2,7 +2,7 @@ import type { Profiler } from "node:inspector";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type EncodedSourceMap, TraceMap } from "@jridgewell/trace-mapping";
-import type { Node } from "estree";
+import { type Node } from "estree";
 import type { CoverageMapData } from "istanbul-lib-coverage";
 
 import { type FunctionNodes, getFunctionName, walk } from "./ast";
@@ -23,7 +23,10 @@ export { convert };
  * Maps V8 `ScriptCoverage` to Istanbul's `CoverageMap`.
  * Results are identical with `istanbul-lib-instrument`.
  */
-export default async function convert(options: {
+export default async function convert<
+  T = Node,
+  Program = T & { type: "Program" },
+>(options: {
   /** Code of the executed runtime file, not the original source file */
   code: string;
 
@@ -37,14 +40,14 @@ export default async function convert(options: {
   coverage: Pick<Profiler.ScriptCoverage, "functions" | "url">;
 
   /** AST for the transpiled file that matches the coverage results */
-  ast: Node | Promise<Node>;
+  ast: Program | Promise<Program>;
 
   /** Class method names to ignore for coverage, identical to https://github.com/istanbuljs/nyc?tab=readme-ov-file#ignoring-methods */
   ignoreClassMethods?: string[];
 
   /** Filter to ignore code based on AST nodes */
   ignoreNode?: (
-    node: Node,
+    node: T,
     type: "function" | "statement" | "branch",
   ) => boolean | void;
 }): Promise<CoverageMapData> {
@@ -238,7 +241,7 @@ export default async function convert(options: {
       decl: Pick<Node, "start" | "end">;
     },
   ) {
-    if (options.ignoreNode?.(node, "function")) {
+    if (options.ignoreNode?.(node as unknown as T, "function")) {
       return;
     }
 
@@ -267,7 +270,7 @@ export default async function convert(options: {
   }
 
   function onStatement(node: Node, parent?: Node) {
-    if (options.ignoreNode?.(node, "statement")) {
+    if (options.ignoreNode?.(node as unknown as T, "statement")) {
       return;
     }
 
@@ -295,7 +298,7 @@ export default async function convert(options: {
     node: Node,
     branches: (Node | null | undefined)[],
   ) {
-    if (options.ignoreNode?.(node, "branch")) {
+    if (options.ignoreNode?.(node as unknown as T, "branch")) {
       return;
     }
 
