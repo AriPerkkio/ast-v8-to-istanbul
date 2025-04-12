@@ -14,6 +14,7 @@ import reports from "istanbul-reports";
 import { expect } from "vitest";
 import { parseAstAsync as viteParser } from "vite";
 import { parse as acornParser } from "acorn";
+import { parse as babelParser } from "@babel/parser";
 import { type Node } from "estree";
 import { parseSync as oxcParser } from "oxc-parser";
 
@@ -23,7 +24,8 @@ export { test } from "./test";
 const PARSER = (process.env.TEST_PARSER ?? "vite") as
   | "vite"
   | "acorn"
-  | "oxc-parser";
+  | "oxc-parser"
+  | "babel";
 
 export async function readFixture(filename: string) {
   const root = fileURLToPath(
@@ -113,5 +115,9 @@ export async function parse(code: string): Promise<Node> {
       .program as Node;
   }
 
-  return viteParser(code);
+  if (PARSER === "babel") {
+    return babelParser(code, { sourceType: "module" }).program as Node;
+  }
+
+  return await viteParser(code);
 }

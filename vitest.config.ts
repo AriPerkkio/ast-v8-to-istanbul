@@ -21,6 +21,16 @@ export default defineConfig({
     workspace: [
       {
         test: {
+          name: "Public API",
+          include: [],
+          typecheck: {
+            enabled: true,
+            include: ["test/public-api.test-d.ts"],
+          },
+        },
+      },
+      {
+        test: {
           name: "vite/parseAstAsync",
           env: { TEST_PARSER: "vite" },
           setupFiles: ["./test/utils/setup.ts"],
@@ -37,6 +47,13 @@ export default defineConfig({
         test: {
           name: "oxc-parser",
           env: { TEST_PARSER: "oxc-parser" },
+          setupFiles: ["./test/utils/setup.ts"],
+        },
+      },
+      {
+        test: {
+          name: "babel",
+          env: { TEST_PARSER: "babel" },
           setupFiles: ["./test/utils/setup.ts"],
         },
       },

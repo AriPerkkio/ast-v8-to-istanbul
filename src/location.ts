@@ -72,7 +72,7 @@ export class Locator {
     return { line, column };
   }
 
-  getLoc(node: Node) {
+  getLoc(node: Pick<Node, "start" | "end">) {
     const start = getPosition(this.offsetToNeedle(node.start), this.#map);
 
     if (start === null) {

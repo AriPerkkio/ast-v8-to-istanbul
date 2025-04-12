@@ -1,3 +1,9 @@
+import {
+  type ObjectMethod,
+  type ClassMethod,
+  type ClassBody as BabelClassBody,
+  type Node as BabelNode,
+} from "@babel/types";
 import type {
   ArrowFunctionExpression,
   BreakStatement,
@@ -51,6 +57,8 @@ interface Visitors {
   onArrowFunctionExpression: (node: ArrowFunctionExpression) => void;
   onMethodDefinition: (node: MethodDefinition) => void;
   onProperty: (node: Property) => void;
+  onClassMethod: (node: ClassMethod) => void;
+  onObjectMethod: (node: ObjectMethod) => void;
 
   // Statements
   onExpressionStatement: (node: ExpressionStatement) => void;
@@ -68,7 +76,7 @@ interface Visitors {
   onWithStatement: (node: WithStatement) => void;
   onLabeledStatement: (node: LabeledStatement) => void;
   onVariableDeclarator: (node: VariableDeclarator) => void;
-  onClassBody: (node: ClassBody) => void;
+  onClassBody: (node: ClassBody | BabelClassBody) => void;
 
   // Branches
   onIfStatement: (
@@ -93,14 +101,14 @@ export type FunctionNodes = Parameters<
 >[0];
 
 export async function walk(
-  ast: Node,
+  ast: unknown,
   ignoreHints: IgnoreHint[],
   ignoreClassMethods: string[] | undefined,
   visitors: Visitors,
 ) {
   let nextIgnore: Node | false = false;
 
-  return await asyncWalk(ast, {
+  return await asyncWalk(ast as Node, {
     async enter(node) {
       if (nextIgnore !== false) {
         return;
@@ -198,9 +206,14 @@ export async function walk(
           return visitors.onVariableDeclarator(node);
         }
         case "ClassBody": {
+          const classBody = node as ClassBody | BabelClassBody;
+
           if (ignoreClassMethods) {
-            for (const child of node.body) {
-              if (child.type === "MethodDefinition") {
+            for (const child of classBody.body) {
+              if (
+                child.type === "MethodDefinition" ||
+                child.type === "ClassMethod"
+              ) {
                 const name = child.key.type === "Identifier" && child.key.name;
 
                 if (name && ignoreClassMethods.includes(name)) {
@@ -209,10 +222,12 @@ export async function walk(
               }
             }
 
-            node.body = node.body.filter((child) => !isSkipped(child));
+            classBody.body = classBody.body.filter(
+              (child) => !isSkipped(child),
+            ) as typeof classBody.body;
           }
 
-          return visitors.onClassBody(node);
+          return visitors.onClassBody(classBody);
         }
 
         // Branches
@@ -280,6 +295,16 @@ export async function walk(
         case "AssignmentPattern": {
           return visitors.onAssignmentPattern(node);
         }
+
+        // @ts-expect-error -- Babel AST
+        case "ClassMethod": {
+          return visitors.onClassMethod(node);
+        }
+
+        // @ts-expect-error -- Babel AST
+        case "ObjectMethod": {
+          return visitors.onObjectMethod(node);
+        }
       }
     },
     async leave(node) {
@@ -300,7 +325,7 @@ export async function walk(
   }
 }
 
-export function getFunctionName(node: Node) {
+export function getFunctionName(node: Node | BabelNode) {
   if (node.type === "Identifier") {
     return node.name;
   }
@@ -310,12 +335,12 @@ export function getFunctionName(node: Node) {
   }
 }
 
-function setSkipped(node: Node) {
+function setSkipped(node: Node | BabelNode) {
   // @ts-expect-error -- internal
   node.__skipped = true;
 }
 
-function isSkipped(node: Node) {
+function isSkipped(node: Node | BabelNode) {
   // @ts-expect-error -- internal
   return node.__skipped === true;
 }
