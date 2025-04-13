@@ -4,7 +4,6 @@ import { type Profiler } from "node:inspector";
 import { normalize, resolve } from "node:path";
 import { Worker } from "node:worker_threads";
 import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
-import MagicString from "magic-string";
 import { describe, expect, onTestFinished, test } from "vitest";
 import yaml from "yaml";
 
@@ -90,10 +89,6 @@ describe.each(suites)("$suite", async ({ tests }) => {
         code: t.code,
         coverage,
         ast: parse(t.code),
-        sourceMap: new MagicString(t.code).generateMap({
-          hires: "boundary",
-          file: fullname,
-        }),
         ignoreClassMethods: t.instrumentOpts?.ignoreClassMethods,
       });
 

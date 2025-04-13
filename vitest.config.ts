@@ -3,8 +3,6 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     globalSetup: ["./test/utils/global-setup.ts"],
-    passWithNoTests: true,
-    hideSkippedTests: true,
 
     coverage: {
       enabled: true,
