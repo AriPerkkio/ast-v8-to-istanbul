@@ -1,9 +1,9 @@
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import inspector, { Profiler } from "node:inspector";
 import { fileURLToPath } from "node:url";
-import * as ts from "typescript";
 import c from "tinyrainbow";
 import { createInstrumenter } from "istanbul-lib-instrument";
+import { transform as oxc } from "oxc-transform";
 
 import { toVisualizer } from "./source-map-visualizer";
 import { toAstExplorer } from "./ast-explorer";
@@ -24,7 +24,7 @@ export async function setup() {
 
     const { code, map } = await transform(`${root}/fixtures/${directory}`);
 
-    const visualizer = toVisualizer({ code, map: JSON.parse(map) });
+    const visualizer = toVisualizer({ code, map });
     const astExplorer = toAstExplorer({ code });
 
     await writeFile(
@@ -43,7 +43,7 @@ export async function setup() {
     const instrumented = instrumenter.instrumentSync(
       code,
       `${root}/fixtures/${directory}/dist/index.js`,
-      JSON.parse(map) as any,
+      map,
     );
     await writeFile(
       `${root}/fixtures/${directory}/dist/instrumented.js`,
@@ -118,25 +118,17 @@ async function collectCoverage(
 }
 
 async function transform(directory: string) {
-  const transformResult = ts.transpileModule(
+  const result = oxc(
+    `${directory}/sources.ts`,
     await readFile(`${directory}/sources.ts`, "utf8"),
-    {
-      fileName: `${directory}/sources.ts`,
-      compilerOptions: {
-        outDir: `${directory}/dist`,
-        target: ts.ScriptTarget.ESNext,
-        module: ts.ModuleKind.NodeNext,
-        moduleResolution: ts.ModuleResolutionKind.Bundler,
-        inlineSources: true,
-        sourceMap: true,
-      },
-    },
+    { sourcemap: true },
   );
-  const code = transformResult.outputText;
-  const map = transformResult.sourceMapText || "{}";
+
+  const code = result.code;
+  const map: any = result.map || {};
 
   await writeFile(`${directory}/dist/index.js`, code);
-  await writeFile(`${directory}/dist/index.js.map`, map);
+  await writeFile(`${directory}/dist/index.js.map`, JSON.stringify(map));
 
   return { code, map };
 }
