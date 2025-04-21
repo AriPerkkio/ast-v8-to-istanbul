@@ -73,7 +73,8 @@ export class Locator {
   }
 
   getLoc(node: Pick<Node, "start" | "end">) {
-    const start = getPosition(this.offsetToNeedle(node.start), this.#map);
+    const startNeedle = this.offsetToNeedle(node.start);
+    const start = getPosition(startNeedle, this.#map);
 
     if (start === null) {
       // Does not exist in source maps, e.g. generated code
@@ -100,7 +101,7 @@ export class Locator {
     const loc = { start, end };
 
     const afterEndMappings = allGeneratedPositionsFor(this.#map, {
-      source: loc.end.filename!,
+      source: loc.end.filename,
       line: loc.end.line,
       column: loc.end.column + 1,
       bias: LEAST_UPPER_BOUND,
@@ -114,7 +115,7 @@ export class Locator {
 
         const original = originalPositionFor(this.#map, mapping);
         if (original.line === loc.end.line) {
-          loc.end = { ...original, filename: original.source };
+          loc.end = { ...original, filename: original.source! };
           break;
         }
       }
@@ -125,13 +126,25 @@ export class Locator {
 }
 
 function getPosition(needle: Needle, map: TraceMap) {
-  const { line, column, source } = originalPositionFor(map, needle);
+  let position = originalPositionFor(map, needle);
 
-  if (line == null || column == null) {
+  if (position.source == null) {
+    position = originalPositionFor(map, {
+      column: needle.column,
+      line: needle.line,
+      bias: LEAST_UPPER_BOUND,
+    });
+  }
+
+  if (position.source == null) {
     return null;
   }
 
-  return { line, column, filename: source };
+  return {
+    line: position.line,
+    column: position.column,
+    filename: position.source,
+  };
 }
 
 export function createEmptySourceMap(
