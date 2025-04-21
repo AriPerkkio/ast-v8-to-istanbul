@@ -43,6 +43,7 @@
     "@types/istanbul-lib-source-maps": "^4.0.4",
     "@types/istanbul-reports": "^3.0.4",
     "@types/node": "^22.10.9",
+    "@vitejs/plugin-vue": "^5.2.3",
     "@vitest/coverage-istanbul": "^3.1.0",
     "@vitest/coverage-v8": "^3.1.0",
     "acorn": "^8.14.1",
@@ -58,7 +59,6 @@
     "istanbul-reports": "^3.1.7",
     "magic-string": "^0.30.17",
     "oxc-parser": "^0.64.0",
-    "oxc-transform": "^0.64.0",
     "prettier": "^3.5.1",
     "rollup": "^4.32.1",
     "tinyrainbow": "^2.0.0",
@@ -67,6 +67,7 @@
     "typescript-eslint": "^8.24.1",
     "vite": "^6.0.7",
     "vitest": "^3.1.0",
+    "vue": "^3.5.13",
     "yaml": "^2.7.0"
   },
   "prettier": {}

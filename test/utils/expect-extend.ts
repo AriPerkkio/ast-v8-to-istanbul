@@ -112,6 +112,13 @@ function toMatchBranches(
     const branchActual = actual[key];
     const branchExpected = expected[key];
 
+    if (!branchActual) {
+      mismatches.push(
+        `Branch missing at ${key}, expected: ${JSON.stringify(branchExpected, null, 2)}`,
+      );
+      continue;
+    }
+
     if (branchActual.type !== branchExpected.type) {
       mismatches.push(
         `Type did not match: ${branchActual.type} !== ${branchExpected.type}`,

@@ -26,8 +26,8 @@ test("ignore if else", async ({ actual, expected }) => {
     {
       "branches": "1/1 (100%)",
       "functions": "1/1 (100%)",
-      "lines": "6/6 (100%)",
-      "statements": "6/6 (100%)",
+      "lines": "7/7 (100%)",
+      "statements": "8/8 (100%)",
     }
   `);
 

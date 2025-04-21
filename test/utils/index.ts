@@ -51,9 +51,9 @@ export function normalizeMap(coverageMap: CoverageMap) {
   const normalized: Record<string, FileCoverageData> = {};
 
   for (const filename of coverageMap.files()) {
-    const coverage = coverageMap
-      .fileCoverageFor(filename)
-      .toJSON() as FileCoverageData;
+    const coverage = copy(
+      coverageMap.fileCoverageFor(filename).toJSON(),
+    ) as FileCoverageData;
 
     coverage.path = normalizeFilename(coverage.path);
 
@@ -120,4 +120,15 @@ export async function parse(code: string): Promise<Node> {
   }
 
   return await viteParser(code);
+}
+
+function copy(obj: object) {
+  const string = JSON.stringify(obj, (_, value) =>
+    value === Infinity ? "__Infinity__" : value,
+  );
+  const json = JSON.parse(string, (_, value) =>
+    value === "__Infinity__" ? Infinity : value,
+  );
+
+  return json;
 }

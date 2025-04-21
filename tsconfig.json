@@ -6,6 +6,6 @@
     "moduleResolution": "bundler",
     "types": ["./test/utils/expect-extend"]
   },
-  "include": ["src/*", "test/*", "benchmark/*"],
-  "exclude": ["benchmark/fixtures/*"]
+  "include": ["src", "test", "benchmark"],
+  "exclude": ["benchmark/fixtures", "test/fixtures"]
 }

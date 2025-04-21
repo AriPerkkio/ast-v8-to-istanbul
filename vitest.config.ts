@@ -1,6 +1,27 @@
 import { defineConfig } from "vitest/config";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
+  plugins: [
+    vue(),
+    {
+      name: "custom:transform-result",
+      transform(code, id) {
+        if (id.includes("?transform-result")) {
+          const map = this.getCombinedSourcemap();
+          map.sources = map.sources.map((source) =>
+            source.replace("?transform-result", ""),
+          );
+
+          return `
+            export const code = ${JSON.stringify(code)};
+            export const map = ${JSON.stringify(map)};
+          `;
+        }
+      },
+    },
+  ],
+
   test: {
     globalSetup: ["./test/utils/global-setup.ts"],
 
