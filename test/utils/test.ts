@@ -1,4 +1,3 @@
-import { join } from "node:path";
 import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
 import libSourceMaps from "istanbul-lib-source-maps";
 import { expect, test as base } from "vitest";
@@ -35,23 +34,18 @@ export const test = base.extend<{
       sourceMap: fixture.sourceMap,
       ignoreClassMethods,
     });
-
-    const copy = createCoverageMap(JSON.parse(JSON.stringify(data)));
-
     const normalized = normalizeMap(createCoverageMap(data));
     const isEmpty = normalized.files().length === 0;
     const actual = isEmpty
       ? ({} as any)
-      : normalized.fileCoverageFor(
-          join("<process-cwd>", "test", "fixtures", fixture.name, "sources.ts"),
-        );
+      : normalized.fileCoverageFor(normalized.files()[0]);
 
     debug.generateReports = false;
 
     await use(actual);
 
     if (debug.generateReports) {
-      generateReports(copy);
+      generateReports(createCoverageMap(data));
     }
   },
 
