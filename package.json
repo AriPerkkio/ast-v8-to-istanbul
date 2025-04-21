@@ -58,7 +58,6 @@
     "istanbul-reports": "^3.1.7",
     "magic-string": "^0.30.17",
     "oxc-parser": "^0.64.0",
-    "oxc-transform": "^0.64.0",
     "prettier": "^3.5.1",
     "rollup": "^4.32.1",
     "tinyrainbow": "^2.0.0",
