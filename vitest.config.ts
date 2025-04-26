@@ -1,17 +1,17 @@
 import { defineConfig } from "vitest/config";
 import vue from "@vitejs/plugin-vue";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 
 export default defineConfig({
   plugins: [
     vue(),
+    svelte(),
     {
       name: "custom:transform-result",
       transform(code, id) {
         if (id.includes("?transform-result")) {
           const map = this.getCombinedSourcemap();
-          map.sources = map.sources.map((source) =>
-            source.replace("?transform-result", ""),
-          );
+          map.sources = [id.replace("?transform-result", "")];
 
           return `
             export const code = ${JSON.stringify(code)};

@@ -23,6 +23,7 @@
     "bench:ci": "node --experimental-strip-types ./benchmark/run.ts",
     "build": "tsdown",
     "test": "vitest",
+    "test:dev": "vitest --project 'vite/parseAstAsync'",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "debug": "open fixture-coverage/index.html istanbul-coverage/index.html"
@@ -36,6 +37,7 @@
     "@babel/parser": "^7.27.0",
     "@babel/types": "^7.27.0",
     "@eslint/js": "^9.20.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@types/estree": "^1.0.6",
     "@types/istanbul-lib-coverage": "^2.0.6",
     "@types/istanbul-lib-instrument": "^1.7.7",
