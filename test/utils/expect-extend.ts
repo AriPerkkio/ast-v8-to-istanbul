@@ -33,9 +33,15 @@ function toMatchFunctions(
     }
 
     if (fnActual.name !== fnExpected.name) {
-      mismatches.push(
-        `Name did not match: ${fnActual.name} !== ${fnExpected.name}`,
-      );
+      if (
+        // Generated function names may differ when generated positions are not found in sources
+        !fnActual.name.startsWith("(anonymous_") &&
+        !fnExpected.name.startsWith("(anonymous_")
+      ) {
+        mismatches.push(
+          `Name did not match: ${fnActual.name} !== ${fnExpected.name}`,
+        );
+      }
     }
 
     const locDiff = rangeDiff(fnActual.loc, fnExpected.loc);
@@ -74,13 +80,7 @@ function toMatchStatements(
   const mismatches: string[] = [];
 
   for (const key in expected) {
-    const rangeExpected = expected[key];
-
-    // Order is not guaranteed, so find closest match
-    const rangeActual =
-      findClosestByStart(actual, rangeExpected) || actual[key];
-
-    const diff = rangeDiff(rangeActual, rangeExpected);
+    const diff = rangeDiff(actual[key], expected[key]);
 
     if (diff.length) {
       mismatches.push(`range ${key} did not match:`);
@@ -177,15 +177,4 @@ function rangeDiff(a: Partial<Range>, b: Partial<Range>) {
   }
 
   return diff;
-}
-
-function findClosestByStart(
-  a: FileCoverage["statementMap"],
-  b: Partial<Range>,
-) {
-  return Object.values(a).find(
-    (v) =>
-      rangeDiff({ ...v, end: undefined }, { ...b, end: undefined }).length ===
-      0,
-  );
 }
