@@ -7,7 +7,13 @@ import libSourceMaps from "istanbul-lib-source-maps";
 import { expect, test as base } from "vitest";
 
 import convert from "../../src/index";
-import { readFixture, normalizeMap, generateReports, parse } from "./index";
+import {
+  readFixture,
+  normalizeMap,
+  generateReports,
+  parse,
+  cliCoverageReport,
+} from "./index";
 
 export const test = base.extend<{
   actual: FileCoverage;
@@ -44,11 +50,14 @@ export const test = base.extend<{
   },
 
   // This is called when ever test case destructures `debug` - it's magic
-  debug: async ({ __coverageMaps }, use) => {
+  debug: async ({ __coverageMaps, __fixture, actual, expected }, use) => {
     await use(undefined);
 
     generateReports(__coverageMaps.v8, "./fixture-coverage");
     generateReports(__coverageMaps.istanbul, "./istanbul-coverage");
+
+    cliCoverageReport("v8", __fixture.sourceMap, actual);
+    cliCoverageReport("istanbul", __fixture.sourceMap, expected);
   },
 
   __fixture: async ({}, use) => {
