@@ -24,7 +24,7 @@
     "build": "tsdown",
     "test": "vitest",
     "test:dev": "vitest --project 'vite/parseAstAsync'",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "debug": "open fixture-coverage/index.html istanbul-coverage/index.html"
   },

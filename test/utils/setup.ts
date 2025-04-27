@@ -1,5 +1,5 @@
 import {
-  CoverageSummary,
+  type CoverageSummary,
   type CoverageMap,
   type FileCoverage,
 } from "istanbul-lib-coverage";

@@ -1,22 +1,22 @@
 import { readFile } from "node:fs/promises";
-import { Profiler } from "node:inspector";
+import { type Profiler } from "node:inspector";
 import { normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { EncodedSourceMap } from "@jridgewell/trace-mapping";
+import { parse as babelParser } from "@babel/parser";
+import { type EncodedSourceMap } from "@jridgewell/trace-mapping";
+import { parse as acornParser } from "acorn";
+import { type Node } from "estree";
 import {
-  CoverageMap,
   createCoverageMap,
-  FileCoverage,
-  FileCoverageData,
+  type CoverageMap,
+  type FileCoverage,
+  type FileCoverageData,
 } from "istanbul-lib-coverage";
 import libReport from "istanbul-lib-report";
 import reports from "istanbul-reports";
-import { expect } from "vitest";
-import { parseAstAsync as viteParser } from "vite";
-import { parse as acornParser } from "acorn";
-import { parse as babelParser } from "@babel/parser";
-import { type Node } from "estree";
 import { parseSync as oxcParser } from "oxc-parser";
+import { parseAstAsync as viteParser } from "vite";
+import { expect } from "vitest";
 
 export { test } from "./test";
 

@@ -36,16 +36,16 @@ export default defineConfig([
     },
   },
   {
-    files: tsconfig.include,
     name: "recommended-imports",
     plugins: {
-      import: pluginImport,
+      "import-x": pluginImport,
       unicorn: eslintPluginUnicorn,
     },
     rules: {
       "unicorn/prefer-node-protocol": "error",
-      "import/order": ["error", { alphabetize: { order: "asc" } }],
-      "import/no-duplicates": ["error", { "prefer-inline": true }],
+      "import-x/order": ["error", { alphabetize: { order: "asc" } }],
+
+      "import-x/no-duplicates": ["error", { "prefer-inline": true }],
       "@typescript-eslint/consistent-type-imports": [
         "error",
         {
@@ -70,7 +70,7 @@ export default defineConfig([
     },
   },
   {
-    ignores: ["dist/**", "test/fixtures/**", ...tsconfig.exclude],
+    ignores: ["dist/**", ...tsconfig.exclude.map((path) => `${path}/**`)],
   },
   eslintPluginPrettierRecommended,
 ]);

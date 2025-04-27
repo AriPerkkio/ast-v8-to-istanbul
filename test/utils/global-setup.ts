@@ -1,13 +1,13 @@
 import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
-import inspector, { Profiler } from "node:inspector";
-import { fileURLToPath } from "node:url";
+import inspector, { type Profiler } from "node:inspector";
 import { extname } from "node:path";
-import c from "tinyrainbow";
-import { createInstrumenter, type Instrumenter } from "istanbul-lib-instrument";
-
-import { toVisualizer } from "./source-map-visualizer";
-import { toAstExplorer } from "./ast-explorer";
+import { fileURLToPath } from "node:url";
 import { createCoverageMap } from "istanbul-lib-coverage";
+import { createInstrumenter, type Instrumenter } from "istanbul-lib-instrument";
+import c from "tinyrainbow";
+
+import { toAstExplorer } from "./ast-explorer";
+import { toVisualizer } from "./source-map-visualizer";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 
