@@ -1,4 +1,8 @@
-import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
+import {
+  type CoverageMap,
+  createCoverageMap,
+  type FileCoverage,
+} from "istanbul-lib-coverage";
 import libSourceMaps from "istanbul-lib-source-maps";
 import { expect, test as base } from "vitest";
 
@@ -8,14 +12,46 @@ import { readFixture, normalizeMap, generateReports, parse } from "./index";
 export const test = base.extend<{
   actual: FileCoverage;
   expected: FileCoverage;
-  fixture: { name: string } & Awaited<ReturnType<typeof readFixture>>;
-  debug: { generateReports: boolean };
   ignoreClassMethods: string[];
+  debug: undefined;
+
+  /**  @internal */
+  __coverageMaps: { v8: CoverageMap; istanbul: CoverageMap };
+  /**  @internal */
+  __fixture: { name: string } & Awaited<ReturnType<typeof readFixture>>;
 }>({
-  debug: { generateReports: false },
   ignoreClassMethods: [],
 
-  fixture: async ({}, use) => {
+  actual: async ({ __coverageMaps }, use) => {
+    const coverageMap = __coverageMaps.v8;
+    const normalized = normalizeMap(coverageMap);
+
+    const isEmpty = normalized.files().length === 0;
+    const actual = isEmpty
+      ? ({} as any)
+      : normalized.fileCoverageFor(normalized.files()[0]);
+
+    await use(actual);
+  },
+
+  expected: async ({ __coverageMaps }, use) => {
+    const coverageMap = __coverageMaps.istanbul;
+
+    const file = coverageMap.files()[0];
+    const expected = file ? coverageMap.fileCoverageFor(file) : ({} as any);
+
+    await use(expected);
+  },
+
+  // This is called when ever test case destructures `debug` - it's magic
+  debug: async ({ __coverageMaps }, use) => {
+    await use(undefined);
+
+    generateReports(__coverageMaps.v8, "./fixture-coverage");
+    generateReports(__coverageMaps.istanbul, "./istanbul-coverage");
+  },
+
+  __fixture: async ({}, use) => {
     const name = expect
       .getState()
       .currentTestName!.replace(/ /g, "-")
@@ -25,42 +61,19 @@ export const test = base.extend<{
     return use({ name, ...(await readFixture(name)) });
   },
 
-  actual: async ({ fixture, debug, ignoreClassMethods }, use) => {
+  __coverageMaps: async ({ __fixture, ignoreClassMethods }, use) => {
     const data = await convert({
-      ast: parse(fixture.transpiled),
-      code: fixture.transpiled,
+      ast: parse(__fixture.transpiled),
+      code: __fixture.transpiled,
       wrapperLength: 0,
-      coverage: fixture.coverage[0],
-      sourceMap: fixture.sourceMap,
+      coverage: __fixture.coverage[0],
+      sourceMap: __fixture.sourceMap,
       ignoreClassMethods,
     });
-    const normalized = normalizeMap(createCoverageMap(data));
-    const isEmpty = normalized.files().length === 0;
-    const actual = isEmpty
-      ? ({} as any)
-      : normalized.fileCoverageFor(normalized.files()[0]);
 
-    debug.generateReports = false;
-
-    await use(actual);
-
-    if (debug.generateReports) {
-      generateReports(createCoverageMap(data));
-    }
-  },
-
-  expected: async ({ fixture, debug }, use) => {
     const sourceMapStore = libSourceMaps.createSourceMapStore();
-    const coverageMap = await sourceMapStore.transformCoverage(
-      fixture.istanbul,
-    );
+    const istanbul = await sourceMapStore.transformCoverage(__fixture.istanbul);
 
-    debug.generateReports = false;
-    const file = coverageMap.files()[0];
-    await use(file ? coverageMap.fileCoverageFor(file) : ({} as any));
-
-    if (debug.generateReports) {
-      generateReports(coverageMap, "./istanbul-coverage");
-    }
+    await use({ v8: createCoverageMap(data), istanbul });
   },
 });
