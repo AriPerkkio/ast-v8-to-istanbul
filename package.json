@@ -73,5 +73,10 @@
     "vue": "^3.5.13",
     "yaml": "^2.7.0"
   },
-  "prettier": {}
+  "prettier": {},
+  "pnpm": {
+    "overrides": {
+      "istanbul-reports": "link:/../istanbuljs/packages/istanbul-reports"
+    }
+  }
 }

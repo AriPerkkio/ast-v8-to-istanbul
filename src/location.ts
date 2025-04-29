@@ -4,6 +4,7 @@ import {
   allGeneratedPositionsFor,
   LEAST_UPPER_BOUND,
   originalPositionFor,
+  generatedPositionFor,
   type TraceMap,
   type Needle,
   type SourceMapSegment,
@@ -96,6 +97,29 @@ export class Locator {
     if (end === null) {
       // Does not exist in source maps, e.g. generated code
       return null;
+    }
+
+    // End is before start, Vue wth
+    if (end.line < start.line) {
+      console.log("end before start");
+      const beforeEnd = generatedPositionFor(this.#map, {
+        source: start.filename,
+        line: start.line,
+        column: start.column,
+      });
+
+      if (beforeEnd?.column != null) {
+        const fixed = getPosition(
+          {
+            column: beforeEnd.column + 1,
+            line: beforeEnd.line,
+            bias: LEAST_UPPER_BOUND,
+          },
+          this.#map,
+        );
+        console.log("fixed", end, "to", fixed);
+        end = fixed || end;
+      }
     }
 
     const loc = { start, end };
