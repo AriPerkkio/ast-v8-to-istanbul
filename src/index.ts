@@ -50,6 +50,16 @@ export default async function convert<
     node: T,
     type: "function" | "statement" | "branch",
   ) => boolean | void;
+
+  /**
+   * Filter to ignore code based on source code
+   * - Note that this is slower than `ignoreNode` as exclusion happens after remapping
+   */
+  ignoreSourceCode?: (
+    code: string,
+    type: "function" | "statement" | "branch",
+    location: Record<"start" | "end", { line: number; column: number }>,
+  ) => boolean | void;
 }): Promise<CoverageMapData> {
   const ignoreHints = getIgnoreHints(options.code);
 
@@ -67,7 +77,7 @@ export default async function convert<
       (await getInlineSourceMap(filename, options.code)) ||
       createEmptySourceMap(filename, options.code),
   );
-  const locator = new Locator(options.code, map);
+  const locator = new Locator(options.code, map, directory);
 
   const coverageMapData = createCoverageMapData(filename, map);
   const ranges = normalize(options.coverage);
@@ -259,6 +269,24 @@ export default async function convert<
       ranges,
     );
 
+    if (options.ignoreSourceCode) {
+      const current = locator.getLoc(node) || loc;
+      const sources = locator.getSourceLines(
+        current,
+        getSourceFilename(current),
+      );
+
+      if (
+        sources != null &&
+        options.ignoreSourceCode(sources, "function", {
+          start: { line: current.start.line, column: current.start.column },
+          end: { line: current.end.line, column: current.end.column },
+        })
+      ) {
+        return;
+      }
+    }
+
     addFunction({
       coverageMapData,
       covered,
@@ -284,6 +312,24 @@ export default async function convert<
       },
       ranges,
     );
+
+    if (options.ignoreSourceCode) {
+      const current = (parent && locator.getLoc(node)) || loc;
+      const sources = locator.getSourceLines(
+        current,
+        getSourceFilename(current),
+      );
+
+      if (
+        sources != null &&
+        options.ignoreSourceCode(sources, "statement", {
+          start: { line: current.start.line, column: current.start.column },
+          end: { line: current.end.line, column: current.end.column },
+        })
+      ) {
+        return;
+      }
+    }
 
     addStatement({
       coverageMapData,
@@ -354,6 +400,20 @@ export default async function convert<
 
     if (locations.length === 0) {
       return;
+    }
+
+    if (options.ignoreSourceCode) {
+      const sources = locator.getSourceLines(loc, getSourceFilename(loc));
+
+      if (
+        sources != null &&
+        options.ignoreSourceCode(sources, "branch", {
+          start: { line: loc.start.line, column: loc.start.column },
+          end: { line: loc.end.line, column: loc.end.column },
+        })
+      ) {
+        return;
+      }
     }
 
     addBranch({
