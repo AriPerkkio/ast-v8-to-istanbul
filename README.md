@@ -65,6 +65,8 @@ const data: CoverageMapData = await convert({
 
 ### Ignoring source code
 
+#### Ignore hints
+
 The typical ignore hints from `nyc` are supported: https://github.com/istanbuljs/nyc?tab=readme-ov-file#parsing-hints-ignoring-lines:
 
 > * `/* istanbul ignore if */`: ignore the next if statement.
@@ -79,6 +81,8 @@ In addition to `istanbul` keyword, you can use `v8`, `c8` and `node:coverage`:
 - `/* c8 ignore file */`
 - `/* node:coverage ignore next */`
 
+#### Class methods
+
 The `ignore-class-method` from `nyc` is also supported: https://github.com/istanbuljs/nyc?tab=readme-ov-file#ignoring-methods
 
 > You can ignore every instance of a method simply by adding its name to the `ignore-class-method` array in your `nyc` config.
@@ -88,6 +92,44 @@ import { convert } from "ast-v8-to-istanbul";
 
 await convert({
   ignoreClassMethods: ['render']
+});
+```
+
+#### Ignore after remapping
+
+You can ignore source code after coverage results have been remapped back to original sources using `ignoreSourceCode`.
+This is a high level API that can be exposed to end-users by tooling developers.
+
+It's mostly intended for excluding code that is incorrectly shown in coverage report when compilers add generated code in the source maps.
+
+Note that as the exclusion happens after remapping, this option is slower than [`ignoreNode`](#ignoring-generated-code) option.
+
+```ts
+function ignoreSourceCode(
+  code: string,
+  type: "function" | "statement" | "branch",
+  location: Record<"start" | "end", { line: number; column: number }>,
+): boolean | void;
+```
+
+```ts
+import { convert } from "ast-v8-to-istanbul";
+
+await convert({
+  ignoreSourceCode: (code, type, location) => {
+    // Ignore all "noop()" calls
+    if(type === "function" && code.includes("noop(")) {
+      return true;
+    }
+
+    // In Vue "<script>" tags generate code that is incorrectly left in source maps - exclude it
+    if(code === '<script>') {
+      return true;
+    }
+
+    // Ignore anything above line 5
+    return location.start.line < 5;
+  },
 });
 ```
 

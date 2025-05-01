@@ -23,7 +23,7 @@ Object.defineProperty(__vite_ssr_exports__, "remainder", { enumerable: true, con
 const map = new TraceMap(createEmptySourceMap("example.js", code));
 
 test("offsetToNeedle picks correct positions", () => {
-  const locator = new Locator(code, map);
+  const locator = new Locator(code, map, "");
 
   expect({
     start: locator.offsetToNeedle(0),
@@ -68,6 +68,7 @@ function sum(a, b) {
   const locator = new Locator(
     code,
     new TraceMap(createEmptySourceMap("example.js", code)),
+    "",
   );
 
   expect({
@@ -92,6 +93,7 @@ function sum(a, b) {
   const locator = new Locator(
     code,
     new TraceMap(createEmptySourceMap("example.js", code)),
+    "",
   );
 
   expect(locator.offsetToNeedle(58)).toEqual({ line: 2, column: 9 });

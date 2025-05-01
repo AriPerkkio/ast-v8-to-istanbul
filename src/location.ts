@@ -23,10 +23,12 @@ export class Locator {
   #cache = new Map<number, Needle>();
   #codeParts: string[];
   #map: TraceMap;
+  #directory: string;
 
-  constructor(code: string, map: TraceMap) {
+  constructor(code: string, map: TraceMap, directory: string) {
     this.#codeParts = code.split("");
     this.#map = map;
+    this.#directory = directory;
   }
 
   reset() {
@@ -122,6 +124,26 @@ export class Locator {
     }
 
     return loc;
+  }
+
+  getSourceLines(loc: { start: Needle; end: Needle }, filename: string) {
+    const index = this.#map.resolvedSources.findIndex(
+      (source) => source === filename || resolve(this.#directory, source),
+    );
+    const sourcesContent = this.#map.sourcesContent?.[index];
+
+    if (sourcesContent == null) {
+      return null;
+    }
+
+    const lines = sourcesContent
+      .split("\n")
+      .slice(loc.start.line - 1, loc.end.line);
+
+    lines[0] = lines[0].slice(loc.start.column);
+    lines[lines.length - 1] = lines[lines.length - 1].slice(0, loc.end.column);
+
+    return lines.join("\n");
   }
 }
 
