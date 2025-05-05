@@ -27,6 +27,7 @@ export default defineConfig({
 
     coverage: {
       enabled: true,
+      experimentalAstAwareRemapping: true,
       include: ["src"],
     },
 
@@ -37,10 +38,10 @@ export default defineConfig({
       },
     },
 
-    workspace: [
+    projects: [
       {
         test: {
-          name: "Public API",
+          name: { label: "Public API", color: "green" },
           include: [],
           typecheck: {
             enabled: true,
@@ -50,28 +51,28 @@ export default defineConfig({
       },
       {
         test: {
-          name: "vite/parseAstAsync",
+          name: { label: "vite/parseAstAsync", color: "red" },
           env: { TEST_PARSER: "vite" },
           setupFiles: ["./test/utils/setup.ts"],
         },
       },
       {
         test: {
-          name: "acorn",
+          name: { label: "acorn", color: "blue" },
           env: { TEST_PARSER: "acorn" },
           setupFiles: ["./test/utils/setup.ts"],
         },
       },
       {
         test: {
-          name: "oxc-parser",
+          name: { label: "oxc-parser", color: "yellow" },
           env: { TEST_PARSER: "oxc-parser" },
           setupFiles: ["./test/utils/setup.ts"],
         },
       },
       {
         test: {
-          name: "babel",
+          name: { label: "babel", color: "cyan" },
           env: { TEST_PARSER: "babel" },
           setupFiles: ["./test/utils/setup.ts"],
         },
