@@ -1,0 +1,55 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        type: choice
+        description: Type of the release
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-and-cache
+        with:
+          node-version: 22
+
+      - name: Install & Build
+        run: |
+          pnpm install
+          pnpm build
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Configure github-actions git
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@users.noreply.github.com'
+
+      - name: Bump version
+        run: pnpm version ${{ github.event.inputs.release-type }}
+
+      - name: Push release tag
+        run: git push origin main --follow-tags
+
+      - name: Publish to npm
+        run: pnpm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
