@@ -21,6 +21,8 @@ Test cases run against:
 - `oxc-parser` ✅
 - `@babel/parser` ✅
 
+See example report at https://ariperkkio.github.io/ast-v8-to-istanbul.
+
 ```ts
 import { convert } from "ast-v8-to-istanbul";
 import { parseAstAsync } from "vite";
