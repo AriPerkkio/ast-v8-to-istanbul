@@ -100,229 +100,236 @@ export type FunctionNodes = Parameters<
     | "onProperty"]
 >[0];
 
-export async function walk(
-  ast: unknown,
-  ignoreHints: IgnoreHint[],
-  ignoreClassMethods: string[] | undefined,
-  visitors: Visitors,
-) {
+export function getWalker() {
   let nextIgnore: Node | false = false;
 
-  return await asyncWalk(ast as Node, {
-    async enter(node) {
-      if (nextIgnore !== false) {
-        return;
-      }
+  function onIgnore(node: Node) {
+    nextIgnore = node;
+  }
 
-      const hint = getIgnoreHint(node);
-
-      if (hint === "next") {
-        nextIgnore = node;
-        return;
-      }
-
-      if (isSkipped(node)) {
-        nextIgnore = node;
-      }
-
-      switch (node.type) {
-        // Functions
-        case "FunctionDeclaration": {
-          return visitors.onFunctionDeclaration(node);
+  async function walk(
+    ast: unknown,
+    ignoreHints: IgnoreHint[],
+    ignoreClassMethods: string[] | undefined,
+    visitors: Visitors,
+  ) {
+    return await asyncWalk(ast as Node, {
+      async enter(node) {
+        if (nextIgnore !== false) {
+          return;
         }
-        case "FunctionExpression": {
-          if (ignoreClassMethods && node.id?.name) {
-            if (ignoreClassMethods.includes(node.id.name)) {
-              nextIgnore = node;
-              return;
+
+        const hint = getIgnoreHint(node);
+
+        if (hint === "next") {
+          return onIgnore(node);
+        }
+
+        if (isSkipped(node)) {
+          onIgnore(node);
+        }
+
+        switch (node.type) {
+          // Functions
+          case "FunctionDeclaration": {
+            return visitors.onFunctionDeclaration(node);
+          }
+          case "FunctionExpression": {
+            if (ignoreClassMethods && node.id?.name) {
+              if (ignoreClassMethods.includes(node.id.name)) {
+                return onIgnore(node);
+              }
             }
+            return visitors.onFunctionExpression(node);
           }
-          return visitors.onFunctionExpression(node);
-        }
-        case "MethodDefinition": {
-          return visitors.onMethodDefinition(node);
-        }
-        case "Property": {
-          return visitors.onProperty(node);
-        }
-        case "ArrowFunctionExpression": {
-          // Get inner body in cases where parenthesis are preserverd, e.g. acorn, oxc: https://oxc.rs/docs/learn/ecmascript/grammar.html#parenthesized-expression
-          if (
-            (node.body as unknown as ParenthesizedExpression)?.type ===
-            "ParenthesizedExpression"
-          ) {
-            node.body = (
-              node.body as unknown as ParenthesizedExpression
-            ).expression;
+          case "MethodDefinition": {
+            return visitors.onMethodDefinition(node);
+          }
+          case "Property": {
+            return visitors.onProperty(node);
+          }
+          case "ArrowFunctionExpression": {
+            // Get inner body in cases where parenthesis are preserverd, e.g. acorn, oxc: https://oxc.rs/docs/learn/ecmascript/grammar.html#parenthesized-expression
+            if (
+              (node.body as unknown as ParenthesizedExpression)?.type ===
+              "ParenthesizedExpression"
+            ) {
+              node.body = (
+                node.body as unknown as ParenthesizedExpression
+              ).expression;
+            }
+
+            return visitors.onArrowFunctionExpression(node);
           }
 
-          return visitors.onArrowFunctionExpression(node);
-        }
+          // Statements
+          case "ExpressionStatement": {
+            return visitors.onExpressionStatement(node);
+          }
+          case "BreakStatement": {
+            return visitors.onBreakStatement(node);
+          }
+          case "ContinueStatement": {
+            return visitors.onContinueStatement(node);
+          }
+          case "DebuggerStatement": {
+            return visitors.onDebuggerStatement(node);
+          }
+          case "ReturnStatement": {
+            return visitors.onReturnStatement(node);
+          }
+          case "ThrowStatement": {
+            return visitors.onThrowStatement(node);
+          }
+          case "TryStatement": {
+            return visitors.onTryStatement(node);
+          }
+          case "ForStatement": {
+            return visitors.onForStatement(node);
+          }
+          case "ForInStatement": {
+            return visitors.onForInStatement(node);
+          }
+          case "ForOfStatement": {
+            return visitors.onForOfStatement(node);
+          }
+          case "WhileStatement": {
+            return visitors.onWhileStatement(node);
+          }
+          case "DoWhileStatement": {
+            return visitors.onDoWhileStatement(node);
+          }
+          case "WithStatement": {
+            return visitors.onWithStatement(node);
+          }
+          case "LabeledStatement": {
+            return visitors.onLabeledStatement(node);
+          }
+          case "VariableDeclarator": {
+            return visitors.onVariableDeclarator(node);
+          }
+          case "ClassBody": {
+            const classBody = node as ClassBody | BabelClassBody;
 
-        // Statements
-        case "ExpressionStatement": {
-          return visitors.onExpressionStatement(node);
-        }
-        case "BreakStatement": {
-          return visitors.onBreakStatement(node);
-        }
-        case "ContinueStatement": {
-          return visitors.onContinueStatement(node);
-        }
-        case "DebuggerStatement": {
-          return visitors.onDebuggerStatement(node);
-        }
-        case "ReturnStatement": {
-          return visitors.onReturnStatement(node);
-        }
-        case "ThrowStatement": {
-          return visitors.onThrowStatement(node);
-        }
-        case "TryStatement": {
-          return visitors.onTryStatement(node);
-        }
-        case "ForStatement": {
-          return visitors.onForStatement(node);
-        }
-        case "ForInStatement": {
-          return visitors.onForInStatement(node);
-        }
-        case "ForOfStatement": {
-          return visitors.onForOfStatement(node);
-        }
-        case "WhileStatement": {
-          return visitors.onWhileStatement(node);
-        }
-        case "DoWhileStatement": {
-          return visitors.onDoWhileStatement(node);
-        }
-        case "WithStatement": {
-          return visitors.onWithStatement(node);
-        }
-        case "LabeledStatement": {
-          return visitors.onLabeledStatement(node);
-        }
-        case "VariableDeclarator": {
-          return visitors.onVariableDeclarator(node);
-        }
-        case "ClassBody": {
-          const classBody = node as ClassBody | BabelClassBody;
+            if (ignoreClassMethods) {
+              for (const child of classBody.body) {
+                if (
+                  child.type === "MethodDefinition" ||
+                  child.type === "ClassMethod"
+                ) {
+                  const name =
+                    child.key.type === "Identifier" && child.key.name;
 
-          if (ignoreClassMethods) {
-            for (const child of classBody.body) {
-              if (
-                child.type === "MethodDefinition" ||
-                child.type === "ClassMethod"
-              ) {
-                const name = child.key.type === "Identifier" && child.key.name;
-
-                if (name && ignoreClassMethods.includes(name)) {
-                  setSkipped(child);
+                  if (name && ignoreClassMethods.includes(name)) {
+                    setSkipped(child);
+                  }
                 }
               }
+
+              classBody.body = classBody.body.filter(
+                (child) => !isSkipped(child),
+              ) as typeof classBody.body;
             }
 
-            classBody.body = classBody.body.filter(
-              (child) => !isSkipped(child),
-            ) as typeof classBody.body;
+            return visitors.onClassBody(classBody);
           }
 
-          return visitors.onClassBody(classBody);
-        }
+          // Branches
+          case "IfStatement": {
+            const branches = [];
 
-        // Branches
-        case "IfStatement": {
-          const branches = [];
+            if (node.consequent.type !== "BlockStatement") {
+              node.consequent = {
+                type: "BlockStatement",
+                body: [node.consequent],
+                start: node.consequent.start,
+                end: node.consequent.end,
+              } satisfies BlockStatement;
+            }
 
-          if (node.consequent.type !== "BlockStatement") {
-            node.consequent = {
-              type: "BlockStatement",
-              body: [node.consequent],
-              start: node.consequent.start,
-              end: node.consequent.end,
-            } satisfies BlockStatement;
+            if (node.alternate && node.alternate.type !== "BlockStatement") {
+              node.alternate = {
+                type: "BlockStatement",
+                body: [node.alternate],
+                start: node.alternate.start,
+                end: node.alternate.end,
+              } satisfies BlockStatement;
+            }
+
+            if (hint === "if") {
+              setSkipped(node.consequent);
+            } else {
+              branches.push(node.consequent);
+            }
+
+            if (hint === "else" && node.alternate) {
+              setSkipped(node.alternate);
+            } else if (hint !== "if") {
+              branches.push(node.alternate);
+            }
+
+            return visitors.onIfStatement(node, branches);
           }
-
-          if (node.alternate && node.alternate.type !== "BlockStatement") {
-            node.alternate = {
-              type: "BlockStatement",
-              body: [node.alternate],
-              start: node.alternate.start,
-              end: node.alternate.end,
-            } satisfies BlockStatement;
+          case "SwitchStatement": {
+            return visitors.onSwitchStatement(node);
           }
-
-          if (hint === "if") {
-            setSkipped(node.consequent);
-          } else {
-            branches.push(node.consequent);
+          case "ConditionalExpression": {
+            return visitors.onConditionalExpression(node);
           }
+          case "LogicalExpression": {
+            if (isSkipped(node)) return;
 
-          if (hint === "else" && node.alternate) {
-            setSkipped(node.alternate);
-          } else if (hint !== "if") {
-            branches.push(node.alternate);
-          }
+            const branches: Node[] = [];
 
-          return visitors.onIfStatement(node, branches);
-        }
-        case "SwitchStatement": {
-          return visitors.onSwitchStatement(node);
-        }
-        case "ConditionalExpression": {
-          return visitors.onConditionalExpression(node);
-        }
-        case "LogicalExpression": {
-          if (isSkipped(node)) return;
+            function visit(child: Node) {
+              if (child.type === "LogicalExpression") {
+                setSkipped(child);
 
-          const branches: Node[] = [];
-
-          function visit(child: Node) {
-            if (child.type === "LogicalExpression") {
-              setSkipped(child);
-
-              if (getIgnoreHint(child) !== "next") {
-                visit(child.left);
-                return visit(child.right);
+                if (getIgnoreHint(child) !== "next") {
+                  visit(child.left);
+                  return visit(child.right);
+                }
               }
+              branches.push(child);
             }
-            branches.push(child);
+
+            visit(node);
+            return visitors.onLogicalExpression(node, branches);
+          }
+          case "AssignmentPattern": {
+            return visitors.onAssignmentPattern(node);
           }
 
-          visit(node);
-          return visitors.onLogicalExpression(node, branches);
-        }
-        case "AssignmentPattern": {
-          return visitors.onAssignmentPattern(node);
-        }
+          // @ts-expect-error -- Babel AST
+          case "ClassMethod": {
+            return visitors.onClassMethod(node);
+          }
 
-        // @ts-expect-error -- Babel AST
-        case "ClassMethod": {
-          return visitors.onClassMethod(node);
+          // @ts-expect-error -- Babel AST
+          case "ObjectMethod": {
+            return visitors.onObjectMethod(node);
+          }
         }
+      },
+      async leave(node) {
+        if (node === nextIgnore) {
+          nextIgnore = false;
+        }
+      },
+    });
 
-        // @ts-expect-error -- Babel AST
-        case "ObjectMethod": {
-          return visitors.onObjectMethod(node);
+    function getIgnoreHint(node: Node) {
+      for (const hint of ignoreHints) {
+        if (hint.loc.end === node.start) {
+          return hint.type;
         }
       }
-    },
-    async leave(node) {
-      if (node === nextIgnore) {
-        nextIgnore = false;
-      }
-    },
-  });
 
-  function getIgnoreHint(node: Node) {
-    for (const hint of ignoreHints) {
-      if (hint.loc.end === node.start) {
-        return hint.type;
-      }
+      return null;
     }
-
-    return null;
   }
+
+  return { walk, onIgnore };
 }
 
 export function getFunctionName(node: Node | BabelNode) {

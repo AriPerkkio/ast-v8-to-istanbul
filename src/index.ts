@@ -5,7 +5,7 @@ import { type EncodedSourceMap, TraceMap } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
 import type { CoverageMapData } from "istanbul-lib-coverage";
 
-import { type FunctionNodes, getFunctionName, walk } from "./ast";
+import { type FunctionNodes, getFunctionName, getWalker } from "./ast";
 import {
   addBranch,
   addFunction,
@@ -83,7 +83,9 @@ export default async function convert<
   const ranges = normalize(options.coverage);
   const ast = await options.ast;
 
-  await walk(ast, ignoreHints, options.ignoreClassMethods, {
+  const walker = getWalker();
+
+  await walker.walk(ast, ignoreHints, options.ignoreClassMethods, {
     // Functions
     onFunctionDeclaration(node) {
       onFunction(node, {
@@ -252,7 +254,7 @@ export default async function convert<
     },
   ) {
     if (options.ignoreNode?.(node as unknown as T, "function")) {
-      return;
+      return walker.onIgnore(node);
     }
 
     const loc = locator.getLoc(positions.loc);
@@ -299,7 +301,7 @@ export default async function convert<
 
   function onStatement(node: Node, parent?: Node) {
     if (options.ignoreNode?.(node as unknown as T, "statement")) {
-      return;
+      return walker.onIgnore(node);
     }
 
     const loc = locator.getLoc(node);
@@ -345,7 +347,7 @@ export default async function convert<
     branches: (Node | null | undefined)[],
   ) {
     if (options.ignoreNode?.(node as unknown as T, "branch")) {
-      return;
+      return walker.onIgnore(node);
     }
 
     const loc = locator.getLoc(node);
