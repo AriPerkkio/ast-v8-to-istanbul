@@ -142,8 +142,14 @@ This API is mostly for developers integrating `ast-v8-to-istanbul` with other to
 If your code transform pipeline is adding generated code that's included in the source maps, it will be included in coverage too.
 You can exclude these known patterns by defining `ignoreNode` for filtering such nodes.
 
+By returning `"ignore-this-and-nested-nodes"` from the handler, you can ignore all nested nodes too.
+This can be useful when you need to ignore everything a certain node wraps, e.g. `IfStatement`.
+
 ```ts
-function ignoreNode(node: Node, type: "branch" | "function" | "statement"): boolean | void;
+function ignoreNode(
+  node: Node,
+  type: "branch" | "function" | "statement"
+): boolean | "ignore-this-and-nested-nodes" | void;
 ```
 
 ```ts

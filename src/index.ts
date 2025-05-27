@@ -5,7 +5,7 @@ import { type EncodedSourceMap, TraceMap } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
 import type { CoverageMapData } from "istanbul-lib-coverage";
 
-import { type FunctionNodes, getFunctionName, walk } from "./ast";
+import { type FunctionNodes, getFunctionName, getWalker } from "./ast";
 import {
   addBranch,
   addFunction,
@@ -49,7 +49,7 @@ export default async function convert<
   ignoreNode?: (
     node: T,
     type: "function" | "statement" | "branch",
-  ) => boolean | void;
+  ) => boolean | "ignore-this-and-nested-nodes" | void;
 
   /**
    * Filter to ignore code based on source code
@@ -83,7 +83,9 @@ export default async function convert<
   const ranges = normalize(options.coverage);
   const ast = await options.ast;
 
-  await walk(ast, ignoreHints, options.ignoreClassMethods, {
+  const walker = getWalker();
+
+  await walker.walk(ast, ignoreHints, options.ignoreClassMethods, {
     // Functions
     onFunctionDeclaration(node) {
       onFunction(node, {
@@ -251,7 +253,7 @@ export default async function convert<
       decl: Pick<Node, "start" | "end">;
     },
   ) {
-    if (options.ignoreNode?.(node as unknown as T, "function")) {
+    if (onIgnore(node, "function")) {
       return;
     }
 
@@ -298,7 +300,7 @@ export default async function convert<
   }
 
   function onStatement(node: Node, parent?: Node) {
-    if (options.ignoreNode?.(node as unknown as T, "statement")) {
+    if (onIgnore(node, "statement")) {
       return;
     }
 
@@ -344,7 +346,7 @@ export default async function convert<
     node: Node,
     branches: (Node | null | undefined)[],
   ) {
-    if (options.ignoreNode?.(node as unknown as T, "branch")) {
+    if (onIgnore(node, "branch")) {
       return;
     }
 
@@ -443,6 +445,20 @@ export default async function convert<
     }
 
     return resolve(directory, sourceFilename);
+  }
+
+  function onIgnore(node: Node, type: "function" | "statement" | "branch") {
+    if (!options.ignoreNode) {
+      return false;
+    }
+
+    const scope = options.ignoreNode(node as T, type);
+
+    if (scope === "ignore-this-and-nested-nodes") {
+      walker.onIgnore(node);
+    }
+
+    return scope;
   }
 }
 

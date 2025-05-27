@@ -77,3 +77,72 @@ test("ignoreNode can ignore Vite's imports", async () => {
     ]
   `);
 });
+
+test("ignoreNode can ignore nested nodes", async () => {
+  const code = `\
+    function firstFn() {
+      if ("first branch") {
+        // if + implicit else
+      }
+      if ("second branch") {
+        // if + implicit else
+      }
+    }
+
+    // This should be ignored
+    if (import.meta.vitest) {
+      function secondFn() {
+        if ("third branch") {
+          // if + implicit else
+        }
+      }
+    }
+  `;
+
+  const data = await convert({
+    code,
+    ast: parse(code),
+    coverage: { functions: [], url: import.meta.url },
+    sourceMap: undefined,
+    ignoreNode: (node, type) => {
+      if (
+        (type === "branch" || type === "statement") &&
+        node.type === "IfStatement" &&
+        node.test.type === "MemberExpression" &&
+        node.test.object.type === "MetaProperty" &&
+        node.test.property.type === "Identifier" &&
+        node.test.object.meta.name === "import" &&
+        node.test.object.property.name === "meta" &&
+        node.test.property.name === "vitest"
+      ) {
+        return "ignore-this-and-nested-nodes";
+      }
+    },
+  });
+
+  const coverageMap = createCoverageMap(data);
+  const fileCoverage = coverageMap.fileCoverageFor(coverageMap.files()[0]);
+
+  const functions = Object.values(fileCoverage.fnMap).map((fn) => fn.name);
+  expect(functions).toMatchInlineSnapshot(`
+    [
+      "firstFn",
+    ]
+  `);
+
+  const lines = Object.keys(fileCoverage.getLineCoverage()).map((l) =>
+    parseInt(l),
+  );
+  const linesToCover = code
+    .split("\n")
+    .filter((_, index) => lines.includes(1 + index));
+
+  expect(linesToCover).toMatchInlineSnapshot(`
+    [
+      "      if ("first branch") {",
+      "      if ("second branch") {",
+    ]
+  `);
+
+  expect(fileCoverage.getBranchCoverageByLine()).keys("2", "5");
+});
