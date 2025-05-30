@@ -49,6 +49,7 @@ export default async function convert<
   ignoreNode?: (
     node: T,
     type: "function" | "statement" | "branch",
+    parent?: T,
   ) => boolean | "ignore-this-and-nested-nodes" | void;
 
   /**
@@ -300,7 +301,7 @@ export default async function convert<
   }
 
   function onStatement(node: Node, parent?: Node) {
-    if (onIgnore(node, "statement")) {
+    if (onIgnore(node, "statement", parent)) {
       return;
     }
 
@@ -447,12 +448,16 @@ export default async function convert<
     return resolve(directory, sourceFilename);
   }
 
-  function onIgnore(node: Node, type: "function" | "statement" | "branch") {
+  function onIgnore(
+    node: Node,
+    type: "function" | "statement" | "branch",
+    parent?: Node,
+  ) {
     if (!options.ignoreNode) {
       return false;
     }
 
-    const scope = options.ignoreNode(node as T, type);
+    const scope = options.ignoreNode(node as T, type, parent as T | undefined);
 
     if (scope === "ignore-this-and-nested-nodes") {
       walker.onIgnore(node);
