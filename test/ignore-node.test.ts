@@ -51,10 +51,9 @@ test("ignoreNode can ignore Vite's imports", async () => {
     ignoreNode: (node, type) => {
       return (
         type === "statement" &&
-        node.type === "AwaitExpression" &&
-        node.argument.type === "CallExpression" &&
-        node.argument.callee.type === "Identifier" &&
-        node.argument.callee.name === "__vite_ssr_import__"
+        node.type === "VariableDeclarator" &&
+        node.id.type === "Identifier" &&
+        node.id.name.startsWith("__vite_ssr_import_")
       );
     },
   });

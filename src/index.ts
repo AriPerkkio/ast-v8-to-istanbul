@@ -300,7 +300,7 @@ export default async function convert<
   }
 
   function onStatement(node: Node, parent?: Node) {
-    if (onIgnore(node, "statement")) {
+    if (onIgnore(parent || node, "statement")) {
       return;
     }
 
@@ -316,7 +316,7 @@ export default async function convert<
     );
 
     if (options.ignoreSourceCode) {
-      const current = (parent && locator.getLoc(node)) || loc;
+      const current = (parent && locator.getLoc(parent)) || loc;
       const sources = locator.getSourceLines(
         current,
         getSourceFilename(current),
