@@ -49,7 +49,6 @@ export default async function convert<
   ignoreNode?: (
     node: T,
     type: "function" | "statement" | "branch",
-    parent?: T,
   ) => boolean | "ignore-this-and-nested-nodes" | void;
 
   /**
@@ -301,7 +300,7 @@ export default async function convert<
   }
 
   function onStatement(node: Node, parent?: Node) {
-    if (onIgnore(node, "statement", parent)) {
+    if (onIgnore(parent || node, "statement")) {
       return;
     }
 
@@ -317,7 +316,7 @@ export default async function convert<
     );
 
     if (options.ignoreSourceCode) {
-      const current = (parent && locator.getLoc(node)) || loc;
+      const current = (parent && locator.getLoc(parent)) || loc;
       const sources = locator.getSourceLines(
         current,
         getSourceFilename(current),
@@ -448,16 +447,12 @@ export default async function convert<
     return resolve(directory, sourceFilename);
   }
 
-  function onIgnore(
-    node: Node,
-    type: "function" | "statement" | "branch",
-    parent?: Node,
-  ) {
+  function onIgnore(node: Node, type: "function" | "statement" | "branch") {
     if (!options.ignoreNode) {
       return false;
     }
 
-    const scope = options.ignoreNode(node as T, type, parent as T | undefined);
+    const scope = options.ignoreNode(node as T, type);
 
     if (scope === "ignore-this-and-nested-nodes") {
       walker.onIgnore(node);
