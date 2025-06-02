@@ -7,8 +7,8 @@ test("vue if statement", async ({ actual, expected }) => {
     {
       "branches": "0/2 (0%)",
       "functions": "0/0 (100%)",
-      "lines": "0/3 (0%)",
-      "statements": "0/3 (0%)",
+      "lines": "0/2 (0%)",
+      "statements": "0/2 (0%)",
     }
   `);
 
