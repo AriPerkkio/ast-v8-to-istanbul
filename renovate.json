@@ -1,0 +1,32 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["schedule:weekly"],
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": ["npm"],
+      "groupName": "all non-major npm dependencies",
+      "groupSlug": "all-minor-patch-npm"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "all github-actions dependencies",
+      "groupSlug": "all-github-actions"
+    },
+    {
+      "matchUpdateTypes": ["major", "minor"],
+      "groupName": "typescript breaking changes",
+      "matchPackageNames": ["typescript"],
+      "description": "Typescript does not follow semver. Minor versions can introduce breaking changes."
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "groupName": "vitest",
+      "matchPackagePatterns": ["^@vitest", "^vitest"],
+      "description": "Vitest majors"
+    }
+  ]
+}
