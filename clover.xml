@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1748674932529" clover="3.2.0">
-  <project timestamp="1748674932529" name="All files">
-    <metrics statements="411" coveredstatements="401" conditionals="278" coveredconditionals="254" methods="57" coveredmethods="57" elements="746" coveredelements="712" complexity="0" loc="411" ncloc="411" packages="1" files="6" classes="6"/>
+<coverage generated="1748864520624" clover="3.2.0">
+  <project timestamp="1748864520624" name="All files">
+    <metrics statements="396" coveredstatements="386" conditionals="278" coveredconditionals="254" methods="57" coveredmethods="57" elements="731" coveredelements="697" complexity="0" loc="396" ncloc="396" packages="1" files="6" classes="6"/>
     <file name="ast.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/ast.ts">
-      <metrics statements="89" coveredstatements="87" conditionals="84" coveredconditionals="82" methods="11" coveredmethods="11"/>
-      <line num="38" count="44" type="stmt"/>
+      <metrics statements="88" coveredstatements="86" conditionals="84" coveredconditionals="82" methods="11" coveredmethods="11"/>
       <line num="104" count="888" type="stmt"/>
       <line num="107" count="175" type="stmt"/>
       <line num="116" count="888" type="stmt"/>
@@ -95,9 +94,7 @@
       <line num="352" count="27348" type="stmt"/>
     </file>
     <file name="coverage-map.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/coverage-map.ts">
-      <metrics statements="50" coveredstatements="50" conditionals="18" coveredconditionals="15" methods="8" coveredmethods="8"/>
-      <line num="1" count="44" type="stmt"/>
-      <line num="2" count="44" type="stmt"/>
+      <metrics statements="48" coveredstatements="48" conditionals="18" coveredconditionals="15" methods="8" coveredmethods="8"/>
       <line num="31" count="888" type="stmt"/>
       <line num="32" count="888" type="stmt"/>
       <line num="34" count="888" type="stmt"/>
@@ -148,8 +145,7 @@
       <line num="167" count="5953" type="stmt"/>
     </file>
     <file name="ignore-hints.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/ignore-hints.ts">
-      <metrics statements="24" coveredstatements="24" conditionals="18" coveredconditionals="17" methods="1" coveredmethods="1"/>
-      <line num="6" count="48" type="stmt"/>
+      <metrics statements="23" coveredstatements="23" conditionals="18" coveredconditionals="17" methods="1" coveredmethods="1"/>
       <line num="14" count="48" type="stmt"/>
       <line num="17" count="976" type="stmt"/>
       <line num="18" count="976" type="stmt"/>
@@ -175,15 +171,7 @@
       <line num="70" count="952" type="stmt"/>
     </file>
     <file name="index.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/index.ts">
-      <metrics statements="121" coveredstatements="116" conditionals="98" coveredconditionals="85" methods="23" coveredmethods="23"/>
-      <line num="2" count="44" type="stmt"/>
-      <line num="3" count="44" type="stmt"/>
-      <line num="4" count="44" type="stmt"/>
-      <line num="8" count="44" type="stmt"/>
-      <line num="9" count="44" type="stmt"/>
-      <line num="16" count="44" type="stmt"/>
-      <line num="17" count="44" type="stmt"/>
-      <line num="18" count="44" type="stmt"/>
+      <metrics statements="113" coveredstatements="108" conditionals="98" coveredconditionals="85" methods="23" coveredmethods="23"/>
       <line num="64" count="896" type="stmt"/>
       <line num="67" count="896" type="cond" truecount="4" falsecount="0"/>
       <line num="68" count="8" type="stmt"/>
@@ -299,10 +287,7 @@
       <line num="472" count="120" type="stmt"/>
     </file>
     <file name="location.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/location.ts">
-      <metrics statements="92" coveredstatements="89" conditionals="42" coveredconditionals="37" methods="9" coveredmethods="9"/>
-      <line num="1" count="48" type="stmt"/>
-      <line num="2" count="48" type="stmt"/>
-      <line num="3" count="48" type="stmt"/>
+      <metrics statements="89" coveredstatements="86" conditionals="42" coveredconditionals="37" methods="9" coveredmethods="9"/>
       <line num="15" count="48" type="stmt"/>
       <line num="16" count="48" type="stmt"/>
       <line num="17" count="48" type="stmt"/>
