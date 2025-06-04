@@ -1,6 +1,7 @@
 # `ast-v8-to-istanbul`
 
 [![Version][version-badge]][npm-url]
+[![Downloads][downloads-url]][npm-url]
 
 > - Speed of V8 coverage 🏎
 > - Accuracy of Istanbul coverage 🔍
@@ -262,3 +263,4 @@ The way how V8 reports runtime coverage has some limitations when compared to pr
 
 [version-badge]: https://img.shields.io/npm/v/ast-v8-to-istanbul
 [npm-url]: https://www.npmjs.com/package/ast-v8-to-istanbul
+[downloads-url]: https://img.shields.io/npm/dm/ast-v8-to-istanbul
