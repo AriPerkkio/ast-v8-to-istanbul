@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url";
 import { parse as babelParser } from "@babel/parser";
 import { type EncodedSourceMap } from "@jridgewell/trace-mapping";
 import { parse as acornParser } from "acorn";
-import { type Node } from "estree";
 import {
   createCoverageMap,
   type CoverageMap,
@@ -15,6 +14,7 @@ import {
 import libReport from "istanbul-lib-report";
 import reports from "istanbul-reports";
 import { parseSync as oxcParser } from "oxc-parser";
+import { type AstNode as Node } from "rollup";
 import { parseAstAsync as viteParser } from "vite";
 import { expect } from "vitest";
 
