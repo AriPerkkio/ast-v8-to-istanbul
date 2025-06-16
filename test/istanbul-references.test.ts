@@ -11,7 +11,6 @@ import convert from "../src";
 import { parse } from "./utils";
 
 declare global {
-  // eslint-disable-next-line no-var
   var args: any, output: any;
 }
 
