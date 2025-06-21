@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1750053542411" clover="3.2.0">
-  <project timestamp="1750053542411" name="All files">
+<coverage generated="1750516003437" clover="3.2.0">
+  <project timestamp="1750516003437" name="All files">
     <metrics statements="396" coveredstatements="386" conditionals="278" coveredconditionals="254" methods="57" coveredmethods="57" elements="731" coveredelements="697" complexity="0" loc="396" ncloc="396" packages="1" files="6" classes="6"/>
     <file name="ast.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/ast.ts">
       <metrics statements="88" coveredstatements="86" conditionals="84" coveredconditionals="82" methods="11" coveredmethods="11"/>
