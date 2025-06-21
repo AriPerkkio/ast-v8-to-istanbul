@@ -27,7 +27,6 @@ export default defineConfig({
 
     coverage: {
       enabled: true,
-      experimentalAstAwareRemapping: true,
       include: ["src"],
     },
 
