@@ -40,3 +40,16 @@ test("continue break statements", async ({ actual, expected }) => {
 
   assertCoverage(actual, expected);
 });
+
+test("debugger", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "1/2 (50%)",
+      "functions": "1/1 (100%)",
+      "lines": "2/4 (50%)",
+      "statements": "2/4 (50%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
