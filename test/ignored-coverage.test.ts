@@ -34,6 +34,19 @@ test("ignore if else", async ({ actual, expected }) => {
   assertCoverage(actual, expected);
 });
 
+test("ignore try catch", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "2/2 (100%)",
+      "lines": "7/8 (87.5%)",
+      "statements": "7/8 (87.5%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
+
 describe("class methods", () => {
   test.scoped({ ignoreClassMethods: ["excluded"] });
 
