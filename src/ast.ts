@@ -34,6 +34,7 @@ import type {
   FunctionExpression,
   ClassBody,
   BlockStatement,
+  SwitchCase,
 } from "estree";
 import { asyncWalk } from "estree-walker";
 import { type IgnoreHint } from "./ignore-hints";
@@ -83,7 +84,7 @@ interface Visitors {
     node: IfStatement,
     branches: (Node | null | undefined)[],
   ) => void;
-  onSwitchStatement: (node: SwitchStatement) => void;
+  onSwitchStatement: (node: SwitchStatement, cases: SwitchCase[]) => void;
   onConditionalExpression: (node: ConditionalExpression) => void;
   onLogicalExpression: (
     node: LogicalExpression,
@@ -271,7 +272,15 @@ export function getWalker() {
             return visitors.onIfStatement(node, branches);
           }
           case "SwitchStatement": {
-            return visitors.onSwitchStatement(node);
+            const cases = [];
+
+            for (const _case of node.cases) {
+              if (getIgnoreHint(_case) !== "next") {
+                cases.push(_case);
+              }
+            }
+
+            return visitors.onSwitchStatement(node, cases);
           }
           case "ConditionalExpression": {
             return visitors.onConditionalExpression(node);

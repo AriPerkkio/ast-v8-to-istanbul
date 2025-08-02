@@ -233,8 +233,8 @@ export default async function convert<
     onLogicalExpression(node, branches) {
       onBranch("binary-expr", node, branches);
     },
-    onSwitchStatement(node) {
-      onBranch("switch", node, node.cases);
+    onSwitchStatement(node, cases) {
+      onBranch("switch", node, cases);
       onStatement(node);
     },
     onAssignmentPattern(node) {
