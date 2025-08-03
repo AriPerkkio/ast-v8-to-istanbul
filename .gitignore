@@ -6,3 +6,4 @@ istanbul-coverage
 fixture-coverage
 test/fixtures/**/dist/
 bench-profile
+/ignore-examples/
