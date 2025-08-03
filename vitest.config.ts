@@ -76,6 +76,13 @@ export default defineConfig({
           setupFiles: ["./test/utils/setup.ts"],
         },
       },
+
+      {
+        test: {
+          name: { label: "Examples", color: "magenta" },
+          include: ["test/utils/generate-ignore-example.ts"],
+        },
+      },
     ],
   },
 });

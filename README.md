@@ -70,6 +70,8 @@ const data: CoverageMapData = await convert({
 
 #### Ignore hints
 
+See live example at https://ariperkkio.github.io/ast-v8-to-istanbul/ignore-examples.html.
+
 The typical ignore hints from `nyc` are supported: https://github.com/istanbuljs/nyc?tab=readme-ov-file#parsing-hints-ignoring-lines:
 
 > * `/* istanbul ignore if */`: ignore the next if statement.
