@@ -219,7 +219,7 @@ test("inline source map as base64", async () => {
   const map = s.generateDecodedMap({ hires: "boundary", source: filename });
   const encoded = Buffer.from(JSON.stringify(map)).toString("base64");
 
-  code += `\n//# sourceMappingURL=data:application/json;base64,${encoded}\n`;
+  code += `\n//# source${/* https://github.com/vitejs/vite/issues/20551 */ ""}MappingURL=data:application/json;base64,${encoded}\n`;
 
   const data = await convert({
     code,
