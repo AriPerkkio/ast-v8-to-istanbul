@@ -4,6 +4,7 @@
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "bundler",
+    "skipLibCheck": true,
     "types": ["./test/utils/expect-extend"]
   },
   "include": ["src", "test", "benchmark"],

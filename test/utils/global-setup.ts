@@ -5,13 +5,14 @@ import { fileURLToPath } from "node:url";
 import { createCoverageMap } from "istanbul-lib-coverage";
 import { createInstrumenter, type Instrumenter } from "istanbul-lib-instrument";
 import c from "tinyrainbow";
+import type { TestProject } from "vitest/node";
 
 import { toAstExplorer } from "./ast-explorer";
 import { toVisualizer } from "./source-map-visualizer";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 
-export async function setup() {
+export async function setup(project: TestProject) {
   const fixtures = await readdir(`${root}/fixtures`);
 
   for (const directory of fixtures) {
@@ -22,8 +23,10 @@ export async function setup() {
       force: true,
     });
     await mkdir(`${root}/fixtures/${directory}/dist`);
-
-    const { code, map } = await transform(`${root}/fixtures/${directory}`);
+    const { code, map } = await transform(
+      project,
+      `${root}/fixtures/${directory}`,
+    );
 
     const visualizer = toVisualizer({ code, map });
     const astExplorer = toAstExplorer({ code });
@@ -136,14 +139,20 @@ async function collectCoverage(
   });
 }
 
-async function transform(directory: string) {
+async function transform(project: TestProject, directory: string) {
   const files = await readdir(directory);
   const filename = files.find((file) => file.includes("sources"))!;
   const extension = extname(filename);
 
-  const { code, map } = (await import(
-    `${directory}/sources${extension}?transform-result`
-  )) as typeof import("file?transform-result");
+  const result = await project.vite.environments.client.transformRequest(
+    `${directory}/sources${extension}?transform-result`,
+  );
+
+  if (!result) {
+    throw new Error(`Failed to transform ${directory}`);
+  }
+
+  const { code, map } = eval(result.code);
 
   await writeFile(`${directory}/dist/index.js`, code);
   await writeFile(`${directory}/dist/index.js.map`, JSON.stringify(map));
