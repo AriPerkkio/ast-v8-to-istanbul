@@ -41,7 +41,6 @@ export async function setup(project: TestProject) {
       autoWrap: false,
       esModules: true,
       coverageVariable: `__istanbul_coverage_${directory}__`,
-      // @ts-expect-error -- untyped
       ignoreClassMethods: ["excluded"],
     });
     const instrumented = instrumenter.instrumentSync(
