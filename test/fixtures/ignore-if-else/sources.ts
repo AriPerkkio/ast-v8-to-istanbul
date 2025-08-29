@@ -21,3 +21,11 @@ if (truthy) {
   }
   uncovered_2();
 }
+
+/* istanbul ignore else -- @preserve */
+if (truthy) {
+  function covered_2() {
+    return "covered but implicit else ignored";
+  }
+  covered_2();
+}

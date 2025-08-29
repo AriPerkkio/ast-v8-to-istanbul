@@ -24,10 +24,10 @@ test("ignore next", async ({ actual, expected }) => {
 test("ignore if else", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "1/1 (100%)",
-      "functions": "1/1 (100%)",
-      "lines": "7/7 (100%)",
-      "statements": "8/8 (100%)",
+      "branches": "2/2 (100%)",
+      "functions": "2/2 (100%)",
+      "lines": "11/11 (100%)",
+      "statements": "13/13 (100%)",
     }
   `);
 

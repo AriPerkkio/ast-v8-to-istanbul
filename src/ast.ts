@@ -265,7 +265,7 @@ export function getWalker() {
 
             if (hint === "else" && node.alternate) {
               setSkipped(node.alternate);
-            } else if (hint !== "if") {
+            } else if (hint !== "if" && hint !== "else") {
               branches.push(node.alternate);
             }
 
