@@ -6,9 +6,9 @@ test("function declaration", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "0/0 (100%)",
-      "functions": "1/4 (25%)",
-      "lines": "2/5 (40%)",
-      "statements": "2/5 (40%)",
+      "functions": "1/5 (20%)",
+      "lines": "2/6 (33.33%)",
+      "statements": "2/6 (33.33%)",
     }
   `);
 
