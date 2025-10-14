@@ -90,7 +90,7 @@ export default async function convert<
     onFunctionDeclaration(node) {
       onFunction(node, {
         loc: node.body,
-        decl: node.id,
+        decl: node.id || { ...node, end: node.start + 1 },
       });
     },
     onFunctionExpression(node) {
