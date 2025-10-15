@@ -311,3 +311,34 @@ test("inline source map as filename", async () => {
     }
   `);
 });
+
+test("windows repro #95", async () => {
+  const code = `\
+import util from "/util.ts";
+
+export const getHello = () => {
+    return 'hello';
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy5qcyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgdXRpbCBmcm9tIFwiL3V0aWwudHNcIjtcclxuXHJcbmV4cG9ydCBjb25zdCBnZXRIZWxsbyA9ICgpID0+IHtcclxuICByZXR1cm4gJ2hlbGxvJztcclxufVxyXG4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsTUFBTSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDLElBQUksQ0FBQyxFQUFFLENBQUMsQ0FBQztBQUM1QjtBQUNBLE1BQU0sQ0FBQyxLQUFLLENBQUMsUUFBUSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDO0FBQy9CLENBQUMsQ0FBQyxNQUFNLENBQUMsQ0FBQyxLQUFLLENBQUMsQ0FBQztBQUNqQixDQUFDOyJ9
+`
+    .split("\n")
+    .join("\r\n");
+
+  const filename = normalize(resolve("/some/file.ts"));
+
+  const data = await convert({
+    code,
+    sourceMap: undefined,
+    ast: parse(code),
+    coverage: {
+      url: pathToFileURL(filename).href,
+      functions: [],
+    },
+  });
+
+  const coverage = createCoverageMap(data);
+  const fileCoverage = coverage.fileCoverageFor(filename);
+
+  expect(fileCoverage).toMatchInlineSnapshot();
+});
