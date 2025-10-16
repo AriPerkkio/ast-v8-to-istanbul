@@ -349,3 +349,61 @@ export const getHello = () => {
     }
   `);
 });
+
+test("windows repro #97", async () => {
+  const code = `\
+import util, { works } from "/util.ts";
+export default () => {
+  const value = util();
+  return value;
+};
+export const working = () => {
+  const value = works();
+  return value;
+};
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgdXRpbCwge3dvcmtzfSBmcm9tICcuL3V0aWwnO1xuXG5leHBvcnQgZGVmYXVsdCAoKSA9PiB7XG4gIGNvbnN0IHZhbHVlPSB1dGlsKCk7XG5cbiAgcmV0dXJuIHZhbHVlXG59XG5cbmV4cG9ydCBjb25zdCB3b3JraW5nID0gKCkgPT4ge1xuICBjb25zdCB2YWx1ZSA9IHdvcmtzKCk7XG5cbiAgcmV0dXJuIHZhbHVlO1xufVxuIl0sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLFFBQU8sYUFBWTtBQUUxQixlQUFlLE1BQU07QUFDbkIsUUFBTSxRQUFPLEtBQUs7QUFFbEIsU0FBTztBQUNUO0FBRU8sYUFBTSxVQUFVLE1BQU07QUFDM0IsUUFBTSxRQUFRLE1BQU07QUFFcEIsU0FBTztBQUNUOyIsIm5hbWVzIjpbXX0=
+`
+    .split("\n")
+    .join("\r\n");
+
+  const filename = normalize(resolve("/some/file.ts"));
+
+  const data = await convert({
+    code,
+    sourceMap: undefined,
+    ast: parse(code),
+    coverage: {
+      url: pathToFileURL(filename).href,
+      functions: [
+        {
+          functionName: "",
+          ranges: [{ startOffset: 0, endOffset: 768, count: 1 }],
+          isBlockCoverage: true,
+        },
+        {
+          functionName: "default",
+          ranges: [{ startOffset: 55, endOffset: 104, count: 1 }],
+          isBlockCoverage: true,
+        },
+        {
+          functionName: "working",
+          ranges: [{ startOffset: 129, endOffset: 179, count: 1 }],
+          isBlockCoverage: true,
+        },
+      ],
+    },
+  });
+
+  const coverage = createCoverageMap(data);
+  const fileCoverage = coverage.fileCoverageFor(filename);
+
+  expect(fileCoverage).toMatchInlineSnapshot(`
+  {
+    "branches": "0/0 (100%)",
+    "functions": "2/2 (100%)",
+    "lines": "5/5 (100%)",
+    "statements": "5/5 (100%)",
+  }
+`);
+});
