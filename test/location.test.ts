@@ -80,7 +80,10 @@ function sum(a, b) {
   });
 });
 
-test("windows end-of-line", () => {
+test.each([
+  { name: "unix", eol: "\n" },
+  { name: "windows", eol: "\r\n" },
+])("$name end-of-line $eol", ({ eol }) => {
   const code = `\
 // test/fixtures/function-declaration/sources.ts
 function sum(a, b) {
@@ -88,7 +91,7 @@ function sum(a, b) {
 }
     `
     .split("\n")
-    .join("\r\n");
+    .join(eol);
 
   const locator = new Locator(
     code,
@@ -96,6 +99,6 @@ function sum(a, b) {
     "",
   );
 
-  expect.soft(locator.offsetToNeedle(58)).toEqual({ line: 2, column: 10 });
-  expect.soft(locator.offsetToNeedle(61)).toEqual({ line: 2, column: 13 });
+  expect.soft(locator.offsetToNeedle(58)).toEqual({ line: 2, column: 9 });
+  expect.soft(locator.offsetToNeedle(61)).toEqual({ line: 2, column: 12 });
 });

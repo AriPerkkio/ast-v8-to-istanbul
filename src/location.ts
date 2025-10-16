@@ -46,23 +46,23 @@ export class Locator {
     let column = cacheHit?.column ?? 0;
 
     for (let i = current; i <= this.#codeParts.length; i++) {
-      const char = this.#codeParts[i];
-
       if (current === offset) {
         return { line, column };
-      }
-
-      // Count \r\n as 1
-      if (char === "\r" && this.#codeParts[i + 1] === "\n") {
-        current--;
-        continue;
       }
 
       if (current % CACHE_THRESHOLD === 0) {
         this.#cache.set(current, { line, column });
       }
 
-      if (char === "\n") {
+      const char = this.#codeParts[i];
+
+      if (char === "\r" && this.#codeParts[i + 1] === "\n") {
+        line++;
+        column = 0;
+
+        // Jump over next \n directly. Increase current only by 1 for whole \r\n.
+        i++;
+      } else if (char === "\n") {
         line++;
         column = 0;
       } else {
@@ -86,7 +86,7 @@ export class Locator {
 
     // End-mapping tracing logic from istanbul-lib-source-maps
     const endNeedle = this.offsetToNeedle(node.end);
-    endNeedle.column -= 1;
+    endNeedle.column = Math.max(0, endNeedle.column - 1);
 
     let end = getPosition(endNeedle, this.#map);
 
