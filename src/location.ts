@@ -52,8 +52,9 @@ export class Locator {
         return { line, column };
       }
 
-      // Handle \r\n EOLs on next iteration
-      if (char === "\r") {
+      // Count \r\n as 1
+      if (char === "\r" && this.#codeParts[i + 1] === "\n") {
+        current--;
         continue;
       }
 

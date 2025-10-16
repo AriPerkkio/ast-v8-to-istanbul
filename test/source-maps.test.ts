@@ -340,5 +340,12 @@ export const getHello = () => {
   const coverage = createCoverageMap(data);
   const fileCoverage = coverage.fileCoverageFor(filename);
 
-  expect(fileCoverage).toMatchInlineSnapshot();
+  expect(fileCoverage).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "0/1 (0%)",
+      "lines": "0/2 (0%)",
+      "statements": "0/2 (0%)",
+    }
+  `);
 });
