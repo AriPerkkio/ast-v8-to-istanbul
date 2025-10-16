@@ -80,18 +80,13 @@ function sum(a, b) {
   });
 });
 
-test.each([
-  { name: "unix", eol: "\n" },
-  { name: "windows", eol: "\r\n" },
-])("$name end-of-line $eol", ({ eol }) => {
+test("unix end-of-line", () => {
   const code = `\
 // test/fixtures/function-declaration/sources.ts
 function sum(a, b) {
   return a + b;
 }
-    `
-    .split("\n")
-    .join(eol);
+    `;
 
   const locator = new Locator(
     code,
@@ -101,4 +96,25 @@ function sum(a, b) {
 
   expect.soft(locator.offsetToNeedle(58)).toEqual({ line: 2, column: 9 });
   expect.soft(locator.offsetToNeedle(61)).toEqual({ line: 2, column: 12 });
+});
+
+test("windows end-of-line", () => {
+  const code = `\
+// test/fixtures/function-declaration/sources.ts
+function sum(a, b) {
+  return a + b;
+}
+    `
+    .split("\n")
+    .join("\r\n");
+
+  const locator = new Locator(
+    code,
+    new TraceMap(createEmptySourceMap("example.js", code)),
+    "",
+  );
+
+  // Offsets include +1 for \r\n
+  expect.soft(locator.offsetToNeedle(59)).toEqual({ line: 2, column: 9 });
+  expect.soft(locator.offsetToNeedle(62)).toEqual({ line: 2, column: 12 });
 });

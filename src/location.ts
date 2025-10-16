@@ -56,13 +56,7 @@ export class Locator {
 
       const char = this.#codeParts[i];
 
-      if (char === "\r" && this.#codeParts[i + 1] === "\n") {
-        line++;
-        column = 0;
-
-        // Jump over next \n directly. Increase current only by 1 for whole \r\n.
-        i++;
-      } else if (char === "\n") {
+      if (char === "\n") {
         line++;
         column = 0;
       } else {
@@ -86,7 +80,7 @@ export class Locator {
 
     // End-mapping tracing logic from istanbul-lib-source-maps
     const endNeedle = this.offsetToNeedle(node.end);
-    endNeedle.column = Math.max(0, endNeedle.column - 1);
+    endNeedle.column -= 1;
 
     let end = getPosition(endNeedle, this.#map);
 

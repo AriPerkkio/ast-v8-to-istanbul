@@ -399,11 +399,11 @@ export const working = () => {
   const fileCoverage = coverage.fileCoverageFor(filename);
 
   expect(fileCoverage).toMatchInlineSnapshot(`
-  {
-    "branches": "0/0 (100%)",
-    "functions": "2/2 (100%)",
-    "lines": "5/5 (100%)",
-    "statements": "5/5 (100%)",
-  }
-`);
+    {
+      "branches": "0/0 (100%)",
+      "functions": "2/2 (100%)",
+      "lines": "5/5 (100%)",
+      "statements": "5/5 (100%)",
+    }
+  `);
 });
