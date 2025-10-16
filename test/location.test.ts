@@ -96,6 +96,9 @@ function sum(a, b) {
     "",
   );
 
-  expect(locator.offsetToNeedle(58)).toEqual({ line: 2, column: 9 });
-  expect(locator.offsetToNeedle(61)).toEqual({ line: 2, column: 12 });
+  const start = code.indexOf("sum");
+  const end = start + "sum".length;
+
+  expect(locator.offsetToNeedle(start)).toEqual({ line: 2, column: 9 });
+  expect(locator.offsetToNeedle(end)).toEqual({ line: 2, column: 12 });
 });

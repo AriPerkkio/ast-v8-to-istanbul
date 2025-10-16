@@ -46,20 +46,15 @@ export class Locator {
     let column = cacheHit?.column ?? 0;
 
     for (let i = current; i <= this.#codeParts.length; i++) {
-      const char = this.#codeParts[i];
-
       if (current === offset) {
         return { line, column };
-      }
-
-      // Handle \r\n EOLs on next iteration
-      if (char === "\r") {
-        continue;
       }
 
       if (current % CACHE_THRESHOLD === 0) {
         this.#cache.set(current, { line, column });
       }
+
+      const char = this.#codeParts[i];
 
       if (char === "\n") {
         line++;
