@@ -36,3 +36,7 @@ export const excludedStatement = 1;
 export const coveredStatement = 1;
 
 switchCase("B");
+
+const condition = true;
+
+condition ? covered() : /* istanbul ignore next -- @preserve */ uncovered();
