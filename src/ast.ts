@@ -44,6 +44,15 @@ declare module "estree" {
     start: number;
     end: number;
   }
+
+  interface ParenthesizedExpression extends BaseExpression {
+    type: "ParenthesizedExpression";
+    expression: Expression;
+  }
+
+  interface ExpressionMap {
+    ParenthesizedExpression: ParenthesizedExpression;
+  }
 }
 
 type ParenthesizedExpression = {
@@ -287,6 +296,13 @@ export function getWalker() {
           }
           case "ConditionalExpression": {
             const branches = [];
+
+            if (node.consequent.type === "ParenthesizedExpression") {
+              node.consequent = node.consequent.expression;
+            }
+            if (node.alternate.type === "ParenthesizedExpression") {
+              node.alternate = node.alternate.expression;
+            }
 
             if (getIgnoreHint(node.consequent) === "next") {
               setSkipped(node.consequent);
