@@ -40,3 +40,4 @@ switchCase("B");
 const condition = true;
 
 condition ? covered() : /* istanbul ignore next -- @preserve */ uncovered();
+!condition ? /* istanbul ignore next -- @preserve */ uncovered() : covered();
