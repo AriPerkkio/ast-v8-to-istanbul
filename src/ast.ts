@@ -55,11 +55,6 @@ declare module "estree" {
   }
 }
 
-type ParenthesizedExpression = {
-  type: "ParenthesizedExpression";
-  expression: Expression;
-};
-
 interface Visitors {
   // Functions
   onFunctionDeclaration: (node: FunctionDeclaration) => void;
@@ -163,13 +158,8 @@ export function getWalker() {
           }
           case "ArrowFunctionExpression": {
             // Get inner body in cases where parenthesis are preserverd, e.g. acorn, oxc: https://oxc.rs/docs/learn/ecmascript/grammar.html#parenthesized-expression
-            if (
-              (node.body as unknown as ParenthesizedExpression)?.type ===
-              "ParenthesizedExpression"
-            ) {
-              node.body = (
-                node.body as unknown as ParenthesizedExpression
-              ).expression;
+            if (node.body?.type === "ParenthesizedExpression") {
+              node.body = node.body.expression;
             }
 
             return visitors.onArrowFunctionExpression(node);
