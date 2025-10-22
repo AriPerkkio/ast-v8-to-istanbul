@@ -85,7 +85,10 @@ interface Visitors {
     branches: (Node | null | undefined)[],
   ) => void;
   onSwitchStatement: (node: SwitchStatement, cases: SwitchCase[]) => void;
-  onConditionalExpression: (node: ConditionalExpression) => void;
+  onConditionalExpression: (
+    node: ConditionalExpression,
+    branches: (Node | null | undefined)[],
+  ) => void;
   onLogicalExpression: (
     node: LogicalExpression,
     branches: (Node | null | undefined)[],
@@ -283,7 +286,21 @@ export function getWalker() {
             return visitors.onSwitchStatement(node, cases);
           }
           case "ConditionalExpression": {
-            return visitors.onConditionalExpression(node);
+            const branches = [];
+
+            if (getIgnoreHint(node.consequent) === "next") {
+              setSkipped(node.consequent);
+            } else {
+              branches.push(node.consequent);
+            }
+
+            if (getIgnoreHint(node.alternate) === "next") {
+              setSkipped(node.alternate);
+            } else {
+              branches.push(node.alternate);
+            }
+
+            return visitors.onConditionalExpression(node, branches);
           }
           case "LogicalExpression": {
             if (isSkipped(node)) return;

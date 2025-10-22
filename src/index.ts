@@ -227,8 +227,8 @@ export default async function convert<
       onBranch("if", node, branches);
       onStatement(node);
     },
-    onConditionalExpression(node) {
-      onBranch("cond-expr", node, [node.consequent, node.alternate]);
+    onConditionalExpression(node, branches) {
+      onBranch("cond-expr", node, branches);
     },
     onLogicalExpression(node, branches) {
       onBranch("binary-expr", node, branches);
@@ -381,7 +381,7 @@ export default async function convert<
         locations.push(location);
       }
 
-      const bias = branch.type === "BlockStatement" ? 1 : 0;
+      const bias = type === "if" ? 1 : 0;
 
       covered.push(
         getCount(
