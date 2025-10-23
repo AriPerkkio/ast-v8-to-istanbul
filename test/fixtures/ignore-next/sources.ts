@@ -36,3 +36,15 @@ export const excludedStatement = 1;
 export const coveredStatement = 1;
 
 switchCase("B");
+
+const condition = true;
+
+export function coveredConsequent() {
+  return "Hello world";
+}
+export function coveredAlternate() {
+  return "Hello world";
+}
+
+condition ? coveredConsequent() : /* istanbul ignore next -- @preserve */ uncovered();
+!condition ? /* istanbul ignore next -- @preserve */ uncovered() : coveredAlternate();

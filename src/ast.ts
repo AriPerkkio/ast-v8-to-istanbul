@@ -44,12 +44,16 @@ declare module "estree" {
     start: number;
     end: number;
   }
-}
 
-type ParenthesizedExpression = {
-  type: "ParenthesizedExpression";
-  expression: Expression;
-};
+  interface ParenthesizedExpression extends BaseExpression {
+    type: "ParenthesizedExpression";
+    expression: Expression;
+  }
+
+  interface ExpressionMap {
+    ParenthesizedExpression: ParenthesizedExpression;
+  }
+}
 
 interface Visitors {
   // Functions
@@ -85,7 +89,10 @@ interface Visitors {
     branches: (Node | null | undefined)[],
   ) => void;
   onSwitchStatement: (node: SwitchStatement, cases: SwitchCase[]) => void;
-  onConditionalExpression: (node: ConditionalExpression) => void;
+  onConditionalExpression: (
+    node: ConditionalExpression,
+    branches: (Node | null | undefined)[],
+  ) => void;
   onLogicalExpression: (
     node: LogicalExpression,
     branches: (Node | null | undefined)[],
@@ -151,13 +158,8 @@ export function getWalker() {
           }
           case "ArrowFunctionExpression": {
             // Get inner body in cases where parenthesis are preserverd, e.g. acorn, oxc: https://oxc.rs/docs/learn/ecmascript/grammar.html#parenthesized-expression
-            if (
-              (node.body as unknown as ParenthesizedExpression)?.type ===
-              "ParenthesizedExpression"
-            ) {
-              node.body = (
-                node.body as unknown as ParenthesizedExpression
-              ).expression;
+            if (node.body?.type === "ParenthesizedExpression") {
+              node.body = node.body.expression;
             }
 
             return visitors.onArrowFunctionExpression(node);
@@ -283,7 +285,28 @@ export function getWalker() {
             return visitors.onSwitchStatement(node, cases);
           }
           case "ConditionalExpression": {
-            return visitors.onConditionalExpression(node);
+            const branches = [];
+
+            if (node.consequent.type === "ParenthesizedExpression") {
+              node.consequent = node.consequent.expression;
+            }
+            if (node.alternate.type === "ParenthesizedExpression") {
+              node.alternate = node.alternate.expression;
+            }
+
+            if (getIgnoreHint(node.consequent) === "next") {
+              setSkipped(node.consequent);
+            } else {
+              branches.push(node.consequent);
+            }
+
+            if (getIgnoreHint(node.alternate) === "next") {
+              setSkipped(node.alternate);
+            } else {
+              branches.push(node.alternate);
+            }
+
+            return visitors.onConditionalExpression(node, branches);
           }
           case "LogicalExpression": {
             if (isSkipped(node)) return;

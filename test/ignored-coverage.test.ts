@@ -11,10 +11,10 @@ test("ignore file", async ({ actual, expected }) => {
 test("ignore next", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "1/2 (50%)",
-      "functions": "2/3 (66.66%)",
-      "lines": "6/8 (75%)",
-      "statements": "6/8 (75%)",
+      "branches": "3/4 (75%)",
+      "functions": "4/5 (80%)",
+      "lines": "11/13 (84.61%)",
+      "statements": "11/13 (84.61%)",
     }
   `);
 
