@@ -381,7 +381,7 @@ export default async function convert<
         locations.push(location);
       }
 
-      const bias = type === "if" ? 1 : 0;
+      const bias = branch.type === "BlockStatement" ? 1 : 0;
 
       covered.push(
         getCount(
