@@ -1,6 +1,6 @@
 {
   "name": "ast-v8-to-istanbul",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "AST-aware v8-to-istanbul",
   "author": "Ari Perkkiö <ari.perkkio@gmail.com>",
   "license": "MIT",
