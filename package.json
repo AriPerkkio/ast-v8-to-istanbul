@@ -19,8 +19,6 @@
   },
   "scripts": {
     "dev": "tsdown --watch --sourcemap",
-    "bench": "node --experimental-strip-types --cpu-prof --cpu-prof-dir=./bench-profile ./benchmark/run.ts",
-    "bench:ci": "node --experimental-strip-types ./benchmark/run.ts",
     "build": "tsdown",
     "deploy": "touch coverage/.nojekyll && gh-pages --dist coverage --dotfiles",
     "test": "vitest",

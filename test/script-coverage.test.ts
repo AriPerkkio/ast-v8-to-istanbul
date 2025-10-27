@@ -143,13 +143,7 @@ test("overlapping ranges", () => {
 
 test("normalized functions.json matches snapshot", async () => {
   const functions = await readFile(
-    resolve(
-      import.meta.dirname,
-      "..",
-      "benchmark",
-      "fixtures",
-      "functions.json",
-    ),
+    resolve(import.meta.dirname, "fixtures", "e2e", "functions.json"),
     "utf8",
   );
   const normalized = normalize({ functions: JSON.parse(functions) });

@@ -11,11 +11,16 @@ import { toAstExplorer } from "./ast-explorer";
 import { toVisualizer } from "./source-map-visualizer";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
+const excludes = ["e2e"];
 
 export async function setup(project: TestProject) {
   const fixtures = await readdir(`${root}/fixtures`);
 
   for (const directory of fixtures) {
+    if (excludes.includes(directory)) {
+      continue;
+    }
+
     console.log(c.bgBlueBright("[setup]"), `Creating fixtures/${directory}`);
 
     await rm(`${root}/fixtures/${directory}/dist`, {
