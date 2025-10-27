@@ -83,6 +83,16 @@ export default defineConfig({
           include: ["test/utils/generate-ignore-example.ts"],
         },
       },
+
+      {
+        test: {
+          name: { label: "e2e", color: "green" },
+          include: ["test/*.e2e.ts"],
+          setupFiles: ["./test/utils/setup.ts"],
+          fileParallelism: false,
+          testTimeout: 30_000,
+        },
+      },
     ],
   },
 });
