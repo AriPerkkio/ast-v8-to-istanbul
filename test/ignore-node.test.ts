@@ -61,14 +61,8 @@ test("ignoreNode can ignore Vite's imports", async () => {
   const coverageMap = createCoverageMap(data);
   const fileCoverage = coverageMap.fileCoverageFor(coverageMap.files()[0]);
 
-  const lines = Object.keys(fileCoverage.getLineCoverage()).map((l) =>
-    parseInt(l),
-  );
-  const linesToCover = sourceCode
-    .split("\n")
-    .filter((_, index) => lines.includes(1 + index));
-
-  expect(linesToCover).toMatchInlineSnapshot(`
+  expect({ code: sourceCode, lines: fileCoverage.getLineCoverage() })
+    .toMatchInlineSnapshot(`
     [
       "  return a + b;",
       "  multiply(2, 3);",
@@ -129,14 +123,8 @@ test("ignoreNode can ignore nested nodes", async () => {
     ]
   `);
 
-  const lines = Object.keys(fileCoverage.getLineCoverage()).map((l) =>
-    parseInt(l),
-  );
-  const linesToCover = code
-    .split("\n")
-    .filter((_, index) => lines.includes(1 + index));
-
-  expect(linesToCover).toMatchInlineSnapshot(`
+  expect({ code, lines: fileCoverage.getLineCoverage() })
+    .toMatchInlineSnapshot(`
     [
       "      if ("first branch") {",
       "      if ("second branch") {",

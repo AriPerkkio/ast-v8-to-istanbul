@@ -123,11 +123,8 @@ test("ignoreSourceCode can exclude", async () => {
   const coverageMap = createCoverageMap(data);
   const fileCoverage = coverageMap.fileCoverageFor(coverageMap.files()[0]);
 
-  const linesToCover = sourceCode
-    .split("\n")
-    .filter((_, index) => fileCoverage.getLineCoverage()[1 + index] != null);
-
-  expect(linesToCover).toMatchInlineSnapshot(`
+  expect({ code: sourceCode, lines: fileCoverage.getLineCoverage() })
+    .toMatchInlineSnapshot(`
     [
       "  return a + b;",
       "  multiply(2, 3);",
