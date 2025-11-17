@@ -57,6 +57,28 @@ expect.addSnapshotSerializer({
   },
 });
 
+expect.addSnapshotSerializer({
+  test: (val) => val?.code && val.lines,
+  serialize: (
+    val: {
+      code: string;
+      lines: ReturnType<FileCoverage["getLineCoverage"]>;
+    },
+    config,
+    indentation,
+    depth,
+    refs,
+    printer,
+  ) => {
+    const lineNumbers = Object.keys(val.lines).map((l) => parseInt(l));
+    const linesToCover = val.code
+      .split("\n")
+      .filter((_, index) => lineNumbers.includes(1 + index));
+
+    return printer(linesToCover, config, indentation, depth, refs);
+  },
+});
+
 function formatSummary(summary: CoverageSummary) {
   return (["branches", "functions", "lines", "statements"] as const).reduce(
     (all, current) => ({
