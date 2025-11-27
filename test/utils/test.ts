@@ -65,7 +65,6 @@ export const test = base.extend<{
     const data = await convert({
       ast: parse(__fixture.transpiled),
       code: __fixture.transpiled,
-      sourceCode: __fixture.sources,
       wrapperLength: 0,
       coverage: __fixture.coverage[0],
       sourceMap: __fixture.sourceMap,

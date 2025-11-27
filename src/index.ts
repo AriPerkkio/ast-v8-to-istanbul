@@ -13,7 +13,7 @@ import {
   type Branch,
   createCoverageMapData,
 } from "./coverage-map";
-import { getIgnoredLines, getIgnoreHints } from "./ignore-hints";
+import { getIgnoreHints } from "./ignore-hints";
 import { createEmptySourceMap, getInlineSourceMap, Locator } from "./location";
 import { getCount, normalize } from "./script-coverage";
 
@@ -29,9 +29,6 @@ export default async function convert<
 >(options: {
   /** Code of the executed runtime file, not the original source file */
   code: string;
-
-  /** Code of the source file. Can be anything - Javascript, Typescript, JSX, Svelte, Vue, anything */
-  sourceCode?: string;
 
   /** Length of the execution wrapper, e.g. wrapper used in node:vm */
   wrapperLength?: number;
@@ -65,7 +62,6 @@ export default async function convert<
   ) => boolean | void;
 }): Promise<CoverageMapData> {
   const ignoreHints = getIgnoreHints(options.code);
-  const ignoredLines = getIgnoredLines(options.sourceCode);
 
   // File ignore contains always only 1 entry
   if (ignoreHints.length === 1 && ignoreHints[0].type === "file") {
@@ -264,10 +260,6 @@ export default async function convert<
     const loc = locator.getLoc(positions.loc);
     if (loc === null) return;
 
-    if (ignoredLines.has(loc.start.line) || ignoredLines.has(loc.end.line)) {
-      return;
-    }
-
     const decl = locator.getLoc(positions.decl);
     if (decl === null) return;
 
@@ -315,10 +307,6 @@ export default async function convert<
     const loc = locator.getLoc(node);
     if (loc === null) return;
 
-    if (ignoredLines.has(loc.start.line) || ignoredLines.has(loc.end.line)) {
-      return;
-    }
-
     const covered = getCount(
       {
         startOffset: (parent || node).start + wrapperLength,
@@ -364,10 +352,6 @@ export default async function convert<
 
     const loc = locator.getLoc(node);
     if (loc === null) return;
-
-    if (ignoredLines.has(loc.start.line) || ignoredLines.has(loc.end.line)) {
-      return;
-    }
 
     const locations = [];
     const covered: number[] = [];
