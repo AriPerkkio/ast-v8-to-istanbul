@@ -10,7 +10,7 @@
   "files": [
     "dist"
   ],
-  "packageManager": "pnpm@10.23.0",
+  "packageManager": "pnpm@10.24.0",
   "homepage": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
   "bugs": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
   "repository": {
@@ -46,8 +46,8 @@
     "@types/istanbul-reports": "^3.0.4",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.2",
-    "@vitest/coverage-istanbul": "^4.0.13",
-    "@vitest/coverage-v8": "^4.0.13",
+    "@vitest/coverage-istanbul": "^4.0.14",
+    "@vitest/coverage-v8": "^4.0.14",
     "acorn": "^8.15.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
@@ -61,17 +61,17 @@
     "istanbul-lib-source-maps": "^5.0.6",
     "istanbul-reports": "^3.2.0",
     "magic-string": "^0.30.21",
-    "oxc-parser": "^0.98.0",
-    "prettier": "^3.6.2",
+    "oxc-parser": "^0.99.0",
+    "prettier": "^3.7.3",
     "rollup": "^4.53.3",
     "tinyrainbow": "^3.0.3",
-    "tsdown": "^0.16.6",
+    "tsdown": "^0.16.8",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.47.0",
+    "typescript-eslint": "^8.48.0",
     "vite": "^7.2.4",
-    "vitest": "^4.0.13",
-    "vue": "^3.5.24",
-    "yaml": "^2.8.1"
+    "vitest": "^4.0.14",
+    "vue": "^3.5.25",
+    "yaml": "^2.8.2"
   },
   "pnpm": {
     "overrides": {
