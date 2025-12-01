@@ -1,6 +1,6 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { type Profiler } from "node:inspector";
-import { normalize, resolve } from "node:path";
+import { extname, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse as babelParser } from "@babel/parser";
 import { type EncodedSourceMap } from "@jridgewell/trace-mapping";
@@ -32,7 +32,12 @@ export async function readFixture(filename: string) {
     new URL(`../fixtures/${filename}`, import.meta.url),
   );
 
-  const [transpiled, sourceMap, v8, istanbul] = await Promise.all([
+  const files = await readdir(root);
+  const sourceFilename = files.find((file) => file.includes("sources"))!;
+  const extension = extname(sourceFilename);
+
+  const [sources, transpiled, sourceMap, v8, istanbul] = await Promise.all([
+    readFile(`${root}/sources${extension}`, "utf8"),
     readFile(`${root}/dist/index.js`, "utf8"),
     readFile(`${root}/dist/index.js.map`, "utf8"),
     readFile(`${root}/dist/coverage.json`, "utf8"),
@@ -40,6 +45,7 @@ export async function readFixture(filename: string) {
   ]);
 
   return {
+    sources,
     transpiled,
     sourceMap: JSON.parse(sourceMap) as EncodedSourceMap,
     coverage: JSON.parse(v8) as Profiler.ScriptCoverage[],
