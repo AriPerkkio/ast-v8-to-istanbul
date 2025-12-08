@@ -86,6 +86,16 @@ In addition to `istanbul` keyword, you can use `v8`, `c8` and `node:coverage`:
 - `/* c8 ignore file */`
 - `/* node:coverage ignore next */`
 
+Also `start` and `stop` ignore hints from original [`v8-to-istanbul`](https://www.npmjs.com/package/v8-to-istanbul) are supported.
+These ignore hints are checked from the original sources instead of transpiled code.
+
+> * `/* v8 ignore start */`: start ignoring lines
+> * `/* v8 ignore stop */`: stop ignoring lines
+> * `<!-- /* v8 ignore start */ -->`: start ignoring lines
+> * `<!-- /* v8 ignore stop */ -->`: stop ignoring lines
+> * `anything /* v8 ignore start */ anything`: start ignoring lines
+> * `anything /* v8 ignore stop */ anything`: stop ignoring lines
+
 #### Class methods
 
 The `ignore-class-method` from `nyc` is also supported: https://github.com/istanbuljs/nyc?tab=readme-ov-file#ignoring-methods
