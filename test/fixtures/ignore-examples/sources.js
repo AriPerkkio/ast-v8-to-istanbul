@@ -16,6 +16,11 @@ if (parameter) {
 noop("Ignored");
 noop("Included");
 
+/* v8 ignore start */
+noop("Ignored");
+noop("Ignored");
+/* v8 ignore stop */
+noop("Included");
 
 /* istanbul ignore next */
 noop("Ignored");

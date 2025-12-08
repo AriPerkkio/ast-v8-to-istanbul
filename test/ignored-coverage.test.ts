@@ -1,6 +1,11 @@
-import { describe, expect } from "vitest";
+import { describe, expect, vi } from "vitest";
 
 import { assertCoverage, test } from "./utils";
+
+vi.mock(import("node:os"), async (importOg) => ({
+  ...(await importOg()),
+  EOL: "\n",
+}));
 
 test("ignore file", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`{}`);
@@ -45,6 +50,27 @@ test("ignore try catch", async ({ actual, expected }) => {
   `);
 
   assertCoverage(actual, expected);
+});
+
+test("ignore start stop", async ({ actual, __fixture }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "1/2 (50%)",
+      "lines": "3/4 (75%)",
+      "statements": "3/4 (75%)",
+    }
+  `);
+
+  expect({ code: __fixture.sources, lines: actual.getLineCoverage() })
+    .toMatchInlineSnapshot(`
+    [
+      "  return "uncovered";",
+      "  return "covered";",
+      "covered();",
+      "covered2();",
+    ]
+  `);
 });
 
 describe("class methods", () => {
