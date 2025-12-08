@@ -1,4 +1,3 @@
-import { EOL } from "node:os";
 import jsTokens from "js-tokens";
 
 export interface IgnoreHint {
@@ -11,6 +10,8 @@ const IGNORE_PATTERN =
 
 const IGNORE_LINES_PATTERN =
   /\s*(?:istanbul|[cv]8|node:coverage)\s+ignore\s+(start|stop)/;
+
+const EOL_PATTERN = /\r?\n/g;
 
 /**
  * Parse ignore hints from **Javascript** code based on AST
@@ -93,7 +94,7 @@ export function getIgnoredLines(text?: string): Set<number> {
   const ranges: { start: number; stop: number }[] = [];
   let lineNumber = 0;
 
-  for (const line of text.split(EOL)) {
+  for (const line of text.split(EOL_PATTERN)) {
     lineNumber++;
 
     const match = line.match(IGNORE_LINES_PATTERN);
