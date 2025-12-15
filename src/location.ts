@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import {
@@ -9,8 +10,10 @@ import {
   type SourceMapSegment,
   type DecodedSourceMap,
   type SourceMap,
+  sourceContentFor,
 } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
+import { getIgnoredLines } from "./ignore-hints";
 
 const WORD_PATTERN = /(\w+|\s|[^\w\s])/g;
 const INLINE_MAP_PATTERN = /#\s*sourceMappingURL=(.*)\s*$/m;
@@ -19,11 +22,14 @@ const BASE_64_PREFIX = "data:application/json;base64,";
 /** How often should offset calculations be cached */
 const CACHE_THRESHOLD = 250;
 
+type Filename = string;
+
 export class Locator {
   #cache = new Map<number, Needle>();
   #codeParts: string[];
   #map: TraceMap;
   #directory: string;
+  #ignoredLines = new Map<Filename, ReturnType<typeof getIgnoredLines>>();
 
   constructor(code: string, map: TraceMap, directory: string) {
     this.#codeParts = code.split("");
@@ -33,6 +39,7 @@ export class Locator {
 
   reset() {
     this.#cache.clear();
+    this.#ignoredLines.clear();
     this.#codeParts = [];
   }
 
@@ -116,6 +123,21 @@ export class Locator {
           break;
         }
       }
+    }
+
+    const filename = loc.start.filename;
+    let ignoredLines = this.#ignoredLines.get(filename);
+
+    if (!ignoredLines) {
+      const sources = sourceContentFor(this.#map, filename);
+      ignoredLines = getIgnoredLines(sources ?? tryReadFileSync(filename));
+
+      this.#ignoredLines.set(filename, ignoredLines);
+    }
+
+    // Anything that starts between the line ignore hints is ignored
+    if (ignoredLines.has(loc.start.line)) {
+      return null;
     }
 
     return loc;
@@ -212,5 +234,13 @@ export async function getInlineSourceMap(filename: string, code: string) {
     return JSON.parse(content) as SourceMap;
   } catch {
     return null;
+  }
+}
+
+function tryReadFileSync(filename: string) {
+  try {
+    return readFileSync(filename, "utf8");
+  } catch {
+    return undefined;
   }
 }
