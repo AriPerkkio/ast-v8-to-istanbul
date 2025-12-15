@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1765829318750" clover="3.2.0">
-  <project timestamp="1765829318751" name="All files">
+<coverage generated="1765830199832" clover="3.2.0">
+  <project timestamp="1765830199832" name="All files">
     <metrics statements="424" coveredstatements="415" conditionals="296" coveredconditionals="273" methods="58" coveredmethods="58" elements="778" coveredelements="746" complexity="0" loc="424" ncloc="424" packages="1" files="6" classes="6"/>
     <file name="ast.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/ast.ts">
       <metrics statements="103" coveredstatements="102" conditionals="96" coveredconditionals="95" methods="11" coveredmethods="11"/>
@@ -366,45 +366,45 @@
       <line num="140" count="18" type="stmt"/>
       <line num="143" count="105214" type="stmt"/>
       <line num="147" count="48" type="stmt"/>
-      <line num="148" count="48" type="cond" truecount="1" falsecount="1"/>
-      <line num="150" count="48" type="stmt"/>
-      <line num="152" count="48" type="cond" truecount="1" falsecount="1"/>
-      <line num="153" count="0" type="stmt"/>
-      <line num="156" count="48" type="stmt"/>
-      <line num="160" count="48" type="stmt"/>
+      <line num="149" count="48" type="cond" truecount="1" falsecount="1"/>
+      <line num="151" count="48" type="stmt"/>
+      <line num="153" count="48" type="cond" truecount="1" falsecount="1"/>
+      <line num="154" count="0" type="stmt"/>
+      <line num="157" count="48" type="stmt"/>
       <line num="161" count="48" type="stmt"/>
-      <line num="163" count="48" type="stmt"/>
-      <line num="168" count="210800" type="stmt"/>
-      <line num="170" count="210800" type="cond" truecount="2" falsecount="0"/>
-      <line num="171" count="455" type="stmt"/>
-      <line num="178" count="210800" type="cond" truecount="2" falsecount="0"/>
-      <line num="179" count="320" type="stmt"/>
-      <line num="182" count="210480" type="stmt"/>
-      <line num="193" count="804" type="stmt"/>
-      <line num="196" count="804" type="stmt"/>
-      <line num="197" count="4280" type="cond" truecount="2" falsecount="0"/>
-      <line num="198" count="4280" type="stmt"/>
+      <line num="162" count="48" type="stmt"/>
+      <line num="164" count="48" type="stmt"/>
+      <line num="169" count="210800" type="stmt"/>
+      <line num="171" count="210800" type="cond" truecount="2" falsecount="0"/>
+      <line num="172" count="455" type="stmt"/>
+      <line num="179" count="210800" type="cond" truecount="2" falsecount="0"/>
+      <line num="180" count="320" type="stmt"/>
+      <line num="183" count="210480" type="stmt"/>
+      <line num="194" count="804" type="stmt"/>
+      <line num="197" count="804" type="stmt"/>
+      <line num="198" count="4280" type="cond" truecount="2" falsecount="0"/>
       <line num="199" count="4280" type="stmt"/>
-      <line num="201" count="4280" type="stmt"/>
-      <line num="202" count="48536" type="stmt"/>
+      <line num="200" count="4280" type="stmt"/>
+      <line num="202" count="4280" type="stmt"/>
       <line num="203" count="48536" type="stmt"/>
-      <line num="206" count="4280" type="stmt"/>
-      <line num="209" count="804" type="stmt"/>
-      <line num="220" count="796" type="stmt"/>
+      <line num="204" count="48536" type="stmt"/>
+      <line num="207" count="4280" type="stmt"/>
+      <line num="210" count="804" type="stmt"/>
       <line num="221" count="796" type="stmt"/>
-      <line num="223" count="796" type="cond" truecount="2" falsecount="0"/>
-      <line num="225" count="8" type="stmt"/>
-      <line num="226" count="8" type="cond" truecount="2" falsecount="0"/>
-      <line num="227" count="4" type="cond" truecount="1" falsecount="1"/>
-      <line num="228" count="4" type="stmt"/>
+      <line num="222" count="796" type="stmt"/>
+      <line num="224" count="796" type="cond" truecount="2" falsecount="0"/>
+      <line num="226" count="8" type="stmt"/>
+      <line num="227" count="8" type="cond" truecount="2" falsecount="0"/>
+      <line num="228" count="4" type="cond" truecount="1" falsecount="1"/>
       <line num="229" count="4" type="stmt"/>
-      <line num="232" count="4" type="stmt"/>
+      <line num="230" count="4" type="stmt"/>
       <line num="233" count="4" type="stmt"/>
       <line num="234" count="4" type="stmt"/>
-      <line num="236" count="0" type="stmt"/>
-      <line num="241" count="28" type="stmt"/>
+      <line num="235" count="4" type="stmt"/>
+      <line num="237" count="0" type="stmt"/>
       <line num="242" count="28" type="stmt"/>
-      <line num="244" count="20" type="stmt"/>
+      <line num="243" count="28" type="stmt"/>
+      <line num="245" count="20" type="stmt"/>
     </file>
     <file name="script-coverage.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/script-coverage.ts">
       <metrics statements="35" coveredstatements="35" conditionals="18" coveredconditionals="18" methods="5" coveredmethods="5"/>
