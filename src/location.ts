@@ -145,7 +145,8 @@ export class Locator {
 
   getSourceLines(loc: { start: Needle; end: Needle }, filename: string) {
     const index = this.#map.resolvedSources.findIndex(
-      (source) => source === filename || resolve(this.#directory, source),
+      (source) =>
+        source === filename || resolve(this.#directory, source) === filename,
     );
     const sourcesContent = this.#map.sourcesContent?.[index];
 
