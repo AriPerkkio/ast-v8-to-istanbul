@@ -130,7 +130,7 @@ export class Locator {
 
     if (!ignoredLines) {
       const sources = sourceContentFor(this.#map, filename);
-      ignoredLines = getIgnoredLines(sources || tryReadFileSync(filename));
+      ignoredLines = getIgnoredLines(sources ?? tryReadFileSync(filename));
 
       this.#ignoredLines.set(filename, ignoredLines);
     }
