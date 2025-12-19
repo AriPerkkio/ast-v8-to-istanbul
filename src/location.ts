@@ -159,6 +159,8 @@ export class Locator {
       .slice(loc.start.line - 1, loc.end.line);
 
     lines[0] = lines[0].slice(loc.start.column);
+
+    // eslint-disable-next-line e18e/prefer-array-at -- https://github.com/e18e/eslint-plugin/issues/27
     lines[lines.length - 1] = lines[lines.length - 1].slice(0, loc.end.column);
 
     return lines.join("\n");

@@ -36,6 +36,7 @@
   "devDependencies": {
     "@babel/parser": "^7.28.5",
     "@babel/types": "^7.28.5",
+    "@e18e/eslint-plugin": "^0.1.0",
     "@eslint/js": "^9.39.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@types/estree": "^1.0.8",

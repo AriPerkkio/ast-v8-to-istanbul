@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import e18e from "@e18e/eslint-plugin";
 import js from "@eslint/js";
 import pluginImport from "eslint-plugin-import-x";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
@@ -14,6 +15,7 @@ export default defineConfig([
     ...config,
     files: tsconfig.include,
   })),
+  e18e.configs.recommended,
   {
     files: tsconfig.include,
     languageOptions: {
@@ -70,7 +72,15 @@ export default defineConfig([
     },
   },
   {
-    ignores: ["dist/**", ...tsconfig.exclude.map((path) => `${path}/**`)],
+    ignores: [
+      "dist/**",
+      "test/fixtures/e2e/**",
+      "./coverage/**",
+      "./fixture-coverage/**",
+      "./istanbul-coverage/**",
+      "./ignore-examples/**",
+      ...tsconfig.exclude.map((path) => `${path}/**`),
+    ],
   },
   eslintPluginPrettierRecommended,
 ]);
