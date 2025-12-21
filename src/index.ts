@@ -462,12 +462,12 @@ export default async function convert<
   }
 }
 
+const coveredNodes = new WeakSet<Node>();
+
 function setCovered(node: Node) {
-  // @ts-expect-error -- internal
-  node.__covered = true;
+  coveredNodes.add(node);
 }
 
 function isCovered(node: Node) {
-  // @ts-expect-error -- internal
-  return node.__covered === true;
+  return coveredNodes.has(node);
 }

@@ -364,6 +364,8 @@ export function getWalker() {
   return { walk, onIgnore };
 }
 
+const skippedNodes = new WeakSet<Node | BabelNode>();
+
 export function getFunctionName(node: Node | BabelNode) {
   if (node.type === "Identifier") {
     return node.name;
@@ -375,11 +377,9 @@ export function getFunctionName(node: Node | BabelNode) {
 }
 
 function setSkipped(node: Node | BabelNode) {
-  // @ts-expect-error -- internal
-  node.__skipped = true;
+  skippedNodes.add(node);
 }
 
 function isSkipped(node: Node | BabelNode) {
-  // @ts-expect-error -- internal
-  return node.__skipped === true;
+  return skippedNodes.has(node);
 }
