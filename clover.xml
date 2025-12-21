@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1766176435051" clover="3.2.0">
-  <project timestamp="1766176435051" name="All files">
-    <metrics statements="424" coveredstatements="415" conditionals="296" coveredconditionals="273" methods="58" coveredmethods="58" elements="778" coveredelements="746" complexity="0" loc="424" ncloc="424" packages="1" files="6" classes="6"/>
+<coverage generated="1766343816676" clover="3.2.0">
+  <project timestamp="1766343816676" name="All files">
+    <metrics statements="426" coveredstatements="417" conditionals="296" coveredconditionals="273" methods="58" coveredmethods="58" elements="780" coveredelements="748" complexity="0" loc="426" ncloc="426" packages="1" files="6" classes="6"/>
     <file name="ast.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/ast.ts">
-      <metrics statements="103" coveredstatements="102" conditionals="96" coveredconditionals="95" methods="11" coveredmethods="11"/>
+      <metrics statements="104" coveredstatements="103" conditionals="96" coveredconditionals="95" methods="11" coveredmethods="11"/>
       <line num="112" count="908" type="stmt"/>
       <line num="115" count="1665" type="stmt"/>
       <line num="124" count="908" type="stmt"/>
@@ -101,11 +101,12 @@
       <line num="356" count="279" type="stmt"/>
       <line num="360" count="340384" type="stmt"/>
       <line num="364" count="908" type="stmt"/>
-      <line num="368" count="9587" type="cond" truecount="2" falsecount="0"/>
-      <line num="369" count="3845" type="stmt"/>
-      <line num="372" count="5742" type="cond" truecount="4" falsecount="0"/>
-      <line num="373" count="3845" type="stmt"/>
-      <line num="379" count="6994" type="stmt"/>
+      <line num="367" count="50" type="stmt"/>
+      <line num="370" count="9587" type="cond" truecount="2" falsecount="0"/>
+      <line num="371" count="3845" type="stmt"/>
+      <line num="374" count="5742" type="cond" truecount="4" falsecount="0"/>
+      <line num="375" count="3845" type="stmt"/>
+      <line num="380" count="6994" type="stmt"/>
       <line num="384" count="333053" type="stmt"/>
     </file>
     <file name="coverage-map.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/coverage-map.ts">
@@ -188,7 +189,7 @@
       <line num="74" count="972" type="stmt"/>
     </file>
     <file name="index.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/index.ts">
-      <metrics statements="113" coveredstatements="108" conditionals="100" coveredconditionals="87" methods="23" coveredmethods="23"/>
+      <metrics statements="114" coveredstatements="109" conditionals="100" coveredconditionals="87" methods="23" coveredmethods="23"/>
       <line num="64" count="916" type="stmt"/>
       <line num="67" count="916" type="cond" truecount="4" falsecount="0"/>
       <line num="68" count="8" type="stmt"/>
@@ -300,7 +301,8 @@
       <line num="457" count="76" type="cond" truecount="2" falsecount="0"/>
       <line num="458" count="8" type="stmt"/>
       <line num="461" count="76" type="stmt"/>
-      <line num="467" count="504" type="stmt"/>
+      <line num="465" count="50" type="stmt"/>
+      <line num="468" count="504" type="stmt"/>
       <line num="472" count="637" type="stmt"/>
     </file>
     <file name="location.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/location.ts">
