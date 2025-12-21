@@ -14,7 +14,7 @@ export type Branch =
   | "switch"
   | "default-arg";
 
-type CoverageMapData = IstanbulCoverageMapData & {
+export type CoverageMapData = IstanbulCoverageMapData & {
   [key: string]: FileCoverageData;
 };
 
