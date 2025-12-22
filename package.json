@@ -10,7 +10,7 @@
   "files": [
     "dist"
   ],
-  "packageManager": "pnpm@10.25.0",
+  "packageManager": "pnpm@10.26.1",
   "homepage": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
   "bugs": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
   "repository": {
@@ -36,7 +36,7 @@
   "devDependencies": {
     "@babel/parser": "^7.28.5",
     "@babel/types": "^7.28.5",
-    "@e18e/eslint-plugin": "^0.1.0",
+    "@e18e/eslint-plugin": "^0.1.3",
     "@eslint/js": "^9.39.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@types/estree": "^1.0.8",
@@ -47,8 +47,8 @@
     "@types/istanbul-reports": "^3.0.4",
     "@types/node": "^25.0.3",
     "@vitejs/plugin-vue": "^6.0.3",
-    "@vitest/coverage-istanbul": "^4.0.15",
-    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/coverage-istanbul": "^4.0.16",
+    "@vitest/coverage-v8": "^4.0.16",
     "acorn": "^8.15.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
@@ -62,16 +62,16 @@
     "istanbul-lib-source-maps": "^5.0.6",
     "istanbul-reports": "^3.2.0",
     "magic-string": "^0.30.21",
-    "oxc-parser": "^0.102.0",
+    "oxc-parser": "^0.104.0",
     "prettier": "^3.7.4",
-    "rollup": "^4.53.3",
+    "rollup": "^4.54.0",
     "tinyrainbow": "^3.0.3",
-    "tsdown": "^0.17.4",
+    "tsdown": "^0.18.2",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.49.0",
-    "vite": "^7.2.7",
-    "vitest": "^4.0.15",
-    "vue": "^3.5.25",
+    "typescript-eslint": "^8.50.0",
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16",
+    "vue": "^3.5.26",
     "yaml": "^2.8.2"
   },
   "pnpm": {
