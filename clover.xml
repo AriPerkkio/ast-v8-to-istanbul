@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1766385013362" clover="3.2.0">
-  <project timestamp="1766385013363" name="All files">
+<coverage generated="1766385480971" clover="3.2.0">
+  <project timestamp="1766385480972" name="All files">
     <metrics statements="426" coveredstatements="417" conditionals="296" coveredconditionals="273" methods="58" coveredmethods="58" elements="780" coveredelements="748" complexity="0" loc="426" ncloc="426" packages="1" files="6" classes="6"/>
     <file name="ast.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/ast.ts">
       <metrics statements="104" coveredstatements="103" conditionals="96" coveredconditionals="95" methods="11" coveredmethods="11"/>
@@ -23,7 +23,7 @@
       <line num="154" count="383" type="stmt"/>
       <line num="157" count="2231" type="stmt"/>
       <line num="161" count="1322" type="cond" truecount="2" falsecount="0"/>
-      <line num="162" count="3" type="stmt"/>
+      <line num="162" count="6" type="stmt"/>
       <line num="165" count="1322" type="stmt"/>
       <line num="170" count="9547" type="stmt"/>
       <line num="173" count="319" type="stmt"/>
@@ -170,12 +170,12 @@
       <line num="24" count="996" type="stmt"/>
       <line num="25" count="996" type="stmt"/>
       <line num="27" count="996" type="stmt"/>
-      <line num="28" count="795327" type="cond" truecount="2" falsecount="0"/>
+      <line num="28" count="795351" type="cond" truecount="2" falsecount="0"/>
       <line num="36" count="279" type="stmt"/>
       <line num="37" count="279" type="cond" truecount="1" falsecount="1"/>
       <line num="38" count="279" type="stmt"/>
       <line num="40" count="279" type="stmt"/>
-      <line num="43" count="795327" type="cond" truecount="2" falsecount="0"/>
+      <line num="43" count="795351" type="cond" truecount="2" falsecount="0"/>
       <line num="47" count="7571" type="stmt"/>
       <line num="48" count="7571" type="stmt"/>
       <line num="58" count="7571" type="stmt"/>
@@ -185,7 +185,7 @@
       <line num="65" count="7547" type="cond" truecount="5" falsecount="0"/>
       <line num="66" count="295" type="stmt"/>
       <line num="67" count="295" type="stmt"/>
-      <line num="71" count="795303" type="stmt"/>
+      <line num="71" count="795327" type="stmt"/>
       <line num="74" count="972" type="stmt"/>
     </file>
     <file name="index.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/index.ts">
@@ -325,16 +325,16 @@
       <line num="52" count="210832" type="cond" truecount="2" falsecount="0"/>
       <line num="53" count="210832" type="cond" truecount="2" falsecount="0"/>
       <line num="55" count="210832" type="stmt"/>
-      <line num="56" count="396951366" type="cond" truecount="2" falsecount="0"/>
+      <line num="56" count="396951726" type="cond" truecount="2" falsecount="0"/>
       <line num="57" count="210832" type="stmt"/>
-      <line num="60" count="396740534" type="cond" truecount="2" falsecount="0"/>
+      <line num="60" count="396740894" type="cond" truecount="2" falsecount="0"/>
       <line num="61" count="1694244" type="stmt"/>
-      <line num="64" count="396740534" type="stmt"/>
-      <line num="66" count="396740534" type="cond" truecount="2" falsecount="0"/>
+      <line num="64" count="396740894" type="stmt"/>
+      <line num="66" count="396740894" type="cond" truecount="2" falsecount="0"/>
       <line num="67" count="12742673" type="stmt"/>
       <line num="68" count="12742673" type="stmt"/>
-      <line num="70" count="383997861" type="stmt"/>
-      <line num="73" count="396740534" type="stmt"/>
+      <line num="70" count="383998221" type="stmt"/>
+      <line num="73" count="396740894" type="stmt"/>
       <line num="76" count="0" type="stmt"/>
       <line num="80" count="105536" type="stmt"/>
       <line num="81" count="105536" type="stmt"/>
@@ -416,7 +416,7 @@
       <line num="14" count="12343" type="stmt"/>
       <line num="22" count="50316" type="stmt"/>
       <line num="23" count="50316" type="cond" truecount="2" falsecount="0"/>
-      <line num="25" count="36201" type="stmt"/>
+      <line num="25" count="36209" type="stmt"/>
       <line num="28" count="890" type="stmt"/>
       <line num="29" count="890" type="stmt"/>
       <line num="30" count="12343" type="cond" truecount="2" falsecount="0"/>
@@ -427,10 +427,10 @@
       <line num="41" count="890" type="stmt"/>
       <line num="43" count="890" type="stmt"/>
       <line num="45" count="890" type="stmt"/>
-      <line num="46" count="5303493" type="stmt"/>
-      <line num="47" count="5303493" type="cond" truecount="2" falsecount="0"/>
-      <line num="48" count="5303493" type="stmt"/>
-      <line num="50" count="5303493" type="cond" truecount="4" falsecount="0"/>
+      <line num="46" count="5303517" type="stmt"/>
+      <line num="47" count="5303517" type="cond" truecount="2" falsecount="0"/>
+      <line num="48" count="5303517" type="stmt"/>
+      <line num="50" count="5303517" type="cond" truecount="4" falsecount="0"/>
       <line num="51" count="23024" type="stmt"/>
       <line num="56" count="23024" type="stmt"/>
       <line num="60" count="890" type="stmt"/>
