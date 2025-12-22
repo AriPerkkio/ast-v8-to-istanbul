@@ -59,7 +59,7 @@ export async function setup(project: TestProject) {
       "utf8",
     );
 
-    const cache = new Date().getTime();
+    const cache = Date.now();
     const { v8, istanbul } = await collectCoverage(
       () =>
         Promise.all([
