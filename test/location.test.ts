@@ -102,3 +102,39 @@ function sum(a, b) {
   expect(locator.offsetToNeedle(start)).toEqual({ line: 2, column: 9 });
   expect(locator.offsetToNeedle(end)).toEqual({ line: 2, column: 12 });
 });
+
+test("getLoc returns mapped location for positions without end mapping", () => {
+  const code = `\
+export function isEven(a: number) {
+  return a % 2 === 0
+}
+
+export function isOdd(a: number) {
+  return !isEven(a)
+}
+`;
+  const map = {
+    version: 3 as const,
+    mappings:
+      "AAAA,OAAO,SAAS,OAAO,GAAW;AAChC,QAAO,IAAI,MAAM;;AAGnB,OAAO,SAAS,MAAM,GAAW;AAC/B,QAAO,CAAC,OAAO,EAAE",
+    sources: ["even.ts"],
+    names: [],
+  };
+
+  const locator = new Locator(code, new TraceMap(map), "");
+
+  expect(locator.getLoc({ start: 25, end: 50 })).toEqual({
+    start: {
+      filename: "even.ts",
+      line: 1,
+      column: 23,
+    },
+    end: {
+      source: "even.ts",
+      filename: "even.ts",
+      line: 2,
+      column: 19,
+      name: null,
+    },
+  });
+});

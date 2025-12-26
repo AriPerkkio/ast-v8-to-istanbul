@@ -7,6 +7,11 @@ settings:
 overrides:
   '@vitest/coverage-v8>ast-v8-to-istanbul': ./
 
+patchedDependencies:
+  istanbul-lib-source-maps:
+    hash: b951f25236a1145ea237e903b9fd0292a37cca73260959fe7b6bbfe7e61a7fcc
+    path: patches/istanbul-lib-source-maps.patch
+
 importers:
 
   .:
@@ -98,7 +103,7 @@ importers:
         version: 3.0.1
       istanbul-lib-source-maps:
         specifier: ^5.0.6
-        version: 5.0.6
+        version: 5.0.6(patch_hash=b951f25236a1145ea237e903b9fd0292a37cca73260959fe7b6bbfe7e61a7fcc)
       istanbul-reports:
         specifier: ^3.2.0
         version: 3.2.0
@@ -2963,7 +2968,7 @@ snapshots:
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-instrument: 6.0.3
       istanbul-lib-report: 3.0.1
-      istanbul-lib-source-maps: 5.0.6
+      istanbul-lib-source-maps: 5.0.6(patch_hash=b951f25236a1145ea237e903b9fd0292a37cca73260959fe7b6bbfe7e61a7fcc)
       istanbul-reports: 3.2.0
       magicast: 0.5.1
       obug: 2.1.1
@@ -2979,7 +2984,7 @@ snapshots:
       ast-v8-to-istanbul: 'link:'
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-report: 3.0.1
-      istanbul-lib-source-maps: 5.0.6
+      istanbul-lib-source-maps: 5.0.6(patch_hash=b951f25236a1145ea237e903b9fd0292a37cca73260959fe7b6bbfe7e61a7fcc)
       istanbul-reports: 3.2.0
       magicast: 0.5.1
       obug: 2.1.1
@@ -3623,7 +3628,7 @@ snapshots:
       make-dir: 4.0.0
       supports-color: 7.2.0
 
-  istanbul-lib-source-maps@5.0.6:
+  istanbul-lib-source-maps@5.0.6(patch_hash=b951f25236a1145ea237e903b9fd0292a37cca73260959fe7b6bbfe7e61a7fcc):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       debug: 4.4.0
