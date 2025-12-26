@@ -19,9 +19,9 @@ test("svelte for loop", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "0/0 (100%)",
-      "functions": "0/3 (0%)",
+      "functions": "0/4 (0%)",
       "lines": "0/3 (0%)",
-      "statements": "0/5 (0%)",
+      "statements": "0/6 (0%)",
     }
   `);
 

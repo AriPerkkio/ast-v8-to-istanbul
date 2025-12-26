@@ -91,15 +91,18 @@ export class Locator {
 
     let end = getPosition(endNeedle, this.#map);
 
-    // e.g. tsc that doesnt include } in source maps
     if (end === null) {
-      endNeedle.column++;
-      end = getPosition(endNeedle, this.#map);
-    }
-
-    if (end === null) {
+      // search the previous lines as the mapping was not found on the same line
+      // e.g. tsc that doesnt include } in source maps
+      for (
+        let line = endNeedle.line;
+        line >= startNeedle.line && end === null;
+        line--
+      ) {
+        end = getPosition({ line, column: Infinity }, this.#map);
+      }
       // Does not exist in source maps, e.g. generated code
-      return null;
+      if (end === null) return null;
     }
 
     const loc = { start, end };
