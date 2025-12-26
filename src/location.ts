@@ -94,8 +94,12 @@ export class Locator {
     if (end === null) {
       // search the previous lines as the mapping was not found on the same line
       // e.g. tsc that doesnt include } in source maps
-      for (let line = endNeedle.line; line > 0 && end === null; line--) {
-        end = getPosition({ line, column: Number.MAX_SAFE_INTEGER }, this.#map);
+      for (
+        let line = endNeedle.line;
+        line >= startNeedle.line && end === null;
+        line--
+      ) {
+        end = getPosition({ line, column: Infinity }, this.#map);
       }
       // Does not exist in source maps, e.g. generated code
       if (end === null) return null;
