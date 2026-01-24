@@ -35,9 +35,7 @@
 
 import type { TransformResult } from "vite";
 
-export function toVisualizer(
-  transformResult: Pick<TransformResult, "code" | "map">,
-) {
+export function toVisualizer(transformResult: Pick<TransformResult, "code" | "map">) {
   const code = transformResult.code;
   const map = JSON.stringify(transformResult.map);
   const encoder = new TextEncoder();
@@ -52,25 +50,14 @@ export function toVisualizer(
 
   // Combine the lengths and the data
   const combinedArray = new Uint8Array(
-    codeLengthArray.length +
-      1 +
-      codeArray.length +
-      mapLengthArray.length +
-      1 +
-      mapArray.length,
+    codeLengthArray.length + 1 + codeArray.length + mapLengthArray.length + 1 + mapArray.length,
   );
 
   combinedArray.set(codeLengthArray);
   combinedArray.set([0], codeLengthArray.length);
   combinedArray.set(codeArray, codeLengthArray.length + 1);
-  combinedArray.set(
-    mapLengthArray,
-    codeLengthArray.length + 1 + codeArray.length,
-  );
-  combinedArray.set(
-    [0],
-    codeLengthArray.length + 1 + codeArray.length + mapLengthArray.length,
-  );
+  combinedArray.set(mapLengthArray, codeLengthArray.length + 1 + codeArray.length);
+  combinedArray.set([0], codeLengthArray.length + 1 + codeArray.length + mapLengthArray.length);
   combinedArray.set(
     mapArray,
     codeLengthArray.length + 1 + codeArray.length + mapLengthArray.length + 1,

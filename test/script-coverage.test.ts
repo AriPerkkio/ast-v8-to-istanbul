@@ -102,11 +102,7 @@ test("getCount covered", () => {
 });
 
 test("getCount uncovered", () => {
-  expect(
-    getCount({ startOffset: 25, endOffset: 50 }, [
-      { start: 0, end: 100, count: 0 },
-    ]),
-  ).toBe(0);
+  expect(getCount({ startOffset: 25, endOffset: 50 }, [{ start: 0, end: 100, count: 0 }])).toBe(0);
 });
 
 test("overlapping ranges", () => {

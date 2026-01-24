@@ -28,10 +28,7 @@ export async function setup(project: TestProject) {
       force: true,
     });
     await mkdir(`${root}/fixtures/${directory}/dist`);
-    const { code, map } = await transform(
-      project,
-      `${root}/fixtures/${directory}`,
-    );
+    const { code, map } = await transform(project, `${root}/fixtures/${directory}`);
 
     const visualizer = toVisualizer({ code, map });
     const astExplorer = toAstExplorer({ code });
@@ -53,20 +50,14 @@ export async function setup(project: TestProject) {
       `${root}/fixtures/${directory}/dist/index.js`,
       { ...map, version: map.version.toString() },
     );
-    await writeFile(
-      `${root}/fixtures/${directory}/dist/instrumented.js`,
-      instrumented,
-      "utf8",
-    );
+    await writeFile(`${root}/fixtures/${directory}/dist/instrumented.js`, instrumented, "utf8");
 
     const cache = Date.now();
     const { v8, istanbul } = await collectCoverage(
       () =>
         Promise.all([
           import(`${root}/fixtures/${directory}/dist/index.js?cache=${cache}`),
-          import(
-            `${root}/fixtures/${directory}/dist/instrumented.js?cache=${cache}`
-          ),
+          import(`${root}/fixtures/${directory}/dist/instrumented.js?cache=${cache}`),
         ]),
       directory,
       instrumenter,
@@ -88,7 +79,7 @@ export async function setup(project: TestProject) {
 }
 
 async function collectCoverage(
-  method: () => unknown | Promise<unknown>,
+  method: () => Promise<unknown>,
   directory: string,
   instrumenter: Instrumenter,
 ): Promise<{ v8: Profiler.ScriptCoverage[]; istanbul: unknown }> {
@@ -128,9 +119,7 @@ async function collectCoverage(
       if (error) return reject(error);
 
       const filtered = data.result.filter(
-        (entry) =>
-          entry.url.includes("test/fixtures") &&
-          entry.url.includes("/dist/index.js"),
+        (entry) => entry.url.includes("test/fixtures") && entry.url.includes("/dist/index.js"),
       );
 
       resolve({
@@ -156,6 +145,7 @@ async function transform(project: TestProject, directory: string) {
     throw new Error(`Failed to transform ${directory}`);
   }
 
+  // oxlint-disable-next-line no-eval -- intentional
   const { code, map } = eval(result.code);
 
   await writeFile(`${directory}/dist/index.js`, code);

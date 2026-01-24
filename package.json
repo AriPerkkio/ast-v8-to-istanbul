@@ -2,21 +2,20 @@
   "name": "ast-v8-to-istanbul",
   "version": "0.3.10",
   "description": "AST-aware v8-to-istanbul",
-  "author": "Ari Perkkiö <ari.perkkio@gmail.com>",
-  "license": "MIT",
-  "type": "module",
-  "exports": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "packageManager": "pnpm@10.28.1",
   "homepage": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
   "bugs": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
+  "license": "MIT",
+  "author": "Ari Perkkiö <ari.perkkio@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AriPerkkio/ast-v8-to-istanbul.git"
   },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": "./dist/index.mjs",
   "scripts": {
     "dev": "tsdown --watch --sourcemap",
     "build": "tsdown",
@@ -68,6 +67,7 @@
     "vue": "^3.5.27",
     "yaml": "^2.8.2"
   },
+  "packageManager": "pnpm@10.28.1",
   "pnpm": {
     "overrides": {
       "@vitest/coverage-v8>ast-v8-to-istanbul": "./"

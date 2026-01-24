@@ -1,8 +1,4 @@
-import {
-  type CoverageSummary,
-  type CoverageMap,
-  type FileCoverage,
-} from "istanbul-lib-coverage";
+import { type CoverageSummary, type CoverageMap, type FileCoverage } from "istanbul-lib-coverage";
 import { expect } from "vitest";
 
 import "./expect-extend";
@@ -10,41 +6,21 @@ import "./expect-extend";
 expect.addSnapshotSerializer({
   test: (val) => val?.constructor?.name === "CoverageMap",
   serialize: (val: CoverageMap, config, indentation, depth, refs, printer) => {
-    return printer(
-      formatSummary(val.getCoverageSummary()),
-      config,
-      indentation,
-      depth,
-      refs,
-    );
+    return printer(formatSummary(val.getCoverageSummary()), config, indentation, depth, refs);
   },
 });
 
 expect.addSnapshotSerializer({
   test: (val) => val?.constructor?.name === "FileCoverage",
   serialize: (val: FileCoverage, config, indentation, depth, refs, printer) => {
-    return printer(
-      formatSummary(val.toSummary()),
-      config,
-      indentation,
-      depth,
-      refs,
-    );
+    return printer(formatSummary(val.toSummary()), config, indentation, depth, refs);
   },
 });
 
 expect.addSnapshotSerializer({
   test: (val) =>
-    Array.isArray(val) &&
-    val.every((entry) => entry?.constructor.name === "FileCoverage"),
-  serialize: (
-    val: FileCoverage[],
-    config,
-    indentation,
-    depth,
-    refs,
-    printer,
-  ) => {
+    Array.isArray(val) && val.every((entry) => entry?.constructor.name === "FileCoverage"),
+  serialize: (val: FileCoverage[], config, indentation, depth, refs, printer) => {
     const summary = val.reduce(
       (all, current) => ({
         ...all,
@@ -71,9 +47,7 @@ expect.addSnapshotSerializer({
     printer,
   ) => {
     const lineNumbers = Object.keys(val.lines).map((l) => parseInt(l));
-    const linesToCover = val.code
-      .split("\n")
-      .filter((_, index) => lineNumbers.includes(1 + index));
+    const linesToCover = val.code.split("\n").filter((_, index) => lineNumbers.includes(1 + index));
 
     return printer(linesToCover, config, indentation, depth, refs);
   },

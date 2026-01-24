@@ -3,10 +3,7 @@ import type { FileCoverage } from "istanbul-lib-coverage";
 
 interface CoverageMatchers<R = unknown> {
   /** Compare `FileCoverage['fnMap']` */
-  toMatchFunctions: (
-    actual: FileCoverage["fnMap"],
-    options?: { ignoreDeclEnd?: boolean },
-  ) => R;
+  toMatchFunctions: (actual: FileCoverage["fnMap"], options?: { ignoreDeclEnd?: boolean }) => R;
 
   /** Compare `FileCoverage['statementMap']` */
   toMatchStatements: (actual: FileCoverage["statementMap"]) => R;

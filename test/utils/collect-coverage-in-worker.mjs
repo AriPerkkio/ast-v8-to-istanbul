@@ -40,9 +40,7 @@ async function collectCoverage(method, filename) {
     session.post("Profiler.takePreciseCoverage", (error, data) => {
       if (error) return reject(error);
 
-      const filtered = data.result.filter((entry) =>
-        entry.url.includes(filename),
-      );
+      const filtered = data.result.filter((entry) => entry.url.includes(filename));
 
       if (filtered.length !== 1) {
         reject(new Error(`Expected 1 entry, got ${filtered.length}`));

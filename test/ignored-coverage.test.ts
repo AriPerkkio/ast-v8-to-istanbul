@@ -62,8 +62,7 @@ test("ignore start stop", async ({ actual, __fixture }) => {
     }
   `);
 
-  expect({ code: __fixture.sources, lines: actual.getLineCoverage() })
-    .toMatchInlineSnapshot(`
+  expect({ code: __fixture.sources, lines: actual.getLineCoverage() }).toMatchInlineSnapshot(`
     [
       "  return "uncovered";",
       "  return "covered";",

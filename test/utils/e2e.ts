@@ -13,11 +13,7 @@ export const e2e = test.extend<{
   report: (coverage: libCoverage.CoverageMapData) => void;
 }>({
   fixture: async ({}, use) => {
-    const filename = expect
-      .getState()
-      .currentTestName!.replace(/ /g, "-")
-      .split(">-")
-      .pop()!;
+    const filename = expect.getState().currentTestName!.replace(/ /g, "-").split(">-").pop()!;
 
     const functions = await getFunctions(filename);
     const { code, map } = await transform(filename);
@@ -32,9 +28,7 @@ export const e2e = test.extend<{
   },
   report: async ({}, use) => {
     await use((coverage) => {
-      const summary = libCoverage
-        .createCoverageMap(coverage)
-        .getCoverageSummary();
+      const summary = libCoverage.createCoverageMap(coverage).getCoverageSummary();
 
       console.log(summary);
     });
@@ -57,9 +51,7 @@ async function transform(filename: string) {
     },
   });
   const code = transformResult.outputText;
-  const map = JSON.parse(
-    transformResult.sourceMapText || "{}",
-  ) as EncodedSourceMap;
+  const map = JSON.parse(transformResult.sourceMapText || "{}") as EncodedSourceMap;
 
   return { code, map };
 }
@@ -70,9 +62,6 @@ async function getFunctions(filename: string) {
   }
 
   return JSON.parse(
-    await readFile(
-      resolve(import.meta.dirname, "../fixtures", "e2e", "functions.json"),
-      "utf8",
-    ),
+    await readFile(resolve(import.meta.dirname, "../fixtures", "e2e", "functions.json"), "utf8"),
   );
 }

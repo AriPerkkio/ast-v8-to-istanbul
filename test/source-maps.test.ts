@@ -258,9 +258,7 @@ test("inline source map as base64", async () => {
 test("inline source map as filename", async () => {
   const uuid = randomUUID();
   const filename = normalize(resolve(import.meta.dirname, `file-${uuid}.ts`));
-  const mapName = normalize(
-    resolve(import.meta.dirname, `file-${uuid}.js.map`),
-  );
+  const mapName = normalize(resolve(import.meta.dirname, `file-${uuid}.js.map`));
 
   const s = new MagicString(`\
     export function covered() {

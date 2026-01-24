@@ -8,8 +8,7 @@ export interface IgnoreHint {
 const IGNORE_PATTERN =
   /^\s*(?:istanbul|[cv]8|node:coverage)\s+ignore\s+(if|else|next|file)(?=\W|$)/;
 
-const IGNORE_LINES_PATTERN =
-  /\s*(?:istanbul|[cv]8|node:coverage)\s+ignore\s+(start|stop)(?=\W|$)/;
+const IGNORE_LINES_PATTERN = /\s*(?:istanbul|[cv]8|node:coverage)\s+ignore\s+(start|stop)(?=\W|$)/;
 
 const EOL_PATTERN = /\r?\n/g;
 
@@ -40,10 +39,7 @@ export function getIgnoreHints(code: string): IgnoreHint[] {
       previousTokenWasIgnoreHint = false;
     }
 
-    if (
-      token.type === "SingleLineComment" ||
-      token.type === "MultiLineComment"
-    ) {
+    if (token.type === "SingleLineComment" || token.type === "MultiLineComment") {
       const loc = { start: current, end: current + token.value.length };
       const comment = token.value
         // Start of multiline comment
