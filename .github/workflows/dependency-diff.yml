@@ -17,3 +17,5 @@ jobs:
 
       - name: Create Diff
         uses: e18e/action-dependency-diff@v1
+        with:
+          duplicate-threshold: 99999
