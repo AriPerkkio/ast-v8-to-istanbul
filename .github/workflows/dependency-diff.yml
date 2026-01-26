@@ -18,4 +18,5 @@ jobs:
       - name: Create Diff
         uses: e18e/action-dependency-diff@v1
         with:
+          # Set to high value to avoid duplicate package reports
           duplicate-threshold: 99999
