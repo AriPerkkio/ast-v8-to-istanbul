@@ -7,5 +7,7 @@ export default defineConfig({
   tsconfig: "./tsconfig.json",
   target: "esnext",
   clean: true,
+
   dts: true,
+  inlineOnly: ["@types/estree"],
 });
