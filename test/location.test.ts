@@ -65,11 +65,7 @@ function sum(a, b) {
   return a + b;
 }
   `;
-  const locator = new Locator(
-    code,
-    new TraceMap(createEmptySourceMap("example.js", code)),
-    "",
-  );
+  const locator = new Locator(code, new TraceMap(createEmptySourceMap("example.js", code)), "");
 
   expect({
     start: locator.offsetToNeedle(58),
@@ -90,11 +86,7 @@ function sum(a, b) {
     .split("\n")
     .join("\r\n");
 
-  const locator = new Locator(
-    code,
-    new TraceMap(createEmptySourceMap("example.js", code)),
-    "",
-  );
+  const locator = new Locator(code, new TraceMap(createEmptySourceMap("example.js", code)), "");
 
   const start = code.indexOf("sum");
   const end = start + "sum".length;

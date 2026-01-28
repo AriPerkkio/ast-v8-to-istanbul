@@ -40,9 +40,7 @@ const suites = await Promise.all(
     .filter((file) => file.endsWith(".yaml"))
     .map(async (suite) => {
       const content = await readFile(`${directory}/${suite}`, "utf8");
-      const parsed: TestCase[] = yaml
-        .parseAllDocuments(content)
-        .map((doc) => doc.toJSON());
+      const parsed: TestCase[] = yaml.parseAllDocuments(content).map((doc) => doc.toJSON());
 
       parsed.forEach(({ tests }) => {
         tests.forEach((t) => {
@@ -99,9 +97,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
 
       const coverageMap = createCoverageMap(data);
       const isEmpty = coverageMap.files().length === 0;
-      const fileCoverage = isEmpty
-        ? ({} as FileCoverage)
-        : coverageMap.fileCoverageFor(fullname);
+      const fileCoverage = isEmpty ? ({} as FileCoverage) : coverageMap.fileCoverageFor(fullname);
 
       if (expected.statements) {
         expect.soft(fileCoverage.s, message).toEqual(expected.statements);
@@ -113,9 +109,7 @@ describe.each(suites)("$suite", async ({ tests }) => {
         expect.soft(fileCoverage.b, message).toEqual(expected.brances);
       }
       if (expected.lines) {
-        expect
-          .soft(fileCoverage.getLineCoverage(), message)
-          .toEqual(expected.lines);
+        expect.soft(fileCoverage.getLineCoverage(), message).toEqual(expected.lines);
       }
     });
   });

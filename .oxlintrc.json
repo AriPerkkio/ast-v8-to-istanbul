@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "import"],
+  "rules": {
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "unicorn/prefer-node-protocol": "error",
+    "import/no-duplicates": "error",
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "inline-type-imports"
+      }
+    ],
+    "no-empty-pattern": "off",
+    "typescript/no-explicit-any": "off",
+    "typescript/ban-ts-comment": "off"
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "test/fixtures/**",
+    "coverage/**",
+    "fixture-coverage/**",
+    "istanbul-coverage/**",
+    "ignore-examples/**",
+    "node_modules/**"
+  ]
+}

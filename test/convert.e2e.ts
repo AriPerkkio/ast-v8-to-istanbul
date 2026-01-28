@@ -5,7 +5,7 @@ import { e2e } from "./utils/e2e";
 
 e2e("checker.ts", async ({ fixture, annotate }) => {
   const { result, duration } = await timer(() => convert(fixture));
-  annotate(`checker.ts converted in ${duration}`);
+  await annotate(`checker.ts converted in ${duration}`);
 
   const fileCoverage = getFileCoverage(result);
   expect(fileCoverage).toMatchInlineSnapshot(`
@@ -20,7 +20,7 @@ e2e("checker.ts", async ({ fixture, annotate }) => {
 
 e2e("functions.ts", async ({ fixture, annotate }) => {
   const { result, duration } = await timer(() => convert(fixture));
-  annotate(`functions.ts converted in ${duration}`);
+  await annotate(`functions.ts converted in ${duration}`);
 
   const fileCoverage = getFileCoverage(result);
   expect(fileCoverage).toMatchInlineSnapshot(`
@@ -35,7 +35,7 @@ e2e("functions.ts", async ({ fixture, annotate }) => {
 
 e2e("vitest-cli-api-bundled.js", async ({ fixture, annotate }) => {
   const { result, duration } = await timer(() => convert(fixture));
-  annotate(`vitest-cli-api-bundled.js converted in ${duration}`);
+  await annotate(`vitest-cli-api-bundled.js converted in ${duration}`);
 
   const fileCoverage = getFileCoverage(result);
   expect(fileCoverage).toMatchInlineSnapshot(`

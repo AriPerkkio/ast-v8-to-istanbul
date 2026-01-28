@@ -13,9 +13,7 @@ export function toAstExplorer(opts: {
   const serialized = JSON.stringify({
     c: opts.code,
     p: opts.parser || "acorn",
-    o: JSON.stringify(
-      opts.options || { ecmaVersion: "latest", sourceType: "module" },
-    ),
+    o: JSON.stringify(opts.options || { ecmaVersion: "latest", sourceType: "module" }),
   });
 
   return `https://ast-explorer.dev/#${btoa(serialized)}`;

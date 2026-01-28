@@ -66,8 +66,7 @@ test("ignoreSourceCode is called with each covered part", async () => {
       part.code
         .split("\n")
         .map(
-          (line, index) =>
-            `${(index + part.location.start.line).toString().padStart(2)} | ${line}`,
+          (line, index) => `${(index + part.location.start.line).toString().padStart(2)} | ${line}`,
         )
         .join("\n"),
   );
@@ -107,11 +106,7 @@ test("ignoreSourceCode can exclude", async () => {
     sourceMap,
     ignoreSourceCode: (code, type) => {
       // Ignore import statement
-      if (
-        code.includes("import ") &&
-        code.includes(" from ") &&
-        type === "statement"
-      ) {
+      if (code.includes("import ") && code.includes(" from ") && type === "statement") {
         return true;
       }
 
@@ -123,8 +118,7 @@ test("ignoreSourceCode can exclude", async () => {
   const coverageMap = createCoverageMap(data);
   const fileCoverage = coverageMap.fileCoverageFor(coverageMap.files()[0]);
 
-  expect({ code: sourceCode, lines: fileCoverage.getLineCoverage() })
-    .toMatchInlineSnapshot(`
+  expect({ code: sourceCode, lines: fileCoverage.getLineCoverage() }).toMatchInlineSnapshot(`
     [
       "  return a + b;",
       "  multiply(2, 3);",

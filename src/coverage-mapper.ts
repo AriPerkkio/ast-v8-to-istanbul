@@ -82,10 +82,7 @@ export class CoverageMapper<T = Node> {
 
     if (this.ignoreSourceCode) {
       const current = this.locator.getLoc(node) || loc;
-      const sources = this.locator.getSourceLines(
-        current,
-        this.#getSourceFilename(current),
-      );
+      const sources = this.locator.getSourceLines(current, this.#getSourceFilename(current));
 
       if (
         sources != null &&
@@ -126,10 +123,7 @@ export class CoverageMapper<T = Node> {
 
     if (this.ignoreSourceCode) {
       const current = (parent && this.locator.getLoc(parent)) || loc;
-      const sources = this.locator.getSourceLines(
-        current,
-        this.#getSourceFilename(current),
-      );
+      const sources = this.locator.getSourceLines(current, this.#getSourceFilename(current));
 
       if (
         sources != null &&
@@ -210,10 +204,7 @@ export class CoverageMapper<T = Node> {
     }
 
     if (this.ignoreSourceCode) {
-      const sources = this.locator.getSourceLines(
-        loc,
-        this.#getSourceFilename(loc),
-      );
+      const sources = this.locator.getSourceLines(loc, this.#getSourceFilename(loc));
 
       if (
         sources != null &&
@@ -248,9 +239,7 @@ export class CoverageMapper<T = Node> {
     const sourceFilename = position.start.filename || position.end.filename;
 
     if (!sourceFilename) {
-      throw new Error(
-        `Missing original filename for ${JSON.stringify(position, null, 2)}`,
-      );
+      throw new Error(`Missing original filename for ${JSON.stringify(position, null, 2)}`);
     }
 
     if (sourceFilename.startsWith("file://")) {

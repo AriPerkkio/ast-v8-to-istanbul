@@ -84,19 +84,13 @@ interface Visitors {
   onClassBody: (node: ClassBody | BabelClassBody) => void;
 
   // Branches
-  onIfStatement: (
-    node: IfStatement,
-    branches: (Node | null | undefined)[],
-  ) => void;
+  onIfStatement: (node: IfStatement, branches: (Node | null | undefined)[]) => void;
   onSwitchStatement: (node: SwitchStatement, cases: SwitchCase[]) => void;
   onConditionalExpression: (
     node: ConditionalExpression,
     branches: (Node | null | undefined)[],
   ) => void;
-  onLogicalExpression: (
-    node: LogicalExpression,
-    branches: (Node | null | undefined)[],
-  ) => void;
+  onLogicalExpression: (node: LogicalExpression, branches: (Node | null | undefined)[]) => void;
   onAssignmentPattern: (node: AssignmentPattern) => void;
 }
 export type FunctionNodes = Parameters<
@@ -216,12 +210,8 @@ export function getWalker() {
 
             if (ignoreClassMethods) {
               for (const child of classBody.body) {
-                if (
-                  child.type === "MethodDefinition" ||
-                  child.type === "ClassMethod"
-                ) {
-                  const name =
-                    child.key.type === "Identifier" && child.key.name;
+                if (child.type === "MethodDefinition" || child.type === "ClassMethod") {
+                  const name = child.key.type === "Identifier" && child.key.name;
 
                   if (name && ignoreClassMethods.includes(name)) {
                     setSkipped(child);

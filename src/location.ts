@@ -44,8 +44,7 @@ export class Locator {
   }
 
   offsetToNeedle(offset: number): Needle {
-    const closestThreshold =
-      Math.floor(offset / CACHE_THRESHOLD) * CACHE_THRESHOLD;
+    const closestThreshold = Math.floor(offset / CACHE_THRESHOLD) * CACHE_THRESHOLD;
     const cacheHit = this.#cache.get(closestThreshold);
 
     let current = cacheHit ? closestThreshold : 0;
@@ -94,11 +93,7 @@ export class Locator {
     if (end === null) {
       // search the previous lines as the mapping was not found on the same line
       // e.g. tsc that doesnt include } in source maps
-      for (
-        let line = endNeedle.line;
-        line >= startNeedle.line && end === null;
-        line--
-      ) {
+      for (let line = endNeedle.line; line >= startNeedle.line && end === null; line--) {
         end = getPosition({ line, column: Infinity }, this.#map);
       }
       // Does not exist in source maps, e.g. generated code
@@ -148,8 +143,7 @@ export class Locator {
 
   getSourceLines(loc: { start: Needle; end: Needle }, filename: string) {
     const index = this.#map.resolvedSources.findIndex(
-      (source) =>
-        source === filename || resolve(this.#directory, source) === filename,
+      (source) => source === filename || resolve(this.#directory, source) === filename,
     );
     const sourcesContent = this.#map.sourcesContent?.[index];
 
@@ -157,9 +151,7 @@ export class Locator {
       return null;
     }
 
-    const lines = sourcesContent
-      .split("\n")
-      .slice(loc.start.line - 1, loc.end.line);
+    const lines = sourcesContent.split("\n").slice(loc.start.line - 1, loc.end.line);
 
     lines[0] = lines[0].slice(loc.start.column);
 
@@ -192,10 +184,7 @@ function getPosition(needle: Needle, map: TraceMap) {
   };
 }
 
-export function createEmptySourceMap(
-  filename: string,
-  code: string,
-): DecodedSourceMap {
+export function createEmptySourceMap(filename: string, code: string): DecodedSourceMap {
   const mappings: SourceMapSegment[][] = [];
 
   // Identical mappings as "magic-string"'s { hires: "boundary" }

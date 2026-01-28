@@ -39,9 +39,7 @@ export function hello() {
   return "Hello /* looks like comment but isn't */"
 }`;
 
-    expect(getIgnoreHints(code)).toStrictEqual([
-      { loc: { start: 0, end: 44 }, type: "next" },
-    ]);
+    expect(getIgnoreHints(code)).toStrictEqual([{ loc: { start: 0, end: 44 }, type: "next" }]);
   });
 
   test("ignore if comment", () => {
@@ -52,9 +50,7 @@ if(window) {
 }
 `;
 
-    expect(getIgnoreHints(code)).toStrictEqual([
-      { loc: { start: 0, end: 42 }, type: "if" },
-    ]);
+    expect(getIgnoreHints(code)).toStrictEqual([{ loc: { start: 0, end: 42 }, type: "if" }]);
   });
 
   test("ignore else comment", () => {
@@ -65,9 +61,7 @@ if(window) {
 }
 `;
 
-    expect(getIgnoreHints(code)).toStrictEqual([
-      { loc: { start: 0, end: 44 }, type: "else" },
-    ]);
+    expect(getIgnoreHints(code)).toStrictEqual([{ loc: { start: 0, end: 44 }, type: "else" }]);
   });
 
   test("ignore file comment", () => {
@@ -80,9 +74,7 @@ if(window) {
     // ignore this comment
     `;
 
-    expect(getIgnoreHints(code)).toStrictEqual([
-      { loc: { end: 0, start: 0 }, type: "file" },
-    ]);
+    expect(getIgnoreHints(code)).toStrictEqual([{ loc: { end: 0, start: 0 }, type: "file" }]);
   });
 
   test("ignore start and stop", () => {

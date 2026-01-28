@@ -38,9 +38,7 @@ function toMatchFunctions(
         !fnActual.name.startsWith("(anonymous_") &&
         !fnExpected.name.startsWith("(anonymous_")
       ) {
-        mismatches.push(
-          `Name did not match: ${fnActual.name} !== ${fnExpected.name}`,
-        );
+        mismatches.push(`Name did not match: ${fnActual.name} !== ${fnExpected.name}`);
       }
     }
 
@@ -120,9 +118,7 @@ function toMatchBranches(
     }
 
     if (branchActual.type !== branchExpected.type) {
-      mismatches.push(
-        `Type did not match: ${branchActual.type} !== ${branchExpected.type}`,
-      );
+      mismatches.push(`Type did not match: ${branchActual.type} !== ${branchExpected.type}`);
     }
 
     const locDiff = rangeDiff(branchActual.loc, branchExpected.loc);
@@ -160,20 +156,12 @@ function rangeDiff(a: Partial<Range>, b: Partial<Range>) {
   }
 
   if (a.start?.line !== b.start?.line || a.start?.column !== b.start?.column) {
-    diff.push(
-      `  actual:   [start.line: ${a.start?.line}, start.col: ${a.start?.column}`,
-    );
-    diff.push(
-      `  expected: [start.line: ${b.start?.line}, start.col: ${b.start?.column}`,
-    );
+    diff.push(`  actual:   [start.line: ${a.start?.line}, start.col: ${a.start?.column}`);
+    diff.push(`  expected: [start.line: ${b.start?.line}, start.col: ${b.start?.column}`);
   }
   if (a.end?.line !== b.end?.line || a.end?.column !== b.end?.column) {
-    diff.push(
-      `  actual:   [end.line: ${a.end?.line}, end.col: ${a.end?.column}`,
-    );
-    diff.push(
-      `  expected: [end.line: ${b.end?.line}, end.col: ${b.end?.column}`,
-    );
+    diff.push(`  actual:   [end.line: ${a.end?.line}, end.col: ${a.end?.column}`);
+    diff.push(`  expected: [end.line: ${b.end?.line}, end.col: ${b.end?.column}`);
   }
 
   return diff;

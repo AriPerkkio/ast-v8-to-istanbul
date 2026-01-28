@@ -21,16 +21,10 @@ import { expect } from "vitest";
 export { test } from "./test";
 
 // env variable controlled by test config. Defaults to Vite.
-const PARSER = (process.env.TEST_PARSER ?? "vite") as
-  | "vite"
-  | "acorn"
-  | "oxc-parser"
-  | "babel";
+const PARSER = (process.env.TEST_PARSER ?? "vite") as "vite" | "acorn" | "oxc-parser" | "babel";
 
 export async function readFixture(filename: string) {
-  const root = fileURLToPath(
-    new URL(`../fixtures/${filename}`, import.meta.url),
-  );
+  const root = fileURLToPath(new URL(`../fixtures/${filename}`, import.meta.url));
 
   const files = await readdir(root);
   const sourceFilename = files.find((file) => file.includes("sources"))!;
@@ -57,9 +51,7 @@ export function normalizeMap(coverageMap: CoverageMap) {
   const normalized: Record<string, FileCoverageData> = {};
 
   for (const filename of coverageMap.files()) {
-    const coverage = copy(
-      coverageMap.fileCoverageFor(filename).toJSON(),
-    ) as FileCoverageData;
+    const coverage = copy(coverageMap.fileCoverageFor(filename).toJSON()) as FileCoverageData;
 
     coverage.path = normalizeFilename(coverage.path);
 
@@ -75,10 +67,7 @@ function normalizeFilename(filename: string) {
     .replace(normalize(resolve(process.cwd(), "../../")), "<project-root>");
 }
 
-export function generateReports(
-  coverageMap: CoverageMap,
-  dir = "./fixture-coverage",
-) {
+export function generateReports(coverageMap: CoverageMap, dir = "./fixture-coverage") {
   const context = libReport.createContext({
     dir,
     coverageMap,
@@ -99,9 +88,7 @@ export function assertCoverage(actual: FileCoverage, expected: FileCoverage) {
     expect(actual.statementMap).toMatchStatements(expected.statementMap);
     expect(actual.s, "Statements did not match").toEqual(expected.s);
 
-    expect(actual.getLineCoverage(), "Lines did not match").toEqual(
-      expected.getLineCoverage(),
-    );
+    expect(actual.getLineCoverage(), "Lines did not match").toEqual(expected.getLineCoverage());
   } catch (error) {
     Error.captureStackTrace(error as Error, assertCoverage);
     throw error;
@@ -117,8 +104,7 @@ export async function parse(code: string): Promise<Node> {
   }
 
   if (PARSER === "oxc-parser") {
-    return oxcParser("example.js", code, { sourceType: "module" })
-      .program as Node;
+    return oxcParser("example.js", code, { sourceType: "module" }).program as Node;
   }
 
   if (PARSER === "babel") {
@@ -129,12 +115,8 @@ export async function parse(code: string): Promise<Node> {
 }
 
 function copy(obj: object) {
-  const string = JSON.stringify(obj, (_, value) =>
-    value === Infinity ? "__Infinity__" : value,
-  );
-  const json = JSON.parse(string, (_, value) =>
-    value === "__Infinity__" ? Infinity : value,
-  );
+  const string = JSON.stringify(obj, (_, value) => (value === Infinity ? "__Infinity__" : value));
+  const json = JSON.parse(string, (_, value) => (value === "__Infinity__" ? Infinity : value));
 
   return json;
 }

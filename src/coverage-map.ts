@@ -7,12 +7,7 @@ import {
 } from "istanbul-lib-coverage";
 
 // https://github.com/istanbuljs/istanbuljs/blob/main/docs/raw-output.md#branch-types
-export type Branch =
-  | "if"
-  | "binary-expr"
-  | "cond-expr"
-  | "switch"
-  | "default-arg";
+export type Branch = "if" | "binary-expr" | "cond-expr" | "switch" | "default-arg";
 
 export type CoverageMapData = IstanbulCoverageMapData & {
   [key: string]: FileCoverageData;

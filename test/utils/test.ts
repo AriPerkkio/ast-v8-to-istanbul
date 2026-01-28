@@ -1,8 +1,4 @@
-import {
-  type CoverageMap,
-  createCoverageMap,
-  type FileCoverage,
-} from "istanbul-lib-coverage";
+import { type CoverageMap, createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
 import libSourceMaps from "istanbul-lib-source-maps";
 import { expect, test as base } from "vitest";
 
@@ -27,9 +23,7 @@ export const test = base.extend<{
     const normalized = normalizeMap(coverageMap);
 
     const isEmpty = normalized.files().length === 0;
-    const actual = isEmpty
-      ? ({} as any)
-      : normalized.fileCoverageFor(normalized.files()[0]);
+    const actual = isEmpty ? ({} as any) : normalized.fileCoverageFor(normalized.files()[0]);
 
     await use(actual);
   },
@@ -52,11 +46,7 @@ export const test = base.extend<{
   },
 
   __fixture: async ({}, use) => {
-    const name = expect
-      .getState()
-      .currentTestName!.replace(/ /g, "-")
-      .split(">-")
-      .pop()!;
+    const name = expect.getState().currentTestName!.replace(/ /g, "-").split(">-").pop()!;
 
     return use({ name, ...(await readFixture(name)) });
   },

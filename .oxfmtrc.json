@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+
+  // TODO: Is there way to make oxlint run oxfmt, so that there's no need to duplicate this option?
+  "ignorePatterns": [
+    "dist/**",
+    "test/fixtures/**",
+    "test/istanbul-references/**",
+    "**/__snapshots__/**",
+    "README.md",
+    "coverage/**",
+    "fixture-coverage/**",
+    "istanbul-coverage/**",
+    "ignore-examples/**",
+    "node_modules/**"
+  ]
+}

@@ -12,10 +12,9 @@ export { convert, Options };
  * Maps V8 `ScriptCoverage` to Istanbul's `CoverageMap`.
  * Results are identical with `istanbul-lib-instrument`.
  */
-export default async function convert<
-  T = Node,
-  Program = T & { type: "Program" },
->(options: Options<T, Program>): Promise<CoverageMapData> {
+export default async function convert<T = Node, Program = T & { type: "Program" }>(
+  options: Options<T, Program>,
+): Promise<CoverageMapData> {
   const ignoreHints = getIgnoreHints(options.code);
 
   // File ignore contains always only 1 entry
@@ -24,10 +23,7 @@ export default async function convert<
   }
 
   const walker = getWalker();
-  const mapper = await CoverageMapper.create<T, Program>(
-    options,
-    walker.onIgnore,
-  );
+  const mapper = await CoverageMapper.create<T, Program>(options, walker.onIgnore);
   const ast = await options.ast;
 
   await walker.walk(ast, ignoreHints, options.ignoreClassMethods, {
@@ -140,10 +136,7 @@ export default async function convert<
     onWithStatement: (node) => mapper.onStatement(node),
     onLabeledStatement: (node) => mapper.onStatement(node),
     onExpressionStatement(node) {
-      if (
-        node.expression.type === "Literal" &&
-        node.expression.value === "use strict"
-      ) {
+      if (node.expression.type === "Literal" && node.expression.value === "use strict") {
         return;
       }
 
