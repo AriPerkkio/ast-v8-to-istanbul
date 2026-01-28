@@ -328,18 +328,7 @@
 <a name='L263'></a><a href='#L263'>263</a>
 <a name='L264'></a><a href='#L264'>264</a>
 <a name='L265'></a><a href='#L265'>265</a>
-<a name='L266'></a><a href='#L266'>266</a>
-<a name='L267'></a><a href='#L267'>267</a>
-<a name='L268'></a><a href='#L268'>268</a>
-<a name='L269'></a><a href='#L269'>269</a>
-<a name='L270'></a><a href='#L270'>270</a>
-<a name='L271'></a><a href='#L271'>271</a>
-<a name='L272'></a><a href='#L272'>272</a>
-<a name='L273'></a><a href='#L273'>273</a>
-<a name='L274'></a><a href='#L274'>274</a>
-<a name='L275'></a><a href='#L275'>275</a>
-<a name='L276'></a><a href='#L276'>276</a>
-<a name='L277'></a><a href='#L277'>277</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L266'></a><a href='#L266'>266</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -425,9 +414,6 @@
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -468,9 +454,6 @@
 <span class="cline-any cline-yes">41307x</span>
 <span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-yes">32x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -553,9 +536,6 @@
 <span class="cline-any cline-yes">20209x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -590,8 +570,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">67068x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">67068x</span>
@@ -699,10 +677,7 @@ export class CoverageMapper&lt;T = Node&gt; {
 &nbsp;
     if (this.ignoreSourceCode) {
       const current = this.locator.getLoc(node) || <span class="branch-1 cbranch-no" title="branch not covered" >loc;</span>
-      const sources = this.locator.getSourceLines(
-        current,
-        this.#getSourceFilename(current),
-      );
+      const sources = this.locator.getSourceLines(current, this.#getSourceFilename(current));
 &nbsp;
       if (
         sources != null &amp;&amp;
@@ -743,10 +718,7 @@ export class CoverageMapper&lt;T = Node&gt; {
 &nbsp;
     if (this.ignoreSourceCode) {
       const current = (parent &amp;&amp; this.locator.getLoc(parent)) || loc;
-      const sources = this.locator.getSourceLines(
-        current,
-        this.#getSourceFilename(current),
-      );
+      const sources = this.locator.getSourceLines(current, this.#getSourceFilename(current));
 &nbsp;
       if (
         sources != null &amp;&amp;
@@ -827,10 +799,7 @@ export class CoverageMapper&lt;T = Node&gt; {
     }
 &nbsp;
     <span class="missing-if-branch" title="if path not taken" >I</span>if (this.ignoreSourceCode) {
-      const sources = <span class="cstat-no" title="statement not covered" >this.locator.getSourceLines(</span>
-        loc,
-        this.#getSourceFilename(loc),
-      );
+      const sources = <span class="cstat-no" title="statement not covered" >this.locator.getSourceLines(loc, this.#getSourceFilename(loc));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (</span>
         sources != null &amp;&amp;
@@ -865,9 +834,7 @@ export class CoverageMapper&lt;T = Node&gt; {
     const sourceFilename = position.start.filename || <span class="branch-1 cbranch-no" title="branch not covered" >position.end.filename;</span>
 &nbsp;
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!sourceFilename) {
-<span class="cstat-no" title="statement not covered" >      throw new Error(</span>
-        `Missing original filename for ${JSON.stringify(position, null, 2)}`,
-      );
+<span class="cstat-no" title="statement not covered" >      throw new Error(`Missing original filename for ${JSON.stringify(position, null, 2)}`);</span>
     }
 &nbsp;
     if (sourceFilename.startsWith("file://")) {
@@ -898,7 +865,7 @@ export class CoverageMapper&lt;T = Node&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-27T19:35:33.784Z
+                at 2026-01-28T06:53:05.332Z
             </div>
         <script src="prettify.js"></script>
         <script>

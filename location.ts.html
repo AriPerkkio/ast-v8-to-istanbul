@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97% </span>
+                <span class="strong">96.96% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>97/100</span>
+                <span class='fraction'>96/99</span>
             </div>
         
             
@@ -304,18 +304,7 @@
 <a name='L239'></a><a href='#L239'>239</a>
 <a name='L240'></a><a href='#L240'>240</a>
 <a name='L241'></a><a href='#L241'>241</a>
-<a name='L242'></a><a href='#L242'>242</a>
-<a name='L243'></a><a href='#L243'>243</a>
-<a name='L244'></a><a href='#L244'>244</a>
-<a name='L245'></a><a href='#L245'>245</a>
-<a name='L246'></a><a href='#L246'>246</a>
-<a name='L247'></a><a href='#L247'>247</a>
-<a name='L248'></a><a href='#L248'>248</a>
-<a name='L249'></a><a href='#L249'>249</a>
-<a name='L250'></a><a href='#L250'>250</a>
-<a name='L251'></a><a href='#L251'>251</a>
-<a name='L252'></a><a href='#L252'>252</a>
-<a name='L253'></a><a href='#L253'>253</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L242'></a><a href='#L242'>242</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -358,7 +347,6 @@
 <span class="cline-any cline-yes">908x</span>
 <span class="cline-any cline-yes">908x</span>
 <span class="cline-any cline-yes">908x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -412,10 +400,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">44x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -465,7 +449,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">48x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">48x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">48x</span>
@@ -475,8 +458,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">48x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">48x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -503,9 +484,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">210520x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -613,8 +591,7 @@ export class Locator {
   }
 &nbsp;
   offsetToNeedle(offset: number): Needle {
-    const closestThreshold =
-      Math.floor(offset / CACHE_THRESHOLD) * CACHE_THRESHOLD;
+    const closestThreshold = Math.floor(offset / CACHE_THRESHOLD) * CACHE_THRESHOLD;
     const cacheHit = this.#cache.get(closestThreshold);
 &nbsp;
     let current = cacheHit ? closestThreshold : 0;
@@ -663,11 +640,7 @@ export class Locator {
     if (end === null) {
       // search the previous lines as the mapping was not found on the same line
       // e.g. tsc that doesnt include } in source maps
-      for (
-        let line = endNeedle.line;
-        line &gt;= startNeedle.line &amp;&amp; end === null;
-        line--
-      ) {
+      for (let line = endNeedle.line; line &gt;= startNeedle.line &amp;&amp; end === null; line--) {
         end = getPosition({ line, column: Infinity }, this.#map);
       }
       // Does not exist in source maps, e.g. generated code
@@ -717,8 +690,7 @@ export class Locator {
 &nbsp;
   getSourceLines(loc: { start: Needle; end: Needle }, filename: string) {
     const index = this.#map.resolvedSources.findIndex(
-      (source) =&gt;
-        source === <span class="branch-1 cbranch-no" title="branch not covered" >filename || resolve(this.#directory, source) === filename,</span>
+      (source) =&gt; source === <span class="branch-1 cbranch-no" title="branch not covered" >filename || resolve(this.#directory, source) === filename,</span>
     );
     const sourcesContent = this.#map.sourcesContent?.[index];
 &nbsp;
@@ -726,9 +698,7 @@ export class Locator {
 <span class="cstat-no" title="statement not covered" >      return null;</span>
     }
 &nbsp;
-    const lines = sourcesContent
-      .split("\n")
-      .slice(loc.start.line - 1, loc.end.line);
+    const lines = sourcesContent.split("\n").slice(loc.start.line - 1, loc.end.line);
 &nbsp;
     lines[0] = lines[0].slice(loc.start.column);
 &nbsp;
@@ -761,10 +731,7 @@ function getPosition(needle: Needle, map: TraceMap) {
   };
 }
 &nbsp;
-export function createEmptySourceMap(
-  filename: string,
-  code: string,
-): DecodedSourceMap {
+export function createEmptySourceMap(filename: string, code: string): DecodedSourceMap {
   const mappings: SourceMapSegment[][] = [];
 &nbsp;
   // Identical mappings as "magic-string"'s { hires: "boundary" }
@@ -826,7 +793,7 @@ function tryReadFileSync(filename: string) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-27T19:35:33.784Z
+                at 2026-01-28T06:53:05.332Z
             </div>
         <script src="prettify.js"></script>
         <script>
