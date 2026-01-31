@@ -22,7 +22,7 @@
     "deploy": "touch coverage/.nojekyll && gh-pages --dist coverage --dotfiles",
     "test": "vitest",
     "test:dev": "vitest --project 'vite/parseAstAsync'",
-    "lint": "oxlint --type-aware && oxfmt --check",
+    "lint": "oxlint --type-aware && oxfmt --check && publint",
     "typecheck": "tsc --noEmit",
     "debug": "open fixture-coverage/index.html istanbul-coverage/index.html",
     "verify": "pnpm build; pnpm lint; pnpm typecheck; pnpm run test --run; pnpm bench"
@@ -58,6 +58,7 @@
     "oxfmt": "^0.27.0",
     "oxlint": "^1.42.0",
     "oxlint-tsgolint": "^0.11.2",
+    "publint": "^0.3.17",
     "rollup": "^4.56.0",
     "tinyrainbow": "^3.0.3",
     "tsdown": "^0.20.1",
