@@ -309,3 +309,69 @@ test("inline source map as filename", async () => {
     }
   `);
 });
+
+test("branch partially in source maps", async () => {
+  const filename = normalize(resolve("/some/file.ts"));
+
+  const code = new MagicString(`\
+// Start
+true === true
+  ? console.log("covered")
+  : false === true
+    ? console.log("uncovered")
+    : false === false
+      ? console.log("uncovered")
+      : console.log("uncovered");
+// End
+`).toString();
+
+  const sourceMap = new MagicString(`\
+// Start
+true === true
+  ? console.log("covered")
+
+
+
+
+
+// End
+`).generateMap({ hires: "boundary", file: filename });
+
+  const data = await convert({
+    code,
+    sourceMap,
+    coverage: {
+      url: pathToFileURL(filename).href,
+      functions: [
+        {
+          functionName: "",
+          ranges: [
+            {
+              startOffset: 0,
+              endOffset: 196,
+              count: 1,
+            },
+            {
+              startOffset: 52,
+              endOffset: 187,
+              count: 0,
+            },
+          ],
+          isBlockCoverage: true,
+        },
+      ],
+    },
+    ast: parse(code),
+  });
+
+  const coverage = createCoverageMap(data);
+  const fileCoverage = coverage.fileCoverageFor(filename);
+
+  expect(fileCoverage.b).toMatchInlineSnapshot(`
+    {
+      "0": [
+        1,
+      ],
+    }
+  `);
+});
