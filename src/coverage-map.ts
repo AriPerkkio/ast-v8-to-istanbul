@@ -147,7 +147,9 @@ export function addBranch(options: {
   }
 
   options.covered?.forEach((hit, i) => {
-    fileCoverage.b[index][i] += hit;
+    if (fileCoverage.b[index][i] !== undefined) {
+      fileCoverage.b[index][i] += hit;
+    }
   });
 }
 

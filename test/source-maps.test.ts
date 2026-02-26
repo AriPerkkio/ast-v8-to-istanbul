@@ -367,5 +367,11 @@ true === true
   const coverage = createCoverageMap(data);
   const fileCoverage = coverage.fileCoverageFor(filename);
 
-  expect(fileCoverage.b[0]).toEqual([1, 0]);
+  expect(fileCoverage.b).toMatchInlineSnapshot(`
+    {
+      "0": [
+        1,
+      ],
+    }
+  `);
 });
