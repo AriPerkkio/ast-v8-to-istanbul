@@ -258,9 +258,7 @@ test("inline source map as base64", async () => {
 test("inline source map as filename", async () => {
   const uuid = randomUUID();
   const filename = normalize(resolve(import.meta.dirname, `file-${uuid}.ts`));
-  const mapName = normalize(
-    resolve(import.meta.dirname, `file-${uuid}.js.map`),
-  );
+  const mapName = normalize(resolve(import.meta.dirname, `file-${uuid}.js.map`));
 
   const s = new MagicString(`\
     export function covered() {
@@ -317,26 +315,26 @@ test("branch partially in source maps", async () => {
 
   const code = new MagicString(`\
 // Start
-true === true ?
-  console.log("covered")
-  : false === true ?
-  console.log("uncovered")
-  : false === false ?
-  console.log("uncovered")
-  : console.log("uncovered");
+true === true
+  ? console.log("covered")
+  : false === true
+    ? console.log("uncovered")
+    : false === false
+      ? console.log("uncovered")
+      : console.log("uncovered");
 // End
 `).toString();
 
   const sourceMap = new MagicString(`\
 // Start
-true === true ?
-  console.log("covered")
+true === true
+  ? console.log("covered")
 
 
 
 
 
-  // End
+// End
 `).generateMap({ hires: "boundary", file: filename });
 
   const data = await convert({
@@ -347,13 +345,19 @@ true === true ?
       functions: [
         {
           functionName: "",
+          ranges: [
+            {
+              startOffset: 0,
+              endOffset: 196,
+              count: 1,
+            },
+            {
+              startOffset: 52,
+              endOffset: 187,
+              count: 0,
+            },
+          ],
           isBlockCoverage: true,
-          ranges: [{ startOffset: 0, endOffset: 47, count: 1 }],
-        },
-        {
-          functionName: "",
-          isBlockCoverage: true,
-          ranges: [{ startOffset: 48, endOffset: 84, count: 0 }],
         },
       ],
     },
