@@ -1,6 +1,6 @@
 {
   "name": "ast-v8-to-istanbul",
-  "version": "0.3.12",
+  "version": "1.0.0",
   "description": "AST-aware v8-to-istanbul",
   "homepage": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
   "bugs": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
