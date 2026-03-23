@@ -33,7 +33,7 @@
     "js-tokens": "^10.0.0"
   },
   "devDependencies": {
-    "@babel/parser": "^7.29.0",
+    "@babel/parser": "^7.29.2",
     "@babel/types": "^7.29.0",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/estree": "^1.0.8",
@@ -54,19 +54,19 @@
     "istanbul-lib-source-maps": "^5.0.6",
     "istanbul-reports": "^3.2.0",
     "magic-string": "^0.30.21",
-    "oxc-parser": "^0.119.0",
-    "oxfmt": "^0.40.0",
-    "oxlint": "^1.55.0",
-    "oxlint-tsgolint": "^0.17.0",
+    "oxc-parser": "^0.121.0",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
+    "oxlint-tsgolint": "^0.17.1",
     "publint": "^0.3.18",
-    "rollup": "^4.59.0",
+    "rollup": "^4.60.0",
     "tinyrainbow": "^3.1.0",
-    "tsdown": "^0.21.3",
+    "tsdown": "^0.21.4",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vitest": "^4.1.0",
     "vue": "^3.5.30",
-    "yaml": "^2.8.2"
+    "yaml": "^2.8.3"
   },
   "packageManager": "pnpm@10.32.1",
   "pnpm": {
