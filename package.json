@@ -62,7 +62,7 @@
     "rollup": "^4.60.1",
     "tinyrainbow": "^3.1.0",
     "tsdown": "^0.21.7",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.2",
     "vite": "^7.3.1",
     "vitest": "^4.1.2",
     "vue": "^3.5.31",
