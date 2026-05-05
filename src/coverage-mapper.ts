@@ -170,7 +170,7 @@ export class CoverageMapper<T = Node> {
           this.ranges,
         );
         const previous = covered.at(-1) || 0;
-        covered.push(count - previous);
+        covered.push(Math.max(0, count - previous));
 
         continue;
       }
