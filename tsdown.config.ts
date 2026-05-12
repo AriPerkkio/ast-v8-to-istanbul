@@ -8,6 +8,13 @@ export default defineConfig({
   target: "esnext",
   clean: true,
 
+  minify: {
+    codegen: { removeWhitespace: false },
+    compress: true,
+    mangle: { keepNames: true },
+  },
+  outputOptions: { comments: false },
+
   dts: true,
   inlineOnly: ["@types/estree"],
 });
