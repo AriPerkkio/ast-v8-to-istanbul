@@ -50,10 +50,10 @@ jobs:
           git config --global user.email 'github-actions@users.noreply.github.com'
 
       - name: Bump version
-        run: pnpm version ${{ github.event.inputs.release-type }}
+        run: npm version ${{ github.event.inputs.release-type }}
 
       - name: Push release tag
         run: git push origin main --follow-tags
 
       - name: Publish to npm
-        run: pnpm publish
+        run: npm stage publish
