@@ -40,3 +40,31 @@ test("function expression", async ({ actual, expected }) => {
 
   assertCoverage(actual, expected);
 });
+
+test("class method", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "2/4 (50%)",
+      "lines": "5/7 (71.42%)",
+      "statements": "5/7 (71.42%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+
+  // Class and object method names should resolve instead of falling back to
+  // "(anonymous_N)". See https://github.com/AriPerkkio/ast-v8-to-istanbul/issues/162
+  const names = Object.values(actual.fnMap)
+    .map((fn) => fn.name)
+    .sort();
+
+  expect(names).toMatchInlineSnapshot(`
+    [
+      "double",
+      "greet",
+      "uncovered",
+      "unused",
+    ]
+  `);
+});
