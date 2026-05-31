@@ -89,7 +89,12 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
         params: [],
         id:
           babelNode.key.type === "Identifier"
-            ? { type: "Identifier", name: babelNode.key.name, start: 0, end: 0 }
+            ? {
+                type: "Identifier",
+                name: babelNode.key.name,
+                start: babelNode.key.start!,
+                end: babelNode.key.end!,
+              }
             : null,
       };
 
@@ -116,7 +121,12 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
         params: [],
         id:
           babelNode.key.type === "Identifier"
-            ? { type: "Identifier", name: babelNode.key.name, start: 0, end: 0 }
+            ? {
+                type: "Identifier",
+                name: babelNode.key.name,
+                start: babelNode.key.start!,
+                end: babelNode.key.end!,
+              }
             : null,
       };
 
