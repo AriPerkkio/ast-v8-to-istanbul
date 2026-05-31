@@ -364,6 +364,10 @@ export function getFunctionName(node: Node | BabelNode) {
   if ("id" in node && node.id) {
     return getFunctionName(node.id);
   }
+
+  if ("key" in node && node.key) {
+    return getFunctionName(node.key);
+  }
 }
 
 function setSkipped(node: Node | BabelNode) {

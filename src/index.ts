@@ -87,6 +87,15 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
           body: [],
         },
         params: [],
+        id:
+          babelNode.key.type === "Identifier"
+            ? {
+                type: "Identifier",
+                name: babelNode.key.name,
+                start: babelNode.key.start!,
+                end: babelNode.key.end!,
+              }
+            : null,
       };
 
       mapper.onFunction(node, {
@@ -110,6 +119,15 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
           body: [],
         },
         params: [],
+        id:
+          babelNode.key.type === "Identifier"
+            ? {
+                type: "Identifier",
+                name: babelNode.key.name,
+                start: babelNode.key.start!,
+                end: babelNode.key.end!,
+              }
+            : null,
       };
 
       mapper.onFunction(node, {
