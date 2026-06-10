@@ -20,7 +20,7 @@ test("arrow function expression", async ({ actual, expected }) => {
     {
       "branches": "0/0 (100%)",
       "functions": "4/9 (44.44%)",
-      "lines": "12/15 (80%)",
+      "lines": "11/15 (73.33%)",
       "statements": "12/16 (75%)",
     }
   `);

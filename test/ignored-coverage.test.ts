@@ -16,7 +16,7 @@ test("ignore file", async ({ actual, expected }) => {
 test("ignore next", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "3/4 (75%)",
+      "branches": "3/5 (60%)",
       "functions": "4/5 (80%)",
       "lines": "11/13 (84.61%)",
       "statements": "11/13 (84.61%)",
@@ -31,8 +31,8 @@ test("ignore if else", async ({ actual, expected }) => {
     {
       "branches": "2/2 (100%)",
       "functions": "2/2 (100%)",
-      "lines": "11/11 (100%)",
-      "statements": "13/13 (100%)",
+      "lines": "9/9 (100%)",
+      "statements": "9/9 (100%)",
     }
   `);
 
@@ -73,7 +73,7 @@ test("ignore start stop", async ({ actual, __fixture }) => {
 });
 
 describe("class methods", () => {
-  test.scoped({ ignoreClassMethods: ["excluded"] });
+  test.override({ ignoreClassMethods: ["excluded"] });
 
   test("ignore class methods", async ({ actual, expected }) => {
     expect(actual).toMatchInlineSnapshot(`
