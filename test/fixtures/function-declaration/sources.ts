@@ -18,7 +18,18 @@ export default function(a: number, b: number) {
   return sum(a, b) / 2;
 }
 
-subtract(2, 3);
+if (typeof sum === "function") {
+  function another() {
+    return 2;
+  }
 
-// TODO:
-// function noop() {}
+  another();
+} else {
+  function another() {
+    return 3;
+  }
+
+  another();
+}
+
+subtract(2, 3);
