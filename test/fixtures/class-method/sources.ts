@@ -1,4 +1,6 @@
 class Greeter {
+  constructor() {}
+
   greet() {
     return "Covered class method";
   }
@@ -6,6 +8,13 @@ class Greeter {
   uncovered() {
     return "Uncovered class method";
   }
+}
+
+// To make name generation complex
+const anonymous = function () {}
+
+class Another {
+  constructor() {}
 }
 
 const utils = {

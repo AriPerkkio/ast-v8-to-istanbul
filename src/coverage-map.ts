@@ -20,6 +20,7 @@ type Meta = {
   lastBranch: number;
   lastStatement: number;
   seen: Record<string, number>;
+  fnNames: Map<string, number>;
 };
 
 export function createCoverageMapData(filename: string, sourceMap: TraceMap) {
@@ -42,6 +43,7 @@ export function createCoverageMapData(filename: string, sourceMap: TraceMap) {
       lastFunction: 0,
       lastStatement: 0,
       seen: {},
+      fnNames: new Map(),
     };
 
     data[path] = {
@@ -80,8 +82,19 @@ export function addFunction(options: {
     meta.lastFunction++;
     meta.seen[key] = index;
 
+    let name = options.name;
+
+    if (name) {
+      const count = (meta.fnNames.get(name) || 0) + 1;
+      meta.fnNames.set(name, count);
+
+      if (count > 1) {
+        name += `_${count}`;
+      }
+    }
+
     fileCoverage.fnMap[index] = {
-      name: options.name || `(anonymous_${index})`,
+      name: name || `(anonymous_${index})`,
       decl: pickLocation(options.decl),
       loc: pickLocation(options.loc),
       line: options.loc.start.line,
