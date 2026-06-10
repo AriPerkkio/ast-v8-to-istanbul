@@ -85,11 +85,19 @@ export function addFunction(options: {
     let name = options.name;
 
     if (name) {
-      const count = (meta.fnNames.get(name) || 0) + 1;
-      meta.fnNames.set(name, count);
+      const base = name;
+      let count = (meta.fnNames.get(base) || 0) + 1;
+      name = count > 1 ? `${base}_${count}` : base;
 
-      if (count > 1) {
-        name += `_${count}`;
+      while (meta.fnNames.has(name)) {
+        count++;
+        name = `${base}_${count}`;
+      }
+
+      meta.fnNames.set(base, count);
+
+      if (name !== base) {
+        meta.fnNames.set(name, 0);
       }
     }
 

@@ -90,7 +90,7 @@ test("class method", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "0/0 (100%)",
-      "functions": "3/7 (42.85%)",
+      "functions": "3/12 (25%)",
       "lines": "6/8 (75%)",
       "statements": "6/8 (75%)",
     }
@@ -103,6 +103,11 @@ test("class method", async ({ actual, expected }) => {
       "(anonymous_3)",
       "constructor",
       "constructor_2",
+      "constructor_2_2",
+      "constructor_3",
+      "constructor_4",
+      "constructor_5",
+      "constructor_6",
       "double",
       "greet",
       "uncovered",

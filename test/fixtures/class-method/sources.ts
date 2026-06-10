@@ -15,6 +15,14 @@ const anonymous = function () {}
 
 class Another {
   constructor() {}
+  constructor_2() {}
+  constructor_3() {}
+  constructor_4() {}
+  constructor_5() {}
+}
+
+class AndAnother {
+  constructor() {}
 }
 
 const utils = {
