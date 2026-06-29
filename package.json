@@ -55,20 +55,20 @@
     "istanbul-reports": "^3.2.0",
     "magic-string": "^0.30.21",
     "oxc-parser": "^0.137.0",
-    "oxfmt": "^0.55.0",
-    "oxlint": "^1.70.0",
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0",
     "oxlint-tsgolint": "^0.23.0",
     "publint": "^0.3.21",
     "rollup": "^4.62.2",
     "tinyrainbow": "^3.1.0",
     "tsdown": "^0.22.3",
     "typescript": "^6.0.3",
-    "vite": "^8.0.16",
+    "vite": "^8.1.0",
     "vitest": "^4.1.9",
-    "vue": "^3.5.38",
+    "vue": "^3.5.39",
     "yaml": "^2.9.0"
   },
-  "packageManager": "pnpm@11.8.0",
+  "packageManager": "pnpm@11.9.0",
   "pnpm": {
     "overrides": {
       "@vitest/coverage-v8>ast-v8-to-istanbul": "./"
