@@ -25,10 +25,10 @@ e2e("functions.ts", async ({ fixture, annotate }) => {
   const fileCoverage = getFileCoverage(result);
   expect(fileCoverage).toMatchInlineSnapshot(`
     {
-      "branches": "1661/10000 (16.61%)",
-      "functions": "268/1000 (26.8%)",
-      "lines": "1866/7000 (26.65%)",
-      "statements": "1866/7000 (26.65%)",
+      "branches": "1698/10000 (16.98%)",
+      "functions": "273/1000 (27.3%)",
+      "lines": "1899/7000 (27.12%)",
+      "statements": "1899/7000 (27.12%)",
     }
   `);
 });
