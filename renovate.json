@@ -4,6 +4,7 @@
   "labels": ["dependencies"],
   "rangeStrategy": "bump",
   "dependencyDashboard": true,
+  "minimumReleaseAge": "1 day",
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
