@@ -36,7 +36,7 @@ import type {
   BlockStatement,
   SwitchCase,
 } from "estree";
-import { asyncWalk } from "estree-walker";
+import { walk as walkAst } from "estree-walker";
 import { type IgnoreHint } from "./ignore-hints";
 
 declare module "estree" {
@@ -109,14 +109,14 @@ export function getWalker() {
     nextIgnore = node;
   }
 
-  async function walk(
+  function walk(
     ast: unknown,
     ignoreHints: IgnoreHint[],
     ignoreClassMethods: string[] | undefined,
     visitors: Visitors,
   ) {
-    return await asyncWalk(ast as Node, {
-      async enter(node) {
+    return walkAst(ast as Node, {
+      enter(node) {
         if (nextIgnore !== false) {
           return;
         }
@@ -333,7 +333,7 @@ export function getWalker() {
           }
         }
       },
-      async leave(node) {
+      leave(node) {
         if (node === nextIgnore) {
           nextIgnore = false;
         }

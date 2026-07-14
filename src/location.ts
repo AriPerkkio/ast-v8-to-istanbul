@@ -19,60 +19,47 @@ const WORD_PATTERN = /(\w+|\s|[^\w\s])/g;
 const INLINE_MAP_PATTERN = /#\s*sourceMappingURL=(.*)\s*$/m;
 const BASE_64_PREFIX = "data:application/json;base64,";
 
-/** How often should offset calculations be cached */
-const CACHE_THRESHOLD = 250;
+const NEW_LINE_CHAR_CODE = "\n".charCodeAt(0);
 
 type Filename = string;
 
 export class Locator {
-  #cache = new Map<number, Needle>();
-  #codeParts: string[];
+  /** Offsets of each line's first character */
+  #lineStarts: number[] = [0];
   #map: TraceMap;
   #directory: string;
   #ignoredLines = new Map<Filename, ReturnType<typeof getIgnoredLines>>();
 
   constructor(code: string, map: TraceMap, directory: string) {
-    this.#codeParts = code.split("");
+    for (let offset = 0; offset < code.length; offset++) {
+      if (code.charCodeAt(offset) === NEW_LINE_CHAR_CODE) {
+        this.#lineStarts.push(offset + 1);
+      }
+    }
     this.#map = map;
     this.#directory = directory;
   }
 
   reset() {
-    this.#cache.clear();
     this.#ignoredLines.clear();
-    this.#codeParts = [];
+    this.#lineStarts = [0];
   }
 
   offsetToNeedle(offset: number): Needle {
-    const closestThreshold = Math.floor(offset / CACHE_THRESHOLD) * CACHE_THRESHOLD;
-    const cacheHit = this.#cache.get(closestThreshold);
+    let low = 0;
+    let high = this.#lineStarts.length - 1;
 
-    let current = cacheHit ? closestThreshold : 0;
-    let line = cacheHit?.line ?? 1;
-    let column = cacheHit?.column ?? 0;
+    while (low <= high) {
+      const mid = (low + high) >> 1;
 
-    for (let i = current; i <= this.#codeParts.length; i++) {
-      if (current === offset) {
-        return { line, column };
-      }
-
-      if (current % CACHE_THRESHOLD === 0) {
-        this.#cache.set(current, { line, column });
-      }
-
-      const char = this.#codeParts[i];
-
-      if (char === "\n") {
-        line++;
-        column = 0;
+      if (this.#lineStarts[mid] <= offset) {
+        low = mid + 1;
       } else {
-        column++;
+        high = mid - 1;
       }
-
-      current++;
     }
 
-    return { line, column };
+    return { line: high + 1, column: offset - this.#lineStarts[high] };
   }
 
   getLoc(node: Pick<Node, "start" | "end">) {

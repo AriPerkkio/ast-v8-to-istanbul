@@ -26,7 +26,7 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
   const mapper = await CoverageMapper.create<T, Program>(options, walker.onIgnore);
   const ast = await options.ast;
 
-  await walker.walk(ast, ignoreHints, options.ignoreClassMethods, {
+  walker.walk(ast, ignoreHints, options.ignoreClassMethods, {
     // Functions
     onFunctionDeclaration(node) {
       mapper.onFunction(node, {
