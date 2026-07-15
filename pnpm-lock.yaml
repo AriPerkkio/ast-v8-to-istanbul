@@ -28,8 +28,8 @@ importers:
         specifier: ^8.0.4
         version: 8.0.4
       '@babel/types':
-        specifier: ^7.29.7
-        version: 7.29.7
+        specifier: ^8.0.4
+        version: 8.0.4
       '@sveltejs/vite-plugin-svelte':
         specifier: ^7.2.0
         version: 7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.27.2)(yaml@2.9.0))
