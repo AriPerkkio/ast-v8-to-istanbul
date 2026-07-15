@@ -6,9 +6,9 @@ test("svelte if statement", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "0/2 (0%)",
-      "functions": "0/0 (100%)",
-      "lines": "0/2 (0%)",
-      "statements": "0/3 (0%)",
+      "functions": "0/1 (0%)",
+      "lines": "0/5 (0%)",
+      "statements": "0/9 (0%)",
     }
   `);
 
@@ -19,9 +19,9 @@ test("svelte for loop", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "0/0 (100%)",
-      "functions": "0/4 (0%)",
-      "lines": "0/3 (0%)",
-      "statements": "0/6 (0%)",
+      "functions": "0/6 (0%)",
+      "lines": "0/4 (0%)",
+      "statements": "0/9 (0%)",
     }
   `);
 
