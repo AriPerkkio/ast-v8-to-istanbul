@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1785143178954" clover="3.2.0">
-  <project timestamp="1785143178954" name="All files">
+<coverage generated="1785745568237" clover="3.2.0">
+  <project timestamp="1785745568237" name="All files">
     <metrics statements="488" coveredstatements="479" conditionals="336" coveredconditionals="310" methods="78" coveredmethods="77" elements="902" coveredelements="866" complexity="0" loc="488" ncloc="488" packages="1" files="8" classes="8"/>
     <file name="ast.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/ast.ts">
       <metrics statements="105" coveredstatements="104" conditionals="100" coveredconditionals="99" methods="11" coveredmethods="11"/>
@@ -405,7 +405,7 @@
       <line num="148" count="48" type="stmt"/>
       <line num="153" count="211328" type="stmt"/>
       <line num="155" count="211328" type="cond" truecount="2" falsecount="0"/>
-      <line num="156" count="527" type="stmt"/>
+      <line num="156" count="523" type="stmt"/>
       <line num="163" count="211328" type="cond" truecount="2" falsecount="0"/>
       <line num="164" count="344" type="stmt"/>
       <line num="167" count="210984" type="stmt"/>
