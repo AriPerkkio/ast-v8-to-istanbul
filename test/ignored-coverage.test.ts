@@ -16,7 +16,7 @@ test("ignore file", async ({ actual, expected }) => {
 test("ignore next", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "3/5 (60%)",
+      "branches": "3/4 (75%)",
       "functions": "4/5 (80%)",
       "lines": "11/13 (84.61%)",
       "statements": "11/13 (84.61%)",
