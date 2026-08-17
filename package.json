@@ -53,10 +53,10 @@
     "istanbul-lib-report": "^3.0.1",
     "istanbul-lib-source-maps": "^5.0.6",
     "istanbul-reports": "^3.2.0",
-    "magic-string": "^1.1.0",
-    "oxc-parser": "^0.143.0",
-    "oxfmt": "^0.62.0",
-    "oxlint": "^1.77.0",
+    "magic-string": "^1.2.0",
+    "oxc-parser": "^0.144.0",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
     "oxlint-tsgolint": "^7.0.2001",
     "publint": "^0.3.23",
     "rollup": "^4.62.4",
@@ -68,7 +68,7 @@
     "vue": "^3.5.41",
     "yaml": "^2.9.0"
   },
-  "packageManager": "pnpm@11.20.0",
+  "packageManager": "pnpm@11.22.0",
   "pnpm": {
     "overrides": {
       "@vitest/coverage-v8>ast-v8-to-istanbul": "./"
