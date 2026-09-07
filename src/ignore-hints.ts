@@ -8,6 +8,9 @@ export interface IgnoreHint {
 const IGNORE_PATTERN =
   /^\s*(?:istanbul|[cv]8|node:coverage)\s+ignore\s+(if|else|next|file)(?=\W|$)/;
 
+const IGNORE_CANDIDATE_PATTERN =
+  /(?:istanbul|[cv]8|node:coverage)\s+ignore\s+(if|else|next|file)(?=\W|$)/;
+
 const IGNORE_LINES_PATTERN = /\s*(?:istanbul|[cv]8|node:coverage)\s+ignore\s+(start|stop)(?=\W|$)/;
 
 const EOL_PATTERN = /\r?\n/g;
@@ -17,6 +20,11 @@ const EOL_PATTERN = /\r?\n/g;
  * - Most AST parsers don't emit comments in AST like Acorn does, so parse comments manually instead.
  */
 export function getIgnoreHints(code: string): IgnoreHint[] {
+  // Only tokenize candidates to distinguish real comments from strings and other code.
+  if (!IGNORE_CANDIDATE_PATTERN.test(code)) {
+    return [];
+  }
+
   const ignoreHints: IgnoreHint[] = [];
   const tokens = jsTokens(code);
 
