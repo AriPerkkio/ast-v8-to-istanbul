@@ -1,7 +1,10 @@
 import { EOL } from "node:os";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
+import jsTokens from "js-tokens";
 
 import { getIgnoredLines, getIgnoreHints } from "../src/ignore-hints";
+
+vi.mock("js-tokens", { spy: true });
 
 const tools = ["istanbul", "v8", "c8", "node:coverage"];
 
@@ -109,5 +112,17 @@ export function hello5(): string {
     expect([...getIgnoredLines(code)]).toStrictEqual([
       5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21,
     ]);
+  });
+
+  test("bails out early if no ignore hints are found", () => {
+    const code = `\
+export function hello1(): string {
+  return "Hello1"
+}
+`.replaceAll("\n", EOL);
+
+    expect.soft([...getIgnoreHints(code)]).toStrictEqual([]);
+
+    expect.soft(vi.mocked(jsTokens)).not.toHaveBeenCalled();
   });
 });
