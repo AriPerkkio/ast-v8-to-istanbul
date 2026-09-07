@@ -1,5 +1,5 @@
 import { expect } from "vitest";
-import { type FileCoverage } from "istanbul-lib-coverage";
+import { type FileCoverage } from "@vitest/istanbul-lib-coverage";
 
 import { assertCoverage, test } from "./utils";
 

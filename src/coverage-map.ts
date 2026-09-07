@@ -4,7 +4,7 @@ import { type Needle, type TraceMap } from "@jridgewell/trace-mapping";
 import {
   type CoverageMapData as IstanbulCoverageMapData,
   type FileCoverageData,
-} from "istanbul-lib-coverage";
+} from "@vitest/istanbul-lib-coverage";
 
 // https://github.com/istanbuljs/istanbuljs/blob/main/docs/raw-output.md#branch-types
 export type Branch = "if" | "binary-expr" | "cond-expr" | "switch" | "default-arg";

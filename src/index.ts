@@ -1,5 +1,5 @@
 import { type Node } from "estree";
-import type { CoverageMapData } from "istanbul-lib-coverage";
+import type { CoverageMapData } from "@vitest/istanbul-lib-coverage";
 
 import { getWalker } from "./ast";
 import { CoverageMapper } from "./coverage-mapper";

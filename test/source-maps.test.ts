@@ -4,7 +4,7 @@ import { writeFile } from "node:fs/promises";
 import { normalize, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { createCoverageMap } from "istanbul-lib-coverage";
+import { createCoverageMap } from "@vitest/istanbul-lib-coverage";
 import MagicString from "magic-string";
 import { expect, onTestFinished, test } from "vitest";
 

@@ -1,4 +1,8 @@
-import { type CoverageSummary, type CoverageMap, type FileCoverage } from "istanbul-lib-coverage";
+import {
+  type CoverageSummary,
+  type CoverageMap,
+  type FileCoverage,
+} from "@vitest/istanbul-lib-coverage";
 import { expect } from "vitest";
 
 import "./expect-extend";

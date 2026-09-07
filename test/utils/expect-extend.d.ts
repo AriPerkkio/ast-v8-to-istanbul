@@ -1,5 +1,5 @@
 import "vitest";
-import type { FileCoverage } from "istanbul-lib-coverage";
+import type { FileCoverage } from "@vitest/istanbul-lib-coverage";
 
 interface CoverageMatchers<R = unknown> {
   /** Compare `FileCoverage['fnMap']` */

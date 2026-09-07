@@ -10,6 +10,3 @@ minimumReleaseAgeExclude:
 
 overrides:
   "@vitest/coverage-v8>ast-v8-to-istanbul": ./
-
-patchedDependencies:
-  istanbul-lib-source-maps: patches/istanbul-lib-source-maps.patch

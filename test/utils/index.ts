@@ -10,9 +10,8 @@ import {
   type CoverageMap,
   type FileCoverage,
   type FileCoverageData,
-} from "istanbul-lib-coverage";
-import libReport from "istanbul-lib-report";
-import reports from "istanbul-reports";
+} from "@vitest/istanbul-lib-coverage";
+import * as libReport from "@vitest/istanbul-lib-report";
 import { parseSync as oxcParser } from "oxc-parser";
 import { type AstNode as Node } from "rollup";
 import { parseAstAsync as viteParser } from "vite";
@@ -73,8 +72,8 @@ export function generateReports(coverageMap: CoverageMap, dir = "./fixture-cover
     coverageMap,
   });
 
-  reports.create("html").execute(context);
-  reports.create("json").execute(context);
+  libReport.create("html").execute(context);
+  libReport.create("json").execute(context);
 }
 
 export function assertCoverage(actual: FileCoverage, expected: FileCoverage) {
