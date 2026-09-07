@@ -16,5 +16,5 @@ export default defineConfig({
   outputOptions: { comments: false },
 
   dts: true,
-  inlineOnly: ["@types/estree"],
+  deps: { dts: { alwaysBundle: ["@types/estree", "@vitest/istanbul-lib-coverage"] } },
 });

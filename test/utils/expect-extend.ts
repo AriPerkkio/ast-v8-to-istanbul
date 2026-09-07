@@ -1,4 +1,4 @@
-import type { FileCoverage, Range } from "istanbul-lib-coverage";
+import type { FileCoverage, Range } from "@vitest/istanbul-lib-coverage";
 import { expect } from "vitest";
 
 expect.extend({ toMatchFunctions, toMatchStatements, toMatchBranches });

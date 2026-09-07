@@ -3,7 +3,7 @@ import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { type Profiler } from "node:inspector";
 import { normalize, resolve } from "node:path";
 import { Worker } from "node:worker_threads";
-import { createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
+import { createCoverageMap, type FileCoverage } from "@vitest/istanbul-lib-coverage";
 import { describe, expect, onTestFinished, test } from "vitest";
 import yaml from "yaml";
 

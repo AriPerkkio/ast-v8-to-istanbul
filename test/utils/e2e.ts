@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { type EncodedSourceMap } from "@jridgewell/trace-mapping";
-import libCoverage from "istanbul-lib-coverage";
+import * as libCoverage from "@vitest/istanbul-lib-coverage";
 import * as ts from "typescript";
 import { parseAstAsync } from "vite";
 import { expect, test } from "vitest";

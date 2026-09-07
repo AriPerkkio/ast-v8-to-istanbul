@@ -2,8 +2,8 @@ import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import inspector, { type Profiler } from "node:inspector";
 import { extname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createCoverageMap } from "istanbul-lib-coverage";
-import { createInstrumenter, type Instrumenter } from "istanbul-lib-instrument";
+import { createCoverageMap } from "@vitest/istanbul-lib-coverage";
+import { createInstrumenter, type Instrumenter } from "@vitest/istanbul-lib-instrument";
 import c from "tinyrainbow";
 import type { TestProject } from "vitest/node";
 

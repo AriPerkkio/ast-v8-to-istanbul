@@ -1,7 +1,7 @@
 import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { createCoverageMap } from "istanbul-lib-coverage";
+import { createCoverageMap } from "@vitest/istanbul-lib-coverage";
 import { expect, test } from "vitest";
 
 import convert from "../src";

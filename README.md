@@ -27,7 +27,7 @@ See example report at https://ariperkkio.github.io/ast-v8-to-istanbul.
 ```ts
 import { convert } from "ast-v8-to-istanbul";
 import { parseAstAsync } from "vite";
-import type { CoverageMapData } from "istanbul-lib-coverage";
+import type { CoverageMapData } from "@vitest/istanbul-lib-coverage";
 
 const data: CoverageMapData = await convert({
   // Bring-your-own AST parser

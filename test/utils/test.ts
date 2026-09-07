@@ -1,5 +1,9 @@
-import { type CoverageMap, createCoverageMap, type FileCoverage } from "istanbul-lib-coverage";
-import libSourceMaps from "istanbul-lib-source-maps";
+import {
+  type CoverageMap,
+  createCoverageMap,
+  type FileCoverage,
+} from "@vitest/istanbul-lib-coverage";
+import * as libSourceMaps from "@vitest/istanbul-lib-source-maps";
 import { expect, test as base } from "vitest";
 
 import convert from "../../src/index";
