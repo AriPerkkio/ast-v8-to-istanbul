@@ -62,5 +62,5 @@
     "vue": "^3.5.42",
     "yaml": "^2.9.0"
   },
-  "packageManager": "pnpm@11.25.0"
+  "packageManager": "pnpm@12.3.4"
 }
