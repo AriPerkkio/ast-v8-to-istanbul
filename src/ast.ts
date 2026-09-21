@@ -127,7 +127,10 @@ export function getWalker() {
           return onIgnore(node);
         }
 
-        if (isSkipped(node)) {
+        // `isSkipped` is also true for a nested logical expression, because the
+        // outermost one registers the "binary-expr" branch for the whole chain.
+        // The walker must still visit the children of the nested one.
+        if (isSkipped(node) && node.type !== "LogicalExpression") {
           onIgnore(node);
         }
 
@@ -304,6 +307,10 @@ export function getWalker() {
             const branches: Node[] = [];
 
             function visit(child: Node) {
+              if (child.type === "ParenthesizedExpression") {
+                return visit(child.expression);
+              }
+
               if (child.type === "LogicalExpression") {
                 setSkipped(child);
 

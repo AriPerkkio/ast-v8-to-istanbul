@@ -10,10 +10,10 @@ e2e("checker.ts", async ({ fixture, annotate }) => {
   const fileCoverage = getFileCoverage(result);
   expect(fileCoverage).toMatchInlineSnapshot(`
     {
-      "branches": "0/27805 (0%)",
-      "functions": "0/3267 (0%)",
-      "lines": "0/23198 (0%)",
-      "statements": "0/24054 (0%)",
+      "branches": "0/27929 (0%)",
+      "functions": "0/3300 (0%)",
+      "lines": "0/23221 (0%)",
+      "statements": "0/24087 (0%)",
     }
   `);
 });
@@ -41,9 +41,9 @@ e2e("vitest-cli-api-bundled.js", async ({ fixture, annotate }) => {
   expect(fileCoverage).toMatchInlineSnapshot(`
     {
       "branches": "0/4128 (0%)",
-      "functions": "0/1009 (0%)",
+      "functions": "0/1011 (0%)",
       "lines": "0/5842 (0%)",
-      "statements": "0/6145 (0%)",
+      "statements": "0/6147 (0%)",
     }
   `);
 });
