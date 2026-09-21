@@ -118,6 +118,31 @@ test("class method", async ({ actual, expected }) => {
   assertCoverage(actual, expected);
 });
 
+test("logical-expression-nested-function", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "6/6 (100%)",
+      "functions": "4/4 (100%)",
+      "lines": "4/4 (100%)",
+      "statements": "6/6 (100%)",
+    }
+  `);
+
+  // `a && b && c` parses as `(a && b) && c`. Only the outermost node registers
+  // the branch, but the walker must still visit the functions and statements
+  // inside the inner node.
+  expect(getNames(actual)).toMatchInlineSnapshot(`
+    [
+      "(anonymous_1)",
+      "(anonymous_3)",
+      "f",
+      "g",
+    ]
+  `);
+
+  assertCoverage(actual, expected);
+});
+
 function getNames(fileCoverage: FileCoverage) {
   return Object.values(fileCoverage.fnMap)
     .map((fn) => fn.name)
