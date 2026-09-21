@@ -121,10 +121,10 @@ test("class method", async ({ actual, expected }) => {
 test("logical-expression-nested-function", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
-      "branches": "6/6 (100%)",
-      "functions": "4/4 (100%)",
-      "lines": "4/4 (100%)",
-      "statements": "6/6 (100%)",
+      "branches": "10/10 (100%)",
+      "functions": "6/6 (100%)",
+      "lines": "6/6 (100%)",
+      "statements": "9/9 (100%)",
     }
   `);
 
@@ -135,8 +135,10 @@ test("logical-expression-nested-function", async ({ actual, expected }) => {
     [
       "(anonymous_1)",
       "(anonymous_3)",
+      "(anonymous_5)",
       "f",
       "g",
+      "h",
     ]
   `);
 

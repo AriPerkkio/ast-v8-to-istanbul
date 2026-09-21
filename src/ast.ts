@@ -307,6 +307,10 @@ export function getWalker() {
             const branches: Node[] = [];
 
             function visit(child: Node) {
+              if (child.type === "ParenthesizedExpression") {
+                return visit(child.expression);
+              }
+
               if (child.type === "LogicalExpression") {
                 setSkipped(child);
 
