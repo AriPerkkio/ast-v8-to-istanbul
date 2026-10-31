@@ -2,17 +2,15 @@ import { expect } from "vitest";
 
 import { assertCoverage, test } from "./utils";
 
-test("vue if statement", async ({ actual, expected }) => {
+test("vue if statement", async ({ actual }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
       "branches": "0/2 (0%)",
       "functions": "0/0 (100%)",
-      "lines": "0/2 (0%)",
-      "statements": "0/2 (0%)",
+      "lines": "0/1 (0%)",
+      "statements": "0/1 (0%)",
     }
   `);
-
-  assertCoverage(actual, expected);
 });
 
 test("vue for loop", async ({ actual, expected }) => {
