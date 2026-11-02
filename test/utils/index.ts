@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { parse as babelParser } from "@babel/parser";
 import { type EncodedSourceMap } from "@jridgewell/trace-mapping";
 import { parse as acornParser } from "acorn";
+import { type Program } from "estree";
 import {
   createCoverageMap,
   type CoverageMap,
@@ -13,7 +14,6 @@ import {
 } from "@vitest/istanbul-lib-coverage";
 import * as libReport from "@vitest/istanbul-lib-report";
 import { parseSync as oxcParser } from "oxc-parser";
-import { type AstNode as Node } from "rollup";
 import { parseAstAsync as viteParser } from "vite";
 import { expect } from "vitest";
 
@@ -94,23 +94,23 @@ export function assertCoverage(actual: FileCoverage, expected: FileCoverage) {
   }
 }
 
-export async function parse(code: string): Promise<Node> {
+export async function parse(code: string): Promise<Program> {
   if (PARSER === "acorn") {
     return acornParser(code, {
       ecmaVersion: "latest",
       sourceType: "module",
-    }) as Node;
+    }) as Program;
   }
 
   if (PARSER === "oxc-parser") {
-    return oxcParser("example.js", code, { sourceType: "module" }).program as Node;
+    return oxcParser("example.js", code, { sourceType: "module" }).program as Program;
   }
 
   if (PARSER === "babel") {
-    return babelParser(code, { sourceType: "module" }).program as Node;
+    return babelParser(code, { sourceType: "module" }).program as Program;
   }
 
-  return await viteParser(code);
+  return (await viteParser(code)) as Program;
 }
 
 function copy(obj: object) {

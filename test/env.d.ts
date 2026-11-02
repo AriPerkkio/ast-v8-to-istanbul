@@ -1,6 +1,6 @@
 declare module "*?transform-result" {
-  import type { SourceMap } from "rollup";
-  const map: SourceMap;
+  import type { Rollup } from "vite";
+  const map: Rollup.SourceMap;
 
   const code: string;
   export { map, code };
