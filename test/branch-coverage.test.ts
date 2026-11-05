@@ -70,3 +70,16 @@ test("assignment-pattern", async ({ actual, expected }) => {
 
   assertCoverage(actual, expected);
 });
+
+test("if-statement-after-await", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "4/4 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "5/5 (100%)",
+      "statements": "5/5 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
