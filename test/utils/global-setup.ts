@@ -21,6 +21,14 @@ export async function setup(project: TestProject) {
       continue;
     }
 
+    // Git keeps ignored "dist" directories of fixtures that exist only on other branches
+    const files = await readdir(`${root}/fixtures/${directory}`);
+
+    if (!files.some((file) => file.includes("sources"))) {
+      console.log(c.bgYellow("[setup]"), `Skipping fixtures/${directory}, no sources file`);
+      continue;
+    }
+
     console.log(c.bgBlueBright("[setup]"), `Creating fixtures/${directory}`);
 
     await rm(`${root}/fixtures/${directory}/dist`, {
