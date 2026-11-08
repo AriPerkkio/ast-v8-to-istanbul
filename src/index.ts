@@ -23,7 +23,7 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
   }
 
   const walker = getWalker();
-  const mapper = await CoverageMapper.create<T, Program>(options, walker.onIgnore);
+  const mapper = await CoverageMapper.create<T, Program>(options, walker);
   const ast = await options.ast;
 
   walker.walk(ast, ignoreHints, options.ignoreClassMethods, {
@@ -168,16 +168,9 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
         mapper.onStatement(node.init, node);
       }
     },
-    onClassBody(node) {
-      for (const child of node.body) {
-        if (
-          (child.type === "PropertyDefinition" ||
-            child.type === "ClassProperty" ||
-            child.type === "ClassPrivateProperty") &&
-          child.value
-        ) {
-          mapper.onStatement(child.value as Node);
-        }
+    onPropertyDefinition(node) {
+      if (node.value) {
+        mapper.onStatement(node.value as Node);
       }
     },
 

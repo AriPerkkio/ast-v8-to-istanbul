@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { TraceMap } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
 
-import { type FunctionNodes, getFunctionName, type getWalker } from "./ast";
+import { type ClassMember, type FunctionNodes, getFunctionName, type getWalker } from "./ast";
 import {
   addBranch,
   addFunction,
@@ -13,26 +13,31 @@ import {
   createCoverageMapData,
 } from "./coverage-map";
 import { createEmptySourceMap, getInlineSourceMap, Locator } from "./location";
-import { getCount, normalize } from "./script-coverage";
+import { getCount, normalize, normalizeClassMember } from "./script-coverage";
 import type { Options } from "./types";
 
 type Normalized = ReturnType<typeof normalize>;
+type Walker = Pick<ReturnType<typeof getWalker>, "onIgnore" | "getClassMember">;
 
 export class CoverageMapper<T = Node> {
+  /** Lazily normalized ranges for class members, `null` when identical with `ranges` */
+  #classMemberRanges: Partial<Record<ClassMember, Normalized | null>> = {};
+
   private constructor(
     private locator: Locator,
     private coverageMapData: CoverageMapData,
+    private coverage: Options<T>["coverage"],
     private ranges: Normalized,
     private wrapperLength: number,
     private directory: string,
-    private onIgnoreNode: ReturnType<typeof getWalker>["onIgnore"],
+    private walker: Walker,
     private ignoreNode?: Options<T>["ignoreNode"],
     private ignoreSourceCode?: Options<T>["ignoreSourceCode"],
   ) {}
 
   static async create<T = Node, Program = T & { type: "Program" }>(
     options: Options<T, Program>,
-    onIgnoreNode: ReturnType<typeof getWalker>["onIgnore"],
+    walker: Walker,
   ): Promise<CoverageMapper<T>> {
     const filename = fileURLToPath(options.coverage.url);
     const directory = dirname(filename);
@@ -46,10 +51,11 @@ export class CoverageMapper<T = Node> {
     return new CoverageMapper<T>(
       new Locator(options.code, map, directory),
       createCoverageMapData(filename, map),
+      options.coverage,
       normalize(options.coverage),
       options.wrapperLength || 0,
       directory,
-      onIgnoreNode,
+      walker,
       options.ignoreNode,
       options.ignoreSourceCode,
     );
@@ -80,7 +86,7 @@ export class CoverageMapper<T = Node> {
         startOffset: countNode.start + this.wrapperLength,
         endOffset: countNode.end + this.wrapperLength,
       },
-      this.ranges,
+      this.#getRanges(),
     );
 
     if (this.ignoreSourceCode) {
@@ -121,7 +127,7 @@ export class CoverageMapper<T = Node> {
         startOffset: (parent || node).start + this.wrapperLength,
         endOffset: (parent || node).end + this.wrapperLength,
       },
-      this.ranges,
+      this.#getRanges(),
     );
 
     if (this.ignoreSourceCode) {
@@ -170,7 +176,7 @@ export class CoverageMapper<T = Node> {
             startOffset: node.start + this.wrapperLength,
             endOffset: node.end + this.wrapperLength,
           },
-          this.ranges,
+          this.#getRanges(),
         );
         const previous = covered.at(-1) || 0;
         covered.push(count - previous);
@@ -191,7 +197,7 @@ export class CoverageMapper<T = Node> {
             startOffset: branch.start + bias + this.wrapperLength,
             endOffset: branch.end - bias + this.wrapperLength,
           },
-          this.ranges,
+          this.#getRanges(),
         ),
       );
     }
@@ -252,6 +258,21 @@ export class CoverageMapper<T = Node> {
     return resolve(this.directory, sourceFilename);
   }
 
+  /** Ranges for looking up counts of the currently visited node */
+  #getRanges(): Normalized {
+    const member = this.walker.getClassMember();
+
+    if (member === null) {
+      return this.ranges;
+    }
+
+    if (!(member in this.#classMemberRanges)) {
+      this.#classMemberRanges[member] = normalizeClassMember(this.coverage, member);
+    }
+
+    return this.#classMemberRanges[member] || this.ranges;
+  }
+
   #onIgnore(node: Node, type: "function" | "statement" | "branch") {
     if (!this.ignoreNode) {
       return false;
@@ -260,7 +281,7 @@ export class CoverageMapper<T = Node> {
     const scope = this.ignoreNode(node as T, type);
 
     if (scope === "ignore-this-and-nested-nodes") {
-      this.onIgnoreNode(node);
+      this.walker.onIgnore(node);
     }
 
     return scope;

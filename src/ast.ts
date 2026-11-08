@@ -2,6 +2,8 @@ import {
   type ObjectMethod,
   type ClassMethod,
   type ClassBody as BabelClassBody,
+  type ClassProperty,
+  type ClassPrivateProperty,
   type Node as BabelNode,
 } from "@babel/types";
 import type {
@@ -33,6 +35,7 @@ import type {
   AssignmentPattern,
   FunctionExpression,
   ClassBody,
+  PropertyDefinition,
   BlockStatement,
   SwitchCase,
 } from "estree";
@@ -81,7 +84,7 @@ interface Visitors {
   onWithStatement: (node: WithStatement) => void;
   onLabeledStatement: (node: LabeledStatement) => void;
   onVariableDeclarator: (node: VariableDeclarator) => void;
-  onClassBody: (node: ClassBody | BabelClassBody) => void;
+  onPropertyDefinition: (node: PropertyDefinition | ClassProperty | ClassPrivateProperty) => void;
 
   // Branches
   onIfStatement: (node: IfStatement, branches: (Node | null | undefined)[]) => void;
@@ -102,11 +105,20 @@ export type FunctionNodes = Parameters<
     | "onProperty"]
 >[0];
 
+/** Class member whose code V8 runs in `<static_initializer>` or `<instance_members_initializer>` */
+export type ClassMember = "static" | "instance";
+
 export function getWalker() {
   let nextIgnore: Node | false = false;
+  const classMembers: (ClassMember | null)[] = [];
 
   function onIgnore(node: Node) {
     nextIgnore = node;
+  }
+
+  /** Class member that contains the currently visited node, if any */
+  function getClassMember(): ClassMember | null {
+    return classMembers.at(-1) ?? null;
   }
 
   function walk(
@@ -117,6 +129,12 @@ export function getWalker() {
   ) {
     return walkAst(ast as Node, {
       enter(node) {
+        const classMember = getClassMemberScope(node);
+
+        if (classMember !== undefined) {
+          classMembers.push(classMember);
+        }
+
         if (nextIgnore !== false) {
           return;
         }
@@ -227,7 +245,10 @@ export function getWalker() {
               ) as typeof classBody.body;
             }
 
-            return visitors.onClassBody(classBody);
+            return;
+          }
+          case "PropertyDefinition": {
+            return visitors.onPropertyDefinition(node);
           }
 
           // Branches
@@ -338,9 +359,20 @@ export function getWalker() {
           case "ObjectMethod": {
             return visitors.onObjectMethod(node);
           }
+
+          // @ts-expect-error -- Babel AST
+          case "ClassProperty":
+          // @ts-expect-error -- Babel AST
+          case "ClassPrivateProperty": {
+            return visitors.onPropertyDefinition(node as unknown as ClassProperty);
+          }
         }
       },
       leave(node) {
+        if (getClassMemberScope(node) !== undefined) {
+          classMembers.pop();
+        }
+
         if (node === nextIgnore) {
           nextIgnore = false;
         }
@@ -358,7 +390,33 @@ export function getWalker() {
     }
   }
 
-  return { walk, onIgnore };
+  return { walk, onIgnore, getClassMember };
+}
+
+/**
+ * Returns the class member scope that the node starts, `null` for nodes that end the scope
+ * and `undefined` for nodes that don't change it.
+ */
+function getClassMemberScope(node: Node | BabelNode): ClassMember | null | undefined {
+  switch (node.type) {
+    case "PropertyDefinition":
+    case "ClassProperty":
+    case "ClassPrivateProperty":
+      return node.static ? "static" : "instance";
+
+    case "StaticBlock":
+      return "static";
+
+    // Nested functions and classes have their own V8 ranges
+    case "FunctionDeclaration":
+    case "FunctionExpression":
+    case "ArrowFunctionExpression":
+    case "ClassMethod":
+    case "ClassPrivateMethod":
+    case "ObjectMethod":
+    case "ClassBody":
+      return null;
+  }
 }
 
 const skippedNodes = new WeakSet<Node | BabelNode>();
