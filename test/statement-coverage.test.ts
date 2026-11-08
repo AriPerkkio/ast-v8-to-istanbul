@@ -28,6 +28,32 @@ test("class-properties", async ({ actual, expected }) => {
   assertCoverage(actual, expected);
 });
 
+test("static class properties", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "0/0 (100%)",
+      "lines": "11/13 (84.61%)",
+      "statements": "11/13 (84.61%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
+
+test("nested class properties", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "0/0 (100%)",
+      "lines": "2/7 (28.57%)",
+      "statements": "2/7 (28.57%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
+
 test("continue break statements", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
