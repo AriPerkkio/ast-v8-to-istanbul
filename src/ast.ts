@@ -2,6 +2,8 @@ import {
   type ObjectMethod,
   type ClassMethod,
   type ClassBody as BabelClassBody,
+  type ClassProperty,
+  type ClassPrivateProperty,
   type Node as BabelNode,
 } from "@babel/types";
 import type {
@@ -33,6 +35,7 @@ import type {
   AssignmentPattern,
   FunctionExpression,
   ClassBody,
+  PropertyDefinition,
   BlockStatement,
   SwitchCase,
 } from "estree";
@@ -81,7 +84,7 @@ interface Visitors {
   onWithStatement: (node: WithStatement) => void;
   onLabeledStatement: (node: LabeledStatement) => void;
   onVariableDeclarator: (node: VariableDeclarator) => void;
-  onClassBody: (node: ClassBody | BabelClassBody) => void;
+  onPropertyDefinition: (node: PropertyDefinition | ClassProperty | ClassPrivateProperty) => void;
 
   // Branches
   onIfStatement: (node: IfStatement, branches: (Node | null | undefined)[]) => void;
@@ -227,7 +230,10 @@ export function getWalker() {
               ) as typeof classBody.body;
             }
 
-            return visitors.onClassBody(classBody);
+            return;
+          }
+          case "PropertyDefinition": {
+            return visitors.onPropertyDefinition(node);
           }
 
           // Branches
@@ -337,6 +343,13 @@ export function getWalker() {
           // @ts-expect-error -- Babel AST
           case "ObjectMethod": {
             return visitors.onObjectMethod(node);
+          }
+
+          // @ts-expect-error -- Babel AST
+          case "ClassProperty":
+          // @ts-expect-error -- Babel AST
+          case "ClassPrivateProperty": {
+            return visitors.onPropertyDefinition(node as unknown as ClassProperty);
           }
         }
       },
