@@ -168,16 +168,10 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
         mapper.onStatement(node.init, node);
       }
     },
-    onClassBody(node) {
-      for (const child of node.body) {
-        if (
-          (child.type === "PropertyDefinition" ||
-            child.type === "ClassProperty" ||
-            child.type === "ClassPrivateProperty") &&
-          child.value
-        ) {
-          mapper.onStatement(child.value as Node);
-        }
+    onPropertyDefinition(node) {
+      if (node.value) {
+        // Count of the class initializer, as the value can have its own range, e.g. arrow function
+        mapper.onStatement(node.value as Node, node as Node);
       }
     },
 
