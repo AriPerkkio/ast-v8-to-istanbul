@@ -60,6 +60,8 @@ export class CoverageMapper<T = Node> {
     positions: {
       loc: Pick<Node, "start" | "end">;
       decl: Pick<Node, "start" | "end">;
+      /** Position used for looking up the execution count. Defaults to `node`. */
+      count?: Pick<Node, "start" | "end">;
     },
   ) {
     if (this.#onIgnore(node, "function")) {
@@ -72,10 +74,11 @@ export class CoverageMapper<T = Node> {
     const decl = this.locator.getLoc(positions.decl);
     if (decl === null) return;
 
+    const countNode = positions.count || node;
     const covered = getCount(
       {
-        startOffset: node.start + this.wrapperLength,
-        endOffset: node.end + this.wrapperLength,
+        startOffset: countNode.start + this.wrapperLength,
+        endOffset: countNode.end + this.wrapperLength,
       },
       this.ranges,
     );

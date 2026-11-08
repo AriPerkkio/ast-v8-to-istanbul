@@ -62,7 +62,10 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
 
       mapper.onFunction(node, {
         loc: node.value.body,
-        decl: node.key,
+        // Istanbul's declaration starts at "static" keyword
+        decl: { start: node.start, end: node.start + 1 },
+        // V8's function range starts after "static" keyword, while MethodDefinition starts at it
+        count: node.value,
       });
     },
     onProperty(node) {
@@ -100,10 +103,10 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
 
       mapper.onFunction(node, {
         loc: node.body,
-        decl: {
-          start: babelNode.key.start!,
-          end: babelNode.key.end!,
-        },
+        // Istanbul's declaration starts at "static" keyword
+        decl: { start: node.start, end: node.start + 1 },
+        // V8's function range starts after "static" keyword, while ClassMethod starts at it
+        count: node.body,
       });
     },
 

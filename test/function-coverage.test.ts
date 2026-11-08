@@ -118,6 +118,29 @@ test("class method", async ({ actual, expected }) => {
   assertCoverage(actual, expected);
 });
 
+test("static class method", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "0/0 (100%)",
+      "functions": "2/5 (40%)",
+      "lines": "4/7 (57.14%)",
+      "statements": "4/7 (57.14%)",
+    }
+  `);
+
+  expect(getNames(actual)).toMatchInlineSnapshot(`
+    [
+      "area",
+      "covered",
+      "uncovered",
+      "uncoveredAsync",
+      "uncoveredGetter",
+    ]
+  `);
+
+  assertCoverage(actual, expected);
+});
+
 test("logical-expression-nested-function", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
