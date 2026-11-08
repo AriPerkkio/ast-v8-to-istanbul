@@ -183,13 +183,25 @@ export class CoverageMapper<T = Node> {
         locations.push(location);
       }
 
-      const bias = branch.type === "BlockStatement" ? 1 : 0;
+      let startOffset = branch.start;
+      let endOffset = branch.end;
+
+      if (branch.type === "BlockStatement") {
+        startOffset += 1;
+        endOffset -= 1;
+      } else if (
+        branch.type === "FunctionExpression" ||
+        branch.type === "ArrowFunctionExpression"
+      ) {
+        // Function's own range starts at the function, while the branch's range starts before it, e.g. at "?" or "||"
+        startOffset = Math.max(0, startOffset - 1);
+      }
 
       covered.push(
         getCount(
           {
-            startOffset: branch.start + bias + this.wrapperLength,
-            endOffset: branch.end - bias + this.wrapperLength,
+            startOffset: startOffset + this.wrapperLength,
+            endOffset: endOffset + this.wrapperLength,
           },
           this.ranges,
         ),
