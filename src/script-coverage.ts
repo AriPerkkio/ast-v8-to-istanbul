@@ -6,6 +6,29 @@ type RawRange = Normalized & { area: number; order: number };
 /** Files larger than this use event sweep to avoid allocating huge hits arrays */
 const HITS_ARRAY_MAX_SIZE = 2_000_000;
 
+const STATIC_INITIALIZER = "<static_initializer>";
+const INSTANCE_MEMBERS_INITIALIZER = "<instance_members_initializer>";
+
+/**
+ * V8 reports `<static_initializer>` and `<instance_members_initializer>` of a class with identical ranges,
+ * so `normalize` cannot know which one applies to a class member. Normalize without the other initializer instead.
+ * Returns `null` when there is nothing to exclude.
+ */
+export function normalizeClassMember(
+  scriptCoverage: Pick<Profiler.ScriptCoverage, "functions">,
+  member: "static" | "instance",
+): Normalized[] | null {
+  const excluded = member === "static" ? INSTANCE_MEMBERS_INITIALIZER : STATIC_INITIALIZER;
+
+  if (!scriptCoverage.functions.some((fn) => fn.functionName === excluded)) {
+    return null;
+  }
+
+  return normalize({
+    functions: scriptCoverage.functions.filter((fn) => fn.functionName !== excluded),
+  });
+}
+
 export function normalize(
   scriptCoverage: Pick<Profiler.ScriptCoverage, "functions">,
   hitsArrayMaxSize = HITS_ARRAY_MAX_SIZE,
