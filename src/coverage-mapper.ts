@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { TraceMap } from "@jridgewell/trace-mapping";
 import { type Node } from "estree";
 
-import { type FunctionNodes, getFunctionName, type getWalker } from "./ast";
+import { type FunctionNodes, getFunctionName, type getWalker, isSyntheticBlock } from "./ast";
 import {
   addBranch,
   addFunction,
@@ -183,7 +183,8 @@ export class CoverageMapper<T = Node> {
         locations.push(location);
       }
 
-      const bias = branch.type === "BlockStatement" ? 1 : 0;
+      // Skip the "{" of the block. Synthetic blocks have no braces, e.g. "if (a) b".
+      const bias = branch.type === "BlockStatement" && !isSyntheticBlock(branch) ? 1 : 0;
 
       covered.push(
         getCount(
