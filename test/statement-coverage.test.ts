@@ -28,6 +28,19 @@ test("class-properties", async ({ actual, expected }) => {
   assertCoverage(actual, expected);
 });
 
+test("parenthesized expressions", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "5/5 (100%)",
+      "functions": "2/2 (100%)",
+      "lines": "10/10 (100%)",
+      "statements": "11/11 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
+
 test("continue break statements", async ({ actual, expected }) => {
   expect(actual).toMatchInlineSnapshot(`
     {
