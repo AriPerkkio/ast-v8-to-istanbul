@@ -69,12 +69,15 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
       });
     },
     onProperty(node) {
-      if (node.value.type === "FunctionExpression") {
+      // Only object methods, e.g. `{ method() {} }` and `{ get value() {} }`, are handled here.
+      // Function expressions as values, e.g. `{ key: function () {} }`, are visited by `onFunctionExpression`.
+      if (node.value.type === "FunctionExpression" && (node.method || node.kind !== "init")) {
         setCovered(node.value);
 
         mapper.onFunction(node, {
           loc: node.value.body,
-          decl: node.key,
+          // Istanbul's declaration starts at "async", "get", "set", "*" or "[" when present
+          decl: { start: node.start, end: node.start + 1 },
         });
       }
     },
@@ -135,10 +138,8 @@ export default async function convert<T = Node, Program = T & { type: "Program" 
 
       mapper.onFunction(node, {
         loc: node.body,
-        decl: {
-          start: babelNode.key.start!,
-          end: babelNode.key.end!,
-        },
+        // Istanbul's declaration starts at "async", "get", "set", "*" or "[" when present
+        decl: { start: node.start, end: node.start + 1 },
       });
     },
 
