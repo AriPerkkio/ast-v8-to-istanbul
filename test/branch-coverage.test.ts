@@ -70,3 +70,16 @@ test("assignment-pattern", async ({ actual, expected }) => {
 
   assertCoverage(actual, expected);
 });
+
+test("functions as branches", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "9/10 (90%)",
+      "functions": "6/14 (42.85%)",
+      "lines": "18/22 (81.81%)",
+      "statements": "21/28 (75%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
