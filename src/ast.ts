@@ -34,6 +34,7 @@ import type {
   FunctionExpression,
   ClassBody,
   BlockStatement,
+  Statement,
   SwitchCase,
 } from "estree";
 import { walk as walkAst } from "estree-walker";
@@ -235,21 +236,11 @@ export function getWalker() {
             const branches = [];
 
             if (node.consequent.type !== "BlockStatement") {
-              node.consequent = {
-                type: "BlockStatement",
-                body: [node.consequent],
-                start: node.consequent.start,
-                end: node.consequent.end,
-              } satisfies BlockStatement;
+              node.consequent = toSyntheticBlock(node.consequent);
             }
 
             if (node.alternate && node.alternate.type !== "BlockStatement") {
-              node.alternate = {
-                type: "BlockStatement",
-                body: [node.alternate],
-                start: node.alternate.start,
-                end: node.alternate.end,
-              } satisfies BlockStatement;
+              node.alternate = toSyntheticBlock(node.alternate);
             }
 
             if (hint === "if") {
@@ -362,6 +353,25 @@ export function getWalker() {
 }
 
 const skippedNodes = new WeakSet<Node | BabelNode>();
+const syntheticBlocks = new WeakSet<Node>();
+
+/** Wraps a statement into `BlockStatement` that has no braces in the source code */
+function toSyntheticBlock(statement: Statement): BlockStatement {
+  const block: BlockStatement = {
+    type: "BlockStatement",
+    body: [statement],
+    start: statement.start,
+    end: statement.end,
+  };
+
+  syntheticBlocks.add(block);
+  return block;
+}
+
+/** Whether the `BlockStatement` was created by the walker, e.g. `if (a) b` -> `if (a) { b }` */
+export function isSyntheticBlock(node: Node) {
+  return syntheticBlocks.has(node);
+}
 
 export function getFunctionName(node: Node | BabelNode) {
   if (node.type === "Identifier") {

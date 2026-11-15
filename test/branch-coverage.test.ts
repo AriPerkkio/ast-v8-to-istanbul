@@ -70,3 +70,16 @@ test("assignment-pattern", async ({ actual, expected }) => {
 
   assertCoverage(actual, expected);
 });
+
+test("if statement single character", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "6/6 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "9/9 (100%)",
+      "statements": "11/11 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
