@@ -6,6 +6,127 @@ type RawRange = Normalized & { area: number; order: number };
 /** Files larger than this use event sweep to avoid allocating huge hits arrays */
 const HITS_ARRAY_MAX_SIZE = 2_000_000;
 
+const INITIALIZERS = {
+  static: "<static_initializer>",
+  instance: "<instance_members_initializer>",
+} as const;
+
+type FunctionCoverage = Profiler.ScriptCoverage["functions"][number];
+
+/**
+ * Collects `<static_initializer>` and `<instance_members_initializer>` functions by their start offset.
+ * V8 reports each as a range from the first to the last member of its kind, so when a class mixes
+ * static and instance members, these ranges can overlap and contain members of the other kind.
+ */
+export function getClassInitializers(scriptCoverage: Pick<Profiler.ScriptCoverage, "functions">) {
+  const initializers = {
+    static: new Map<number, FunctionCoverage>(),
+    instance: new Map<number, FunctionCoverage>(),
+  };
+
+  for (const fn of scriptCoverage.functions) {
+    const kind =
+      fn.functionName === INITIALIZERS.static
+        ? "static"
+        : fn.functionName === INITIALIZERS.instance
+          ? "instance"
+          : null;
+
+    if (kind && fn.ranges.length > 0) {
+      initializers[kind].set(fn.ranges[0].startOffset, fn);
+    }
+  }
+
+  return initializers;
+}
+
+/** Class member that contains a node, see `getWalker().getClassMembers()` */
+interface ClassMember {
+  kind: "static" | "instance";
+
+  /** Start offset of the class member */
+  start: number | null | undefined;
+
+  /** Start offset of the first member of other kind in the same class */
+  otherKindStart: number | null | undefined;
+}
+
+/**
+ * Resolves ranges for nodes inside class members.
+ * Excludes the initializers of other kind from the member's own class, as their ranges may overlap the member.
+ */
+export class ClassMemberRanges {
+  #initializers?: ReturnType<typeof getClassInitializers>;
+
+  /** Ranges without specific initializers, keyed by excluded start offsets */
+  #rangesByExcluded = new Map<string, Normalized[]>();
+
+  /** Resolved ranges of each innermost class member */
+  #rangesByMember = new WeakMap<ClassMember, Normalized[]>();
+
+  constructor(
+    private scriptCoverage: Pick<Profiler.ScriptCoverage, "functions">,
+    private ranges: Normalized[],
+    private wrapperLength: number,
+  ) {}
+
+  /** @param members Class members that contain the node, outermost first */
+  get(members: readonly ClassMember[]): Normalized[] {
+    const innermost = members.at(-1);
+
+    if (!innermost) {
+      return this.ranges;
+    }
+
+    // Each member is pushed on top of specific enclosing members, so it identifies the whole stack
+    let ranges = this.#rangesByMember.get(innermost);
+
+    if (!ranges) {
+      ranges = this.#resolve(members);
+      this.#rangesByMember.set(innermost, ranges);
+    }
+
+    return ranges;
+  }
+
+  #resolve(members: readonly ClassMember[]): Normalized[] {
+    this.#initializers ||= getClassInitializers(this.scriptCoverage);
+    const excluded = new Set<FunctionCoverage>();
+
+    for (const member of members) {
+      if (member.start == null || member.otherKindStart == null) continue;
+
+      const otherKind = member.kind === "static" ? "instance" : "static";
+      const initializer = this.#initializers[otherKind].get(
+        member.otherKindStart + this.wrapperLength,
+      );
+      const range = initializer?.ranges[0];
+      const start = member.start + this.wrapperLength;
+
+      if (range && range.startOffset <= start && start < range.endOffset) {
+        excluded.add(initializer);
+      }
+    }
+
+    if (excluded.size === 0) {
+      return this.ranges;
+    }
+
+    // Members of the same class share the excluded initializers, normalize only once for them
+    const key = Array.from(excluded, (fn) => fn.ranges[0].startOffset).join(",");
+    let ranges = this.#rangesByExcluded.get(key);
+
+    if (!ranges) {
+      ranges = normalize({
+        functions: this.scriptCoverage.functions.filter((fn) => !excluded.has(fn)),
+      });
+      this.#rangesByExcluded.set(key, ranges);
+    }
+
+    return ranges;
+  }
+}
+
 export function normalize(
   scriptCoverage: Pick<Profiler.ScriptCoverage, "functions">,
   hitsArrayMaxSize = HITS_ARRAY_MAX_SIZE,

@@ -1,7 +1,12 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { test, expect } from "vitest";
-import { normalize, getCount } from "../src/script-coverage";
+import {
+  normalize,
+  getCount,
+  getClassInitializers,
+  ClassMemberRanges,
+} from "../src/script-coverage";
 
 test("normalizes single function coverage", async () => {
   expect(
@@ -235,4 +240,223 @@ test("normalized functions.json matches snapshot", async () => {
   await expect(JSON.stringify(normalized, null, 2)).toMatchFileSnapshot(
     "__snapshots__/functions.json",
   );
+});
+
+test("collects class initializers by start offset", () => {
+  // class A { static a = 1; i = 2; static b = 3; j = 4; }
+  const top = {
+    functionName: "",
+    isBlockCoverage: true,
+    ranges: [{ startOffset: 0, endOffset: 53, count: 1 }],
+  };
+  const staticInitializer = {
+    functionName: "<static_initializer>",
+    isBlockCoverage: false,
+    ranges: [{ startOffset: 10, endOffset: 43, count: 1 }],
+  };
+  const instanceInitializer = {
+    functionName: "<instance_members_initializer>",
+    isBlockCoverage: false,
+    ranges: [{ startOffset: 24, endOffset: 50, count: 0 }],
+  };
+
+  expect(
+    getClassInitializers({ functions: [top, staticInitializer, instanceInitializer] }),
+  ).toStrictEqual({
+    static: new Map([[10, staticInitializer]]),
+    instance: new Map([[24, instanceInitializer]]),
+  });
+});
+
+test("collects class initializers of multiple classes", () => {
+  // class A { static s = 1; i = 2; }
+  // class B { i = 2; static s = 1; }
+  const staticA = {
+    functionName: "<static_initializer>",
+    isBlockCoverage: false,
+    ranges: [{ startOffset: 10, endOffset: 22, count: 1 }],
+  };
+  const instanceA = {
+    functionName: "<instance_members_initializer>",
+    isBlockCoverage: false,
+    ranges: [{ startOffset: 24, endOffset: 29, count: 0 }],
+  };
+  const instanceB = {
+    functionName: "<instance_members_initializer>",
+    isBlockCoverage: false,
+    ranges: [{ startOffset: 43, endOffset: 48, count: 0 }],
+  };
+  const staticB = {
+    functionName: "<static_initializer>",
+    isBlockCoverage: false,
+    ranges: [{ startOffset: 50, endOffset: 62, count: 1 }],
+  };
+
+  expect(
+    getClassInitializers({ functions: [staticA, instanceA, instanceB, staticB] }),
+  ).toStrictEqual({
+    static: new Map([
+      [10, staticA],
+      [50, staticB],
+    ]),
+    instance: new Map([
+      [24, instanceA],
+      [43, instanceB],
+    ]),
+  });
+});
+
+test("collects no class initializers from coverage without classes", () => {
+  expect(
+    getClassInitializers({
+      functions: [
+        {
+          functionName: "",
+          isBlockCoverage: true,
+          ranges: [{ startOffset: 0, endOffset: 100, count: 1 }],
+        },
+        {
+          functionName: "noop",
+          isBlockCoverage: true,
+          ranges: [{ startOffset: 50, endOffset: 75, count: 0 }],
+        },
+      ],
+    }),
+  ).toStrictEqual({ static: new Map(), instance: new Map() });
+});
+
+test("collects no class initializers from empty coverage set", () => {
+  expect(getClassInitializers({ functions: [] })).toStrictEqual({
+    static: new Map(),
+    instance: new Map(),
+  });
+});
+
+test("skips class initializers without ranges", () => {
+  expect(
+    getClassInitializers({
+      functions: [{ functionName: "<static_initializer>", isBlockCoverage: false, ranges: [] }],
+    }),
+  ).toStrictEqual({ static: new Map(), instance: new Map() });
+});
+
+// class A { static a = 1; i = 2; static b = 3; j = 4; }
+const interleavedClass = {
+  functions: [
+    {
+      functionName: "",
+      isBlockCoverage: true,
+      ranges: [{ startOffset: 0, endOffset: 53, count: 1 }],
+    },
+    {
+      functionName: "<static_initializer>",
+      isBlockCoverage: false,
+      ranges: [{ startOffset: 10, endOffset: 43, count: 1 }],
+    },
+    {
+      functionName: "<instance_members_initializer>",
+      isBlockCoverage: false,
+      ranges: [{ startOffset: 24, endOffset: 50, count: 0 }],
+    },
+  ],
+};
+
+function createClassMemberRanges(coverage: Parameters<typeof normalize>[0], wrapperLength = 0) {
+  const ranges = normalize(coverage);
+  return { ranges, classMemberRanges: new ClassMemberRanges(coverage, ranges, wrapperLength) };
+}
+
+test("class member ranges are not changed outside class members", () => {
+  const { ranges, classMemberRanges } = createClassMemberRanges(interleavedClass);
+
+  expect(classMemberRanges.get([])).toBe(ranges);
+});
+
+test("class member ranges exclude initializer of other kind that overlaps the member", () => {
+  const { ranges, classMemberRanges } = createClassMemberRanges(interleavedClass);
+
+  // "static b = 3" is inside both initializers, and the smaller instance initializer wins
+  const staticB = { kind: "static", start: 31, otherKindStart: 24 } as const;
+  expect(getCount({ startOffset: 31, endOffset: 43 }, ranges)).toBe(0);
+  expect(getCount({ startOffset: 31, endOffset: 43 }, classMemberRanges.get([staticB]))).toBe(1);
+
+  // "i = 2" is inside both initializers too
+  const instanceI = { kind: "instance", start: 24, otherKindStart: 10 } as const;
+  expect(getCount({ startOffset: 24, endOffset: 29 }, classMemberRanges.get([instanceI]))).toBe(0);
+});
+
+test("class member ranges are not changed when initializer of other kind does not overlap the member", () => {
+  const { ranges, classMemberRanges } = createClassMemberRanges(interleavedClass);
+
+  // "j = 4" is after the static initializer
+  expect(classMemberRanges.get([{ kind: "instance", start: 45, otherKindStart: 10 }])).toBe(ranges);
+
+  // Class has no members of other kind
+  expect(classMemberRanges.get([{ kind: "instance", start: 45, otherKindStart: undefined }])).toBe(
+    ranges,
+  );
+});
+
+test("class member ranges exclude initializers of enclosing class members only", () => {
+  // class O { static a = 1; i = class I { static x = 1; }; static b = 2; }
+  const { classMemberRanges } = createClassMemberRanges({
+    functions: [
+      {
+        functionName: "",
+        isBlockCoverage: true,
+        ranges: [{ startOffset: 0, endOffset: 70, count: 1 }],
+      },
+      {
+        functionName: "<static_initializer>",
+        isBlockCoverage: false,
+        ranges: [{ startOffset: 10, endOffset: 67, count: 1 }],
+      },
+      {
+        functionName: "<instance_members_initializer>",
+        isBlockCoverage: false,
+        ranges: [{ startOffset: 24, endOffset: 53, count: 0 }],
+      },
+    ],
+  });
+
+  const outerI = { kind: "instance", start: 24, otherKindStart: 10 } as const;
+  const innerX = { kind: "static", start: 38, otherKindStart: undefined } as const;
+
+  // "static x = 1" never ran, as instance initializer of O never ran
+  expect(
+    getCount({ startOffset: 38, endOffset: 46 }, classMemberRanges.get([outerI, innerX])),
+  ).toBe(0);
+});
+
+test("class member ranges are cached", () => {
+  const { classMemberRanges } = createClassMemberRanges(interleavedClass);
+
+  const staticA = { kind: "static", start: 10, otherKindStart: 24 } as const;
+  const staticB = { kind: "static", start: 31, otherKindStart: 24 } as const;
+
+  // "static a = 1" is not inside instance initializer
+  const ranges = classMemberRanges.get([staticB]);
+  expect(classMemberRanges.get([staticB])).toBe(ranges);
+  expect(classMemberRanges.get([{ ...staticB }])).toBe(ranges);
+  expect(classMemberRanges.get([staticA])).not.toBe(ranges);
+});
+
+test("class member ranges respect wrapper length", () => {
+  const wrapperLength = 100;
+  const { classMemberRanges } = createClassMemberRanges(
+    {
+      functions: interleavedClass.functions.map((fn) => ({
+        ...fn,
+        ranges: fn.ranges.map((range) => ({
+          ...range,
+          startOffset: range.startOffset + wrapperLength,
+          endOffset: range.endOffset + wrapperLength,
+        })),
+      })),
+    },
+    wrapperLength,
+  );
+
+  const staticB = { kind: "static", start: 31, otherKindStart: 24 } as const;
+  expect(getCount({ startOffset: 131, endOffset: 143 }, classMemberRanges.get([staticB]))).toBe(1);
 });

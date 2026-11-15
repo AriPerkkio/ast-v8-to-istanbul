@@ -2,6 +2,8 @@ import {
   type ObjectMethod,
   type ClassMethod,
   type ClassBody as BabelClassBody,
+  type ClassProperty,
+  type ClassPrivateProperty,
   type Node as BabelNode,
 } from "@babel/types";
 import type {
@@ -33,6 +35,7 @@ import type {
   AssignmentPattern,
   FunctionExpression,
   ClassBody,
+  PropertyDefinition,
   BlockStatement,
   SwitchCase,
 } from "estree";
@@ -81,7 +84,7 @@ interface Visitors {
   onWithStatement: (node: WithStatement) => void;
   onLabeledStatement: (node: LabeledStatement) => void;
   onVariableDeclarator: (node: VariableDeclarator) => void;
-  onClassBody: (node: ClassBody | BabelClassBody) => void;
+  onPropertyDefinition: (node: PropertyDefinition | ClassProperty | ClassPrivateProperty) => void;
 
   // Branches
   onIfStatement: (node: IfStatement, branches: (Node | null | undefined)[]) => void;
@@ -102,11 +105,34 @@ export type FunctionNodes = Parameters<
     | "onProperty"]
 >[0];
 
+/** Kind of class member, whose code V8 runs in `<static_initializer>` or `<instance_members_initializer>` */
+type ClassMemberKind = "static" | "instance";
+
+/** Class member that contains the currently visited node */
+interface ClassMemberScope {
+  kind: ClassMemberKind;
+
+  /** Start offset of the class member */
+  start: number | null | undefined;
+
+  /** Start offset of the first member of other kind in the same class, `null` if class has none */
+  otherKindStart: number | null | undefined;
+}
+
+type ClassBodyNode = ClassBody | BabelClassBody;
+
 export function getWalker() {
   let nextIgnore: Node | false = false;
+  const classBodies: ClassBodyNode[] = [];
+  const classMembers: ClassMemberScope[] = [];
 
   function onIgnore(node: Node) {
     nextIgnore = node;
+  }
+
+  /** Class members that contain the currently visited node, outermost first */
+  function getClassMembers(): readonly ClassMemberScope[] {
+    return classMembers;
   }
 
   function walk(
@@ -117,6 +143,12 @@ export function getWalker() {
   ) {
     return walkAst(ast as Node, {
       enter(node) {
+        if (node.type === "ClassBody") {
+          classBodies.push(node);
+        }
+
+        enterClassMember(node);
+
         if (nextIgnore !== false) {
           return;
         }
@@ -227,7 +259,10 @@ export function getWalker() {
               ) as typeof classBody.body;
             }
 
-            return visitors.onClassBody(classBody);
+            return;
+          }
+          case "PropertyDefinition": {
+            return visitors.onPropertyDefinition(node);
           }
 
           // Branches
@@ -338,9 +373,22 @@ export function getWalker() {
           case "ObjectMethod": {
             return visitors.onObjectMethod(node);
           }
+
+          // @ts-expect-error -- Babel AST
+          case "ClassProperty":
+          // @ts-expect-error -- Babel AST
+          case "ClassPrivateProperty": {
+            return visitors.onPropertyDefinition(node as unknown as ClassProperty);
+          }
         }
       },
       leave(node) {
+        if (node.type === "ClassBody") {
+          classBodies.pop();
+        }
+
+        leaveClassMember(node);
+
         if (node === nextIgnore) {
           nextIgnore = false;
         }
@@ -356,9 +404,48 @@ export function getWalker() {
 
       return null;
     }
+
+    function enterClassMember(node: Node | BabelNode) {
+      const kind = getClassMemberKind(node);
+
+      if (kind) {
+        const otherKind = kind === "static" ? "instance" : "static";
+        const classBody = classBodies.at(-1)!;
+        const otherKindMember = classBody.body.find(
+          (member) => getClassMemberKind(member) === otherKind,
+        );
+
+        classMembers.push({
+          kind,
+          start: node.start,
+          otherKindStart: otherKindMember?.start,
+        });
+      }
+    }
+
+    function leaveClassMember(node: Node | BabelNode) {
+      if (getClassMemberKind(node)) {
+        classMembers.pop();
+      }
+    }
   }
 
-  return { walk, onIgnore };
+  return { walk, onIgnore, getClassMembers };
+}
+
+/** Returns the kind of class member whose code V8 runs in class initializers, `null` for other nodes */
+function getClassMemberKind(node: Node | BabelNode): ClassMemberKind | null {
+  switch (node.type) {
+    case "PropertyDefinition":
+    case "ClassProperty":
+    case "ClassPrivateProperty":
+      return node.static ? "static" : "instance";
+
+    case "StaticBlock":
+      return "static";
+  }
+
+  return null;
 }
 
 const skippedNodes = new WeakSet<Node | BabelNode>();
