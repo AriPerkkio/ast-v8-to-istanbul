@@ -13,26 +13,27 @@ import {
   createCoverageMapData,
 } from "./coverage-map";
 import { createEmptySourceMap, getInlineSourceMap, Locator } from "./location";
-import { getCount, normalize } from "./script-coverage";
+import { ClassMemberRanges, getCount, normalize } from "./script-coverage";
 import type { Options } from "./types";
 
 type Normalized = ReturnType<typeof normalize>;
+type Walker = Pick<ReturnType<typeof getWalker>, "onIgnore" | "getClassMembers">;
 
 export class CoverageMapper<T = Node> {
   private constructor(
     private locator: Locator,
     private coverageMapData: CoverageMapData,
-    private ranges: Normalized,
+    private classMemberRanges: ClassMemberRanges,
     private wrapperLength: number,
     private directory: string,
-    private onIgnoreNode: ReturnType<typeof getWalker>["onIgnore"],
+    private walker: Walker,
     private ignoreNode?: Options<T>["ignoreNode"],
     private ignoreSourceCode?: Options<T>["ignoreSourceCode"],
   ) {}
 
   static async create<T = Node, Program = T & { type: "Program" }>(
     options: Options<T, Program>,
-    onIgnoreNode: ReturnType<typeof getWalker>["onIgnore"],
+    walker: Walker,
   ): Promise<CoverageMapper<T>> {
     const filename = fileURLToPath(options.coverage.url);
     const directory = dirname(filename);
@@ -43,13 +44,16 @@ export class CoverageMapper<T = Node> {
         createEmptySourceMap(filename, options.code),
     );
 
+    const wrapperLength = options.wrapperLength || 0;
+    const ranges = normalize(options.coverage);
+
     return new CoverageMapper<T>(
       new Locator(options.code, map, directory),
       createCoverageMapData(filename, map),
-      normalize(options.coverage),
-      options.wrapperLength || 0,
+      new ClassMemberRanges(options.coverage, ranges, wrapperLength),
+      wrapperLength,
       directory,
-      onIgnoreNode,
+      walker,
       options.ignoreNode,
       options.ignoreSourceCode,
     );
@@ -80,7 +84,7 @@ export class CoverageMapper<T = Node> {
         startOffset: countNode.start + this.wrapperLength,
         endOffset: countNode.end + this.wrapperLength,
       },
-      this.ranges,
+      this.#getRanges(),
     );
 
     if (this.ignoreSourceCode) {
@@ -121,7 +125,7 @@ export class CoverageMapper<T = Node> {
         startOffset: (parent || node).start + this.wrapperLength,
         endOffset: (parent || node).end + this.wrapperLength,
       },
-      this.ranges,
+      this.#getRanges(),
     );
 
     if (this.ignoreSourceCode) {
@@ -157,6 +161,7 @@ export class CoverageMapper<T = Node> {
 
     const locations = [];
     const covered: number[] = [];
+    const ranges = this.#getRanges();
 
     for (const branch of branches) {
       if (!branch) {
@@ -170,7 +175,7 @@ export class CoverageMapper<T = Node> {
             startOffset: node.start + this.wrapperLength,
             endOffset: node.end + this.wrapperLength,
           },
-          this.ranges,
+          ranges,
         );
         const previous = covered.at(-1) || 0;
         covered.push(count - previous);
@@ -191,7 +196,7 @@ export class CoverageMapper<T = Node> {
             startOffset: branch.start + bias + this.wrapperLength,
             endOffset: branch.end - bias + this.wrapperLength,
           },
-          this.ranges,
+          ranges,
         ),
       );
     }
@@ -252,6 +257,11 @@ export class CoverageMapper<T = Node> {
     return resolve(this.directory, sourceFilename);
   }
 
+  /** Ranges for looking up counts of the currently visited node */
+  #getRanges(): Normalized {
+    return this.classMemberRanges.get(this.walker.getClassMembers());
+  }
+
   #onIgnore(node: Node, type: "function" | "statement" | "branch") {
     if (!this.ignoreNode) {
       return false;
@@ -260,7 +270,7 @@ export class CoverageMapper<T = Node> {
     const scope = this.ignoreNode(node as T, type);
 
     if (scope === "ignore-this-and-nested-nodes") {
-      this.onIgnoreNode(node);
+      this.walker.onIgnore(node);
     }
 
     return scope;
