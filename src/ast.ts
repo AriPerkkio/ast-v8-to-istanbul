@@ -154,10 +154,7 @@ export function getWalker() {
             return visitors.onProperty(node);
           }
           case "ArrowFunctionExpression": {
-            // Get inner body in cases where parenthesis are preserverd, e.g. acorn, oxc: https://oxc.rs/docs/learn/ecmascript/grammar.html#parenthesized-expression
-            if (node.body?.type === "ParenthesizedExpression") {
-              node.body = node.body.expression;
-            }
+            node.body = unwrapParentheses(node.body);
 
             return visitors.onArrowFunctionExpression(node);
           }
@@ -206,6 +203,8 @@ export function getWalker() {
             return visitors.onLabeledStatement(node);
           }
           case "VariableDeclarator": {
+            node.init = unwrapParentheses(node.init);
+
             return visitors.onVariableDeclarator(node);
           }
           case "ClassBody": {
@@ -225,6 +224,16 @@ export function getWalker() {
               classBody.body = classBody.body.filter(
                 (child) => !isSkipped(child),
               ) as typeof classBody.body;
+            }
+
+            for (const child of classBody.body) {
+              if (
+                child.type === "PropertyDefinition" ||
+                child.type === "ClassProperty" ||
+                child.type === "ClassPrivateProperty"
+              ) {
+                child.value = unwrapParentheses(child.value as Node) as typeof child.value;
+              }
             }
 
             return visitors.onClassBody(classBody);
@@ -280,12 +289,8 @@ export function getWalker() {
           case "ConditionalExpression": {
             const branches = [];
 
-            if (node.consequent.type === "ParenthesizedExpression") {
-              node.consequent = node.consequent.expression;
-            }
-            if (node.alternate.type === "ParenthesizedExpression") {
-              node.alternate = node.alternate.expression;
-            }
+            node.consequent = unwrapParentheses(node.consequent);
+            node.alternate = unwrapParentheses(node.alternate);
 
             if (getIgnoreHint(node.consequent) === "next") {
               setSkipped(node.consequent);
@@ -326,6 +331,8 @@ export function getWalker() {
             return visitors.onLogicalExpression(node, branches);
           }
           case "AssignmentPattern": {
+            node.right = unwrapParentheses(node.right);
+
             return visitors.onAssignmentPattern(node);
           }
 
@@ -362,6 +369,20 @@ export function getWalker() {
 }
 
 const skippedNodes = new WeakSet<Node | BabelNode>();
+
+/**
+ * Get the inner expression in cases where parenthesis are preserved, e.g. acorn, oxc: https://oxc.rs/docs/learn/ecmascript/grammar.html#parenthesized-expression
+ * Unwraps nested parenthesis too, e.g. `((value))`.
+ */
+function unwrapParentheses<T extends Node | null | undefined>(node: T): T {
+  let current: Node | null | undefined = node;
+
+  while (current?.type === "ParenthesizedExpression") {
+    current = current.expression;
+  }
+
+  return current as T;
+}
 
 export function getFunctionName(node: Node | BabelNode) {
   if (node.type === "Identifier") {
