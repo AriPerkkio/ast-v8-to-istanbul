@@ -53,3 +53,68 @@ test("debugger", async ({ actual, expected }) => {
 
   assertCoverage(actual, expected);
 });
+
+test("statement-after-await", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "2/2 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "4/4 (100%)",
+      "statements": "4/4 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
+
+test("statement-after-await-not-taken", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "1/2 (50%)",
+      "functions": "1/1 (100%)",
+      "lines": "4/4 (100%)",
+      "statements": "4/4 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
+
+test("statement-after-await-never-resolves", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "2/2 (100%)",
+      "functions": "2/2 (100%)",
+      "lines": "5/5 (100%)",
+      "statements": "5/5 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
+
+test("statement-after-await-no-semicolon", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "2/2 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "4/4 (100%)",
+      "statements": "4/4 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
+
+test("statement-after-two-awaits", async ({ actual, expected }) => {
+  expect(actual).toMatchInlineSnapshot(`
+    {
+      "branches": "4/4 (100%)",
+      "functions": "1/1 (100%)",
+      "lines": "4/4 (100%)",
+      "statements": "4/4 (100%)",
+    }
+  `);
+
+  assertCoverage(actual, expected);
+});
