@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1794554558194" clover="3.2.0">
-  <project timestamp="1794554558194" name="All files">
+<coverage generated="1795418970214" clover="3.2.0">
+  <project timestamp="1795418970214" name="All files">
     <metrics statements="494" coveredstatements="485" conditionals="347" coveredconditionals="323" methods="78" coveredmethods="77" elements="919" coveredelements="885" complexity="0" loc="494" ncloc="494" packages="1" files="8" classes="8"/>
     <file name="ast.ts" path="/home/runner/work/ast-v8-to-istanbul/ast-v8-to-istanbul/src/ast.ts">
       <metrics statements="107" coveredstatements="106" conditionals="104" coveredconditionals="103" methods="11" coveredmethods="11"/>
@@ -356,8 +356,8 @@
       <line num="28" count="944" type="stmt"/>
       <line num="31" count="944" type="stmt"/>
       <line num="34" count="944" type="stmt"/>
-      <line num="35" count="3801324" type="cond" truecount="2" falsecount="0"/>
-      <line num="36" count="79312" type="stmt"/>
+      <line num="35" count="3801320" type="cond" truecount="2" falsecount="0"/>
+      <line num="36" count="79308" type="stmt"/>
       <line num="39" count="944" type="stmt"/>
       <line num="40" count="944" type="stmt"/>
       <line num="44" count="928" type="stmt"/>
@@ -365,10 +365,10 @@
       <line num="49" count="212580" type="stmt"/>
       <line num="50" count="212580" type="stmt"/>
       <line num="52" count="212580" type="stmt"/>
-      <line num="53" count="2994871" type="stmt"/>
-      <line num="55" count="2994871" type="cond" truecount="2" falsecount="0"/>
+      <line num="53" count="2994867" type="stmt"/>
+      <line num="55" count="2994867" type="cond" truecount="2" falsecount="0"/>
       <line num="56" count="1542339" type="stmt"/>
-      <line num="58" count="1452532" type="stmt"/>
+      <line num="58" count="1452528" type="stmt"/>
       <line num="62" count="212580" type="stmt"/>
       <line num="66" count="106392" type="stmt"/>
       <line num="67" count="106392" type="stmt"/>
